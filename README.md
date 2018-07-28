@@ -10,4 +10,4 @@ This is a [Data Definition Language](https://en.wikipedia.org/wiki/Data_definiti
 
 # Legal Stuff
 
-Please read the Software License ([LICENSE](LICENSE)) and Contributor License Agreement ([CLA](CLA)).
+Please read the Software License ([LICENSE.md](LICENSE.md)) and Contributor License Agreement ([CLA.md](CLA.md)).
