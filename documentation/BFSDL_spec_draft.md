@@ -194,7 +194,51 @@ The BFSDL Stream is comprised of a Header Definition, and a Data Definition.  Bo
 
 ## 2 Common Formatting Elements
 
-TODO
+Statements are evaluated with various rules, but several formatting elements are common to parsing all statements.
+
+### 2.1 Line Breaks
+
+Line breaks are a subset of white space characters which are used to make the BFSDL Stream easier to read and understand by a text viewer.
+
+    new-line := (10|x0A)
+    carriage-return := (13|x0D)
+    line-break := (<new-line>|<carriage-return>)...
+
+### 2.2 End of Stream
+
+End of stream is a special identifier which has no content.  This is used to mark the end of the stream, which occurs when the parser stops reading from the BFSDL Stream.
+
+    eos := ()
+
+### 2.3 White Space
+
+White space is Text Content which is useful for separating other forms of content, but otherwise does not affect the interpretation of the Data Stream.
+
+    space := (32|x20)
+    tab := (9|x09)
+    intra-line-whitespace := (<space|tab>)...
+
+    whitespace := (<intra-line-whitespace>|<line-break>|<eos>)...
+
+`whitespace` is used sometimes throughout this Specification when needed to define a boundary for the system.
+
+### 2.4 Statement Block
+
+A statement block represents a collection of statements enclosed by curly braces:
+
+    block-begin = '{'
+	block-end = '}'
+    statement-block := <block-begin>(* except <block-begin>)<block-end>
+
+These may not be used by themselves, but appear as part of other constructs such as a class.
+
+### 2.5 Word
+
+Words represent a complete sequence of text that appears in the BFSDL Stream:
+
+    word := ('a' to 'z'|'A' to 'Z'|'0' to '9'|'_')...
+
+Words are used for identifiers and reserved keywords.  This is a very limited character set for consistency, and so that words only contain characters which fit into a single 8-bit code point.
 
 ## 3 Predefined Raw Data
 
