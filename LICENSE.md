@@ -1,6 +1,9 @@
-BSD 3-Clause License
+# Software License
+
+*BSD 3-Clause License*
 
 Copyright (c) 2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
