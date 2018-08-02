@@ -412,23 +412,18 @@ Some escape sequences allow a variable number of digits to follow:
 
 Note that the numeric value of escape sequences corresponds to the *code point*, whose interpretation is dependent upon the encoding of the string. 
 
-#### 3.2.2 Supported String Codes
+#### 3.2.2 String Encoding
 
 String Literals must always use a defined coding:
 
-    string-code := 'ASCII'
-                   'CP1252'
-                   'UTF8'
-                   <word>
+    string-code := <word>
 
-`<word>` could be any coding defined by a supported extension, provided the usage is allowed by the extension according to the rules and constraints defined by the extension.
+`<word>` could be any coding definedin Appendix D for the code() attribute, or by a supported extension (provided the usage is allowed by the extension according to the rules and constraints defined by the extension).
 
-A String Literal may use the default code, or use `<string-code-attribute>` (defined later) to specify the code:
+A String Literal may use the default code, or use `<string-code-attribute>` (attributes are listed in Appendix D) to specify the code:
 
     string-literal := <string-literal-value>
-                      <string-literal-value>'.'<string-code-attribute>'('<string-code>')'
-
-TODO: Define <string-code-attribute>, hopefully avoid future reference.
+                      <string-literal-value>'.code("'<string-code>'")'
 
 The value of `<string-code>` is used for any raw characters, as well as escape codes which do not have an implicit code (`\x`, `\b`, and `\u`).
 
@@ -537,18 +532,88 @@ The BFSDL Stream Header may be omitted if the system implementing the BFSDL Stre
 
 TODO
 
-## 6. Inclusion of External Definitions
+## 6 Inclusion of External Definitions
 
 TODO
 
-## A. Change Log
+## 7 Classes
+
+TODO
+
+## Appendix A: Change Log
 
 1.00 Initial Release
 
-## B. Extensions
+## Appendix B: Extensions
 
 TODO
 
-## C. Extended Floating Point Support
+## Appendix C: Extended Floating Point Support
+
+## Appendix D: Attributes
+
+Attribute(s) are applied at the end of a value or statement where the format is used:
+
+    attribute := '.'<attribute-identifier>'('<attribute-value>')'
+                 '.'<attribute-identifier>'()'
+    attribute-list := (<attribute>)...
+
+Example:
+
+    "HI".FOO().BAZ("BAR");
+    u32.CHEESE(#1#) myField;
+
+### D.1 String Attributes
+
+All string attributes may be used in conjunction with each other, except as noted.
+
+#### D.1.1 Encoding
+
+`code(<encoding>)` - Specifies the encoding for a string literal or the bit format.
+
+`<encoding>` is a String Literal with one the following values:
+* `ASCII` - American Standard Code for Information Interchange (includes extended ASCII characters 128-255)
+* `UTF8`, `UTF16`, `UTF32`, `UTF64` - Unicode variable-length multi-byte encoding
+* `CP1252` - IBM Code Page 1252
+
+#### D.1.2 Fixed-Length Strings
+
+`len(<num-bytes>)` - Specifies a fixed length string format.
+
+`<num-bytes>` is a Numeric Literal specifying the number of bytes; any remaining bytes are filled according to the DefaultStringPad setting or `pad()` attribute.
+
+#### D.1.3 Terminated Strings
+
+`term([<code-point>])` - Specifies that the string is character-terminated.
+
+`<code-point>` is a Numeric Literal specifying the code point of the terminator character, in the same encoding as the string.  NOTE: Default value = `#0#`
+
+The terminator character will be expected to immediately follow the last character in the string data.
+
+#### D.1.4 Unterminated Strings
+
+`unterm()` - Specifies that the string is explicitly allowed to be unterminated.
+
+When used in conjunction with another attribute that specifies a length determination behavior (such as `term`, `len`, etc...), it is not an error for the end of the stream or a parent data container to be reached prior to what could otherwise be the end of the string.
+
+#### D.1.5 Prefixed-Length Strings
+
+`plen([<numeric-type>])` - Specifies that the string is encoded such that a number exists prior to the beginning of the string which contains the length of the string.
+
+`<numeric-type>` is an integral bit format type.  NOTE: Default = `u8`
+
+NOTE: This method of storing strings was traditionally used by programming languages such as Pascal.
+
+#### D.1.6 Padding
+
+`pad([<code-point>])` - Specifies padding character
+
+`<code-point>` is a Numeric Literal specifying the code point of the padding character (overrides DefaultStringPad for this instance).
+
+#### D.2 Field Attributes
+
+TODO
+
+#### D.3 Class Attributes
 
 TODO
