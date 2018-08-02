@@ -530,6 +530,124 @@ The BFSDL Stream Header may be omitted if the system implementing the BFSDL Stre
 
 ## 5 BFSDL Stream Data Definition
 
+After the BFSDL Stream Header parameters are specified, the BFSDL Stream will contain a series of statements necessary to describe the format of the Data Stream.
+
+The statements may contain definitions that allow aggregation of other statements into a named identifier; all statements at each level of aggregation is considered to be within the same scope.  A BFSDL Stream is itself a form of aggregation of statements, and so the statements at the top-level are said to be within the same scope as well.
+
+* The top-level of the stream is defined as the Stream Scope.
+* The BFSDL Header (if not provided externally from the BFSDL Stream) constitutes the Header Scope, which is contained in the Stream Scope.
+* Other scopes will be defined later along with the statements that introduce an aggregation concept.
+
+### 5.1 Statement Separation
+
+Since white space is ignored, statements are separated explicitly until the end of the stream:
+
+    end-of-statement := (';'|<eos>)
+
+The content of each statement depends on the type of statement it is.
+
+### 5.2 Bit Format Types
+
+To parse the Data Stream, it is necessary to define types which correlate to a particular bit format.
+
+#### 5.2.1 Fixed-Point Numeric Bit Format
+
+Numeric bit formats are capable of storing real numeric values using a fixed-point representation.  The type identifiers are defined as follows:
+
+    fixed-point-type := ('s'|'u')
+    format-width := <base-10-digits>
+    fractional-width := <base-10-digits>
+
+    numeric-format := <fixed-point-type><format-width>[<period><fractional-width>]
+
+* `<fixed-point-type>` specifies whether the type is unsigned or signed
+* The sum of `<format-width>` and `<fractional-width>` specify the total number of elements the format occupies, according to the BitBase setting in the Header:
+  * All parsers must support combinations with a total total number of storage bits up to and including 64 bits at a minimum.
+  * For formats whose BitBase=`Byte`, the number of storage bits is 8 times the value specified
+* The default value for `<fractional-width>` is `0`
+
+##### 5.2.1.1 Representation of Signed Fixed-Point Numbers
+
+If `<fixed-point-type>` = `s`, then the value is stored in 2's complement form; this does not change the total number of bits available for storage.
+
+A couple of examples:
+
+The following `s4` signed number value is calculated by the mathematical formula:
+
+    4-bit data '1101' in base 2: 1101.0
+    1101 = -1 * (1 * 2^3) + (1 * 2^2) + (0 * 2^1) + (1 * 2^0)
+         = -8 + 4 + 1
+         = -3
+
+The following `s2.1` signed number value is calculated by the mathematical formula:
+
+    3-bit data '101' in base 2: 10.1
+    10.1 = -1 * (1 * 2^1) + (0 * 2^0) + (1 * 2^-1)
+         = -2 + 0 + 0.5
+         = -1.5
+
+The following `s1` signed number values are calculated by the mathematical formulas:
+
+    1-bit data '1' in base 2: 1
+    1 = -1 * (1 * 2^0)
+      = -1
+
+    1-bit data '0' in base 2: 0
+    0 = -1 * (0 * 2^0)
+      = 0
+
+##### 5.2.1.2 Examples of Fixed-Point Number Formats:
+
+The following examples illustrate the interpretation and range of acceptable values for various formats:
+
+* `u32` := 32-bit unsigned integer (0 to 4294967296)
+* `s8` := 8-bit signed integer (-128 to 127)
+* `u4.4` := 4.4-bit unsigned real (0.0 to 15.9375)
+* `s2.2` := 2.2-bit signed real (-2.0 to 1.75)
+
+#### 5.2.2 Floating-Point Numeric Bit Format
+
+Floating point bit formats are capable of storing real numeric values using an externally-defined floating point representation.  The type identifiers are defined as follows:
+
+    floating-point-type := <string-literal>
+    floating-point-attribute := <period>'('<floating-point-type>')'
+    floating-point-format := 'f'<floating-point-attribute>
+
+`<floating-point-type>` specifies the format to follow.  These may be defined externally, but also see Appendix C for built-in extensions that define floating-point support.
+
+NOTE: Because floating point numbers typically require floating point support from the computer system interpreting the data according to a specific standard, this section does not define any method to create arbitrary floating point number formats.  Many standard floating point number systems define special behavior for certain values such as +/-NaN, +/-Inf, and distinction between +/-0; and this behavior cannot be expressed concisely.
+
+#### 5.2.3 String Bit Format
+
+    string-bit-format := 'string'
+
+This format may be modified by Attributes (see Appendix D).  The following built-in types are defined as shorthand for commonly used types:
+
+    string-bit-format += 'cstring'  # Equivalent to string.term(), for C-style strings
+
+    string-bit-format += 'pstring'  # Equivalent to string.plen(), for Pascal-style string
+
+#### 5.2.4 Supported Bit Formats
+
+Supported bit formats are defined as:
+
+    bit-format := <numeric-format>
+                  <floating-point-format>
+                  <string-bit-format>
+                  <custom-format>
+
+NOTE: `<custom-format>` could be any format defined by an extension, provided the usage is allowed by the extension according to the rules and constraints defined by the extension.
+
+### 5.3 Constants
+
+TODO
+
+### 5.4 Type Aliasing
+
+TODO
+
+### 5.5 Field Definitions
+
 TODO
 
 ## 6 Inclusion of External Definitions
@@ -549,6 +667,47 @@ TODO
 TODO
 
 ## Appendix C: Extended Floating Point Support
+
+This section describes additional floating-point support which is defined by extensions.
+
+NOTE: Remember, extensions are not required to be supported by the parser.
+
+### C.1 IEEE 754 Support
+
+The extension `ieee754` is defined to identify that parsing the file requires supporting data formats from the IEEE 754 document.
+
+#### C.1.1 Configuration
+
+The following configuration settings may be specified in Header Scope to identify the support for floating point values
+
+* IEEE754Version - Takes a Numeric Literal value specifying the minimum supported revision of the IEEE 754 Specification.
+    * Default value = `#1985#`
+        * NOTE: IEEE754Version's value has no storage type
+    * Supported values:
+        * `#1985#`
+        * `#2008#`
+
+#### C.1.2 IEEE 754 (1985)
+
+When `IEEE754Version` is equal to `#1985#`, the following types from IEEE 754 (1985) are required to be supported:
+
+* `single`
+* `double`
+
+#### C.1.3 IEEE 754 (2008)
+
+When `IEEE754Version` is equal to `#2008#`, the following types from IEEE 754 (2008) are required to be supported (in addition to the types defined by the 1985 version):
+
+* `binary16`
+* `binary32` (equivalent to `single`)
+* `binary64` (equivalent to `double`)
+* `binary128`
+* `binary256`
+* `decimal32`
+* `decimal64`
+* `decimal128`
+
+NOTE: Since these are inherently bit-oriented formats, the numeric suffix indicates the total number of bits of the field.
 
 ## Appendix D: Attributes
 
