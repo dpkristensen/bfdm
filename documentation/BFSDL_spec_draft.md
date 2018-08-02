@@ -656,7 +656,15 @@ See Apendix D for Attribute information.
 
 ### 5.4 Type Aliasing
 
-TODO
+Types may be aliased as a new identifier:
+
+    alias-definition := 'alias'<whitespace><bit-format><whitespace><new-format>
+
+Creates an alias `<new-format>` for the already-defined `<bit-format>` type.
+
+Example:
+
+    alias string.len(4).unterm() fourcc;
 
 ### 5.5 Field Definitions
 
