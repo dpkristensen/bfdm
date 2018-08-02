@@ -640,7 +640,19 @@ NOTE: `<custom-format>` could be any format defined by an extension, provided th
 
 ### 5.3 Constants
 
-TODO
+A constant may be defined to a string literal, along with any associated attributes.
+
+    constant := 'define'<whitespace><word><whitespace><bit-format><whitespace>(string-literal|numeric-literal)
+
+Example of a Numeric Literal constant with no defined storage constraints:
+
+    define my_version #1#;
+
+Constants can be modified by the `type` attribute to specify a storage type:
+
+    define my_version.type(u32) #1#;
+
+See Apendix D for Attribute information.
 
 ### 5.4 Type Aliasing
 
@@ -776,3 +788,13 @@ TODO
 #### D.3 Class Attributes
 
 TODO
+
+#### D.4 Constant Attributes
+
+##### D.4.1 Bit Format
+
+`type(<format-type>)` - Specifies the type for a named constant.
+
+`<format-type>` is a `<word>` which defines the storage format.  This can be a built-in type or an alias.
+
+NOTE: The <format-type> must be compatible with the constant's value (numeric types for Numeric Literal, string for string, etc...).
