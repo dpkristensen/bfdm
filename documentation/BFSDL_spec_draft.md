@@ -150,6 +150,18 @@ This is equivalent to the following:
     case-3 := <field-3>
     new-identifier := (<case-1>|<case-2>|<case-3>)
 
+#### 0.2.7.2 Extending Switchable Complex Content
+
+An existing definition of Switchable Complex Content may be extended using `+=`.
+
+Example:
+
+    new-identifier := <field-1>'some text'
+                   := <field-2a>'some other even longer text'<field-2b>
+
+    new-identifier += <field-3>
+
+This is equivalent to the example in 0.2.7.1
 
 #### 0.2.8 Wildcard Content
 
