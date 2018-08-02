@@ -668,7 +668,19 @@ Example:
 
 ### 5.5 Field Definitions
 
-TODO
+Data fields describe a blob of data that may be found in the Data Stream
+
+    data-field-definition := <bit-format><whitespace><word>
+
+`<word>` is unique in its scope, to prevent ambiguity.  The Stream Scope must have at least one data field.
+
+`<bit-format>` is a built-in format, an alias, or a format defined by a supported extension.
+
+Examples:
+
+    u8      version;
+    pstring name;
+    u32     crc;
 
 ## 6 Inclusion of External Definitions
 
