@@ -455,7 +455,83 @@ The bitwise representation of String Literals are undefined until it is stored i
 
 ## 4 BFSDL Stream Header Definition
 
-TODO
+At the beginning of the stream, a header must appear to set configuration settings for parsing the rest of the stream.
+
+### 4.1 Format and Types of Settings
+
+Settings in the header begin with a colon and continue until a `<line-break>` or the start of a new setting.  There are two types of settings:
+
+#### 4.1.1 Keyword Setting
+
+This is represented by a single keyword:
+
+    keyword-setting := ':'<identifier>
+
+#### 4.1.2 Configuration Setting
+
+This is represented by a single keyword, followed by an equals sign, and a value:
+
+    configuration-setting :=':'<identifier>'='(<string-literal>|<numeric-literal>)
+
+The type and range of values that can be accepted are setting-specific.
+
+#### 4.1.3 Blank Setting
+
+This is represented by just a single colon:
+
+    blank-setting := ':'
+
+The purpose of this is to facilitate:
+
+* Separating settings in a BFSDL Stream with line breaks for readability.
+* Following the of the settings block for BFSDL Stream with no `<line-break>` to separate the block from following content..
+
+### 4.2 Defined Settings
+
+Setting `<identifier>` fields are case-sensitive and defined below by type.
+
+#### 4.2.1 Keyword Settings
+
+* BFSDL_HEADER - Must appear as the first non-whitespace element in the BFSDL Stream.
+* END_HEADER - Must be the last non-blank setting, which marks the end of the block.
+
+#### 4.2.2 Configuration Settings
+
+Each configuration value must be specified exactly once per header section, unless otherwise stated.  Supported values are defined below:
+
+* Version - Takes a Numeric Literal value specifying the minimum supported version of the specification to which the BFSDL Stream adheres to.
+    * Default value = `#1#`
+    * NOTE: The Version's value has no storage type
+* BitBase - Takes a String Literal value `"Bit"` or `"Byte"` specifying the base data element for the Data Stream.
+    * NOTE: Choosing `"Byte"` does not prevent the ability to handle bit fields, but bit fields must be a multiple of 8 bits wide.
+    * Default value = `"Byte"`
+* DefaultByteOrder - Takes a String Literal value `"LE"` (Little-Endian) or `"BE"`(Big-Endian) specifying the default endian-ness of byte-oriented numeric fields spanning multiple bytes.
+    * Default value = `"LE"`
+* DefaultBitOrder - Takes a String Literal value `"LE"` or `"BE"` specifying the default endian-ness of bit-oriented numeric fields with defined bits within each Byte element in the Data Stream.
+    * Default value = `"LE"`
+    * NOTE: This is independent of the byte-oriented computing system on which the parser is running, due to the nature of byte-oriented computer science (which must have a defined MSB and LSB).
+    * NOTE: This setting has no effect on bit-oriented fields when used to describe data in a purely bit-oriented computing system.
+* DefaultFloatFormat - Takes a String Literal value specifying the default floating point format
+    * No default; if undefined, then all floating point bit formats must specify the format.
+    * See Appendix C for allowed values.
+* DefaultStringCode = Takes a String Literal value specifying the default value of `<string-code>` code for interpreting other String Literals found in the BFSDL Stream.
+    * Default value = `ASCII`
+    * NOTE: Before this configuration is parsed completely, the default value is used.  So any String Literals which require a different encoding must appear after this setting.
+    * NOTE: Normal parsing rules for String Literals apply here, including escape sequences and attributes.  Examples of valid values ways to specify the UTF8 code:
+        * `"UTF8"`
+        * `"UTF\u0038"`
+        * `"UTF\x38"` (`\x38` is interpreted as an ASCII code point, since the new default value has not taken effect)
+        * `"UTF\x38".code("WCP1252")` ("code" is an attribute, see appendix D)
+* DefaultStringPad - Takes a Numeric Literal value specifying the code to use for padding when converting a String Literal into a defined bit format.
+    * Default Value = `#0#`
+* CustomExtension - Takes a String Literal value specifying a custom extension which must be supported by the parser to interpret the BFSDL Stream correctly.
+    * Default behavior: No custom extensions supported
+    * Multiple settings of this type may be used
+    * See Appendix B for more information about extensions
+
+### 4.3 Implicit Header Specification
+
+The BFSDL Stream Header may be omitted if the system implementing the BFSDL Stream parser supports an alternate method of specifying settings (ex: application configuration, hard-coded settings, etc...).
 
 ## 5 BFSDL Stream Data Definition
 
