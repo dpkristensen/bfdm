@@ -696,7 +696,57 @@ TODO
 
 ## Appendix B: Extensions
 
-TODO
+This standard defines the original designer's intent for the implementation of the language and associated programs, but programs evolve over time and it is understood that someone may wish to modify or augment their behavior in the future.  Extensions are the recommended way to avoid interoperability conflicts between multiple implementations of tools with custom modifications.
+
+See Appendix C for an example of an extension defined by the BFSDL Specification
+
+### B.1 Creation Guidelines
+
+Extensions should not be used as a generic catch-all solution to obviate or change BFSDL.  The purpose of extensions are to define behavior which:
+
+* Requires proprietary Intellectual Property rights, licenses, and/or other types of legal agreements to use.
+* Depends on system-specific behavior which may not be easy to implement on all platforms.
+* Requires a syntax which is not supported by (but also does not conflict with) the published BFSDL Specification.
+
+Possible uses of an extension may include (but are not limited to) one or more of the following:
+
+* Define additional supported String Codes (see Appendix E for additional guidelines)
+* Define additional supported Floating Point formats (see Appendix C for existing definitions)
+* Define additional Configuration Settings
+* Define additional parsing rules to extend the language
+* Define additional escape sequences for String Literals
+
+### B.2 Rules for Extensible Behavior
+
+An extension may allow any variety of extensible behavior of the parser.
+
+* Extensions SHOULD only define behavior with deterministic parsing and application behavior.
+* Extensions SHOULD avoid unnecessary duplication and conflicts with standard behavior.
+* Extensions SHOULD use an extension-specific naming convention for new identifiers.
+    * Ex: Extension "Foo" defines a new String Code "FooBarText"
+    * This allows the extension author(s) to make future updates to the BFSDL spec to define a canonical version of the extension's behavior.
+* Extensions SHOULD use some form of version and/or feature set control to allow updates and additions to the extensible behavior.
+    * Ex: Extension "Foo2" defines a new configuration "FooVersion"
+    * Ex: Extension "Foo2" is a non-backwards-compatible update to the "Foo" extension, because "Foo" did not define a FooVersion configuration and had no other form of version control to make the change.  "Foo2" also gives the look of disapproval to the authors of "Foo" for not planning for future updates appropriately.
+    * See Appendix C for example of versioning scheme defined for the standard `ieee754` extension.
+* Extensions SHOULD avoid conflicts with other extensions.  An extension or group of extensions may follow agreed-upon rules for determining which behavior takes priority over other extensions in the event of a conflict.
+* When defining new attributes, extensions MUST use `<word>` identifiers.  This is to make parsing easier, and is especially important to note for string and floating point formats (since they are defined as attributes).
+* Extensions MUST NOT define or modify the range of supported values for the `Version` Configuration Setting; this is reserved for extension by future BFSDL Specifications.
+
+### B.3 Conflicts with Future BFSDL Specifications
+
+In the case of updates to this specification which conflict with or duplicate the behavior of custom extension:
+
+* If the BFSDL stream's `Version` configuration matches the version of the BFSDL specification where the behavior was added or changed, the BFSDL specification's behavior shall apply.
+* Otherwise, the behavior of the extension will take precedence over the specification's behavior.
+
+### B.5 Discouraged Extension Behavior
+
+The BFSDL Specification is designed to handle general data definition cases for by allowing the specification to simplify data definitions using keywords like `alias`.  Therefore, adding keywords which can otherwise be defined by built-in behavior is discouraged.  A better way to do this is to distribute a specification which creates aliases for use with the `include` or `library` keyword.
+
+### B.6 String Code Extensions
+
+A common forseeable extension use case will be to add support for additional character encodings, guidelines for how to construct deterministic string code identifiers are listed in Appendix E.
 
 ## Appendix C: Extended Floating Point Support
 
