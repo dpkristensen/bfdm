@@ -684,7 +684,65 @@ Examples:
 
 ## 6 Inclusion of External Definitions
 
-TODO
+Within the BFSDL Stream Data Definition, definitions from other sources may be used as well:
+
+    external-source := <string-literal>
+
+The contents found at the location of the external-source are defined as the External Stream, while the BFSDL Stream in which the statement appears is defined as the Current Stream.
+
+### 6.1 External Libraries
+
+External Libraries are the preferred method of importing definitions from another source:
+
+    library-identifier := <word>
+    library-definition := 'library'<whitespace><library-identifier>'('<external-source>')'
+
+This defines the Stream Scope of the External Stream found at `<external-source>` as a sub-scope named `<library-identifier>` in the Current Stream's current scope.  After parsing this statement:
+
+The location of external source must be one of:
+* A file name accessible on the local system
+* A file name accessible via a network, referenced via network path of the type:
+** Uniform Naming Convention (ex: \\server\share\path\to\file)
+** POSIX pathname (ex: hostname:/path/to/file)
+** URI specifying any file-like transfer protocol (ex: http://server/path/to/file).
+
+The following rules apply to implementations of BFSDL parsers:
+* BFSDL parsers are not required to support any method of reading an External Stream which differs from how the Current Stream is read.
+* BFSDL parsers may define any custom method of sourcing, but a URI scheme is recommended to prevent conflicts.
+
+Use of URIs requiring access to resources other than the transport method of the BFSDL Stream is discouraged (e.g., if the BFSDL Stream can be accessed as a file, use file references).
+
+* The Current Stream shall be able to use the `<library-identifier>` as a `<bit-format>` in `<data-field-definition>`, where the data is parsed according to the definition provided via the library.
+* The Current Stream shall be able to use all types and classes from the library.
+  * TODO: What's the syntax for this?  `id.type`, `id:type`, etc...
+  * Ref GH-5
+
+The file is parsed as its own BFSDL Stream, including both Header and Data definitions.
+
+### 6.2 External Resources
+
+External Resources are exactly like an External Library, except using a system-defined access method to obtain the stream.
+
+    resource-identifier := <word>
+    resource-definition := 'resource'<whitespace><resource-identifier>'('<external-source>')'
+
+The content of `<external-source>` is defined by the system, as well as the access method which the system should use to import the External Stream. 
+
+This keyword may not be supported if the parser does not support any resource access methods.
+
+### 6.3 Importing to the Current Stream
+
+Definitions may be imported from an External Stream in such a way that the system will parse its data as if it was part of the Current Stream:
+
+    import-file-definition := 'importfile'<whitespace><external-source>
+    import-resource-definition := 'importsource'<whitespace><external-source>
+
+`<import-file-definition>` works like `<library-definition>` and `<import-resource-definition>` works like `<resource-definition>` with the following exceptions:
+
+* There is no identifier given; the definitions from the External Stream are merged into the Current Stream's current scope.  Conflicts in definitions are prohibited when merging.
+* Header Scopes are prohibited in the External Stream (however, an External Stream may use other External Streams such as libraries that do have Header Scopes).
+
+This method of accessing an External Stream should only be used when the definitions are guaranteed to be unique and the streams are tightly coupled (for example, common definitions for multiple related specifications).
 
 ## 7 Classes
 
