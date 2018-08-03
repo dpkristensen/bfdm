@@ -380,12 +380,12 @@ Escape sequences may be used with `<string-literal-value>` to store characters i
 
     back-slash := '\'
     escape-sequence := <back-slash><double-quote>            # Ex: \" = Unicode 34
-                       <back-slash><back-slash>              # Ex: \\ = Unicode 92 
+                       <back-slash><back-slash>              # Ex: \\ = Unicode 92
                        <back-slash>'t'                       # Ex: \t = Unicode 8
                        <back-slash>'r'                       # Ex: \r = Unicode 13
                        <back-slash>'n'                       # Ex: \n = Unicode 10
-                       <back-slash>'a'(<base-16-digits>...2) # Ex: \aff = ASCII 255 
-                       <back-slash>'w'(<base-16-digits>...2) # Ex: \w7f = Windows CP-1252 127 
+                       <back-slash>'a'(<base-16-digits>...2) # Ex: \a38 = ASCII 38
+                       <back-slash>'w'(<base-16-digits>...2) # Ex: \w7f = Windows CP-1252 127
 
 Some escape sequences allow a variable number of digits to follow:
 
@@ -516,7 +516,7 @@ Each configuration value must be specified exactly once per header section, unle
         * `"UTF8"`
         * `"UTF\u0038"`
         * `"UTF\x38"` (`\x38` is interpreted as an ASCII code point, since the new default value has not taken effect)
-        * `"UTF\x38".code("WCP1252")` ("code" is an attribute, see appendix D)
+        * `"UTF\x38".code("MS-1252")` ("code" is an attribute, see appendix D)
 * DefaultStringPad - Takes a Numeric Literal value specifying the code to use for padding when converting a String Literal into a defined bit format.
     * Default Value = `#0#`
 * CustomExtension - Takes a String Literal value specifying a custom extension which must be supported by the parser to interpret the BFSDL Stream correctly.
@@ -763,9 +763,9 @@ All string attributes may be used in conjunction with each other, except as note
 `code(<encoding>)` - Specifies the encoding for a string literal or the bit format.
 
 `<encoding>` is a String Literal with one the following values:
-* `ASCII` - American Standard Code for Information Interchange (includes extended ASCII characters 128-255)
+* `ASCII` - American Standard Code for Information Interchange (no extensions, 0-127 only)
 * `UTF8`, `UTF16`, `UTF32`, `UTF64` - Unicode variable-length multi-byte encoding
-* `CP1252` - IBM Code Page 1252
+* `MS-1252` - Microsoft Windows code page 1252
 
 #### D.1.2 Fixed-Length Strings
 
@@ -818,3 +818,34 @@ TODO
 `<format-type>` is a `<word>` which defines the storage format.  This can be a built-in type or an alias.
 
 NOTE: The <format-type> must be compatible with the constant's value (numeric types for Numeric Literal, string for string, etc...).
+
+### Appendix E: String Code Identification Conventions
+
+The following guidelines shall be used to prevent ambiguity and conflicting definitions when defining string codes (either via extensions, or subsequent revisions of this specification):
+
+#### E.1 Formal Specification
+
+Extensible string codes shall be prefixed by an identifier corresponding to the organization which originates and/or maintains the formal specification.  For organizations which define multiple string format specifications in different contexts, another identifier should be used to further distinguish the context within the organization.
+- The following guidelines are recommended for established organizations, based on public content provided at [https://en.wikipedia.org/wiki/Code_page] (where "n" is a number used in the name of the specification):
+  - `IBM-<n>` - IBM code page number `<n>` (ex: `IBM-1` for USA WP, Original)
+  - `MS-<n>` - Microsoft code page number `<n>` (ex: `MS-1252` for Windows Western)
+  - `HP-<id>` - Hewlet Packard symbol set `<id>` (ex: `HP-7J` for HP Desktop)
+  - `ISO-<id>` - ISO standard `<id>` (ex: `ISO-8859-1` for Latin 1)
+  - `IEC-<id>` - IEC standard `<id>` (ex: `IEC-62106:1999` for the RDS text specification in Annex E)
+
+#### E.2 Universally-common Specifications
+
+String encoding formats which have universally-unique identifiers and are commonly defined may also be defined by the commonly-used identifier.  Ex: ISO/IEC 10646 defines "UCS", so string codes "UCS8" and "UCS16" may also be defined.
+
+
+#### E.3 Duplicate Specifications
+
+String codes which are EXACT duplicates of another specifications should be defined along with the alternate specification identifiers to provide the widest possible support for encodings.
+
+#### E.4 Prohibited Specifications
+
+String codes MUST NOT be defined for specifications which are ambiguously or poorly defined.  It is better for specification writers to research which string format most closely matches or is most closely compatible with their data.
+
+Examples of poorly defined and historically misused encoding names:
+* Extended ASCII - This term applies to multiple conflicting standards that define the code points 128-255 in addition to the official ASCII code points 0-127.
+* ANSI - This term was used prematurely by Microsoft to describe MS-1252 and other various Windows encodings that were submitted to and rejected by ANSI in their original form.
