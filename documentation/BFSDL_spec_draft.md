@@ -274,8 +274,8 @@ The numeral digits are defined for the set of number systems which are supported
 The formatting characters which are common to multiple types of numeric literals are defined as:
 
     hash := '#'
-    sign-marker := ('+'|'-')
     base-marker := ('b'|'o'|'d'|'x')
+    sign-marker := ('+'|'-')
     period := '.'
     exponent-marker := ('^')
 
@@ -335,15 +335,18 @@ Although it may be tempting to do so as an extension, `<exponential-component>` 
 
 For example, use `#1000000#` instead of `#10^6#`
 
-#### 3.1.4.2 Limitations and Use of Fractional Values
+#### 3.1.4.2 Representation of Negative Values
 
-The `<fractional-component>` of a `<numeric-literal>` shall only be supported when the `<base-marker>` indicates a radix which is an integral power of 2.  This is because radices which are not a power of 2 may not be able to be represented exactly in base 2 otherwise.
+The components of a `<numeric-literal>` shall always be represented as positive values; the sign is a modifier applied to the value.
 
-The system may store the intermediate representation of the `<fractional-component>` as fixed-point values until it must be converted to a specific storage format.  The value of 0.1 in base-10, for example, has an infinite number of binary digits when converted to base 2, and so it is not possible to store.
+Examples:
 
-The digits of this number shall be interpreted a stream of digits mapped to their binary representation, not interpreted in the number system.
+* **10.5 (decimal):** `#d10.5#` == `#b1010.1#` == `#hA.8#` == `#o12.4#`
+* **-10.5 (decimal):** `#d-10.5#` == `#b-1010.1#` == `#h-A.8#` == `#o-12.4#`
 
-TODO: Need to remove this clause; see Issue GH-1
+-10.5 stored as fixed-point integer with 6 integral bits and 2 fractional bits in 2's complement format would have the following binary format:
+
+`11011010` or -1 * 2^5^ + 2^4^ + 2^2^ + 2^1^ + 2^-1^
 
 #### 3.1.5 Bitwise Representation of Numeric Literals
 
