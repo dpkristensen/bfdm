@@ -79,7 +79,7 @@ Literal Text is Text Content surrounded by single-quotes; the Text Content will 
 
 #### 0.2.4 Literal Numeric Text
 
-Literal Numeric Text is Text Content represented in numeric form as a valid Unicode value in Base 10 (which may or may not include leading zeros); the Text Content will appear verbatim in the BFSDL Stream.  The value may be preceded by a lowercase x to indicate the value is in Base 16.  Both examples below are equivalent to Literal Text 'A': 
+Literal Numeric Text is Text Content represented in numeric form as a valid Unicode value in Base 10 (which may or may not include leading zeros); the Text Content will appear verbatim in the BFSDL Stream.  The value may be preceded by a lowercase x to indicate the value is in Base 16.  Both examples below are equivalent to Literal Text 'A':
 
     65
     00065
@@ -170,10 +170,10 @@ Wildcard Content is enclosed in parentheses:
 * The Wildcard Content will include lists of Switchable Content, each of which may either be listed explicitly or using an identifier defined as Switchable Content.
 * The Wildcard Content will represent data found in the content, matched either by the content listed at the beginning or an asterisk.
   * When Switchable Content is listed, all cases found in the data are represented
-  * When an asterisk is used, any data matches. 
+  * When an asterisk is used, any data matches.
 * The Wildcard Content may include modifiers using a modifier keyword followed by a list of Switchable Content, which is listed explicitly or using an identifier defined as Switchable Content.
 * The Wildcard Content may exclude any of the listed content via "except" modifier.
-* The Wildcard Content may allow any of the listed content "allow", if otherwise excluded by "except". 
+* The Wildcard Content may allow any of the listed content "allow", if otherwise excluded by "except".
 
 For example:
 
@@ -190,7 +190,7 @@ Comments may be used to help describe the text.  These begin with a `#` and cont
     (*)  # Comment text after the end of the line
     '#'  # Comment after Literal Text containing a hash
 
-Hashes in Literal Text do not begin a comment. 
+Hashes in Literal Text do not begin a comment.
 
 #### 0.2.10 Literal Ranges
 
@@ -202,7 +202,7 @@ A set of literals may be defined as Switchable Content by using the "to" keyword
 
 ## 1 BFSDL Stream Format Overview
 
-The BFSDL Stream is comprised of a Header Definition, and a Data Definition.  Both sections are comprised of statements which are evaluated in sequence. 
+The BFSDL Stream is comprised of a Header Definition, and a Data Definition.  Both sections are comprised of statements which are evaluated in sequence.
 
 ## 2 Common Formatting Elements
 
@@ -393,12 +393,12 @@ Escape sequences may be used with `<string-literal-value>` to store characters i
 Some escape sequences allow a variable number of digits to follow:
 
     escape-digits := <base-10-digits>...
-    escape-sequence += <back-slash>[<escape-digits>]'x'(<base-16-digits>...2)  
+    escape-sequence += <back-slash>[<escape-digits>]'x'(<base-16-digits>...2)
         # Default for <escape-digits> = 2
-        # Smallest supported range of <escape-digits> is 1-8 
+        # Smallest supported range of <escape-digits> is 1-8
         # Examples:
         #   \x34 = String code 52
-        #   \4x1234 = String code 4660 
+        #   \4x1234 = String code 4660
     escape-sequence += <back-slash>[<escape-digits>]'b'(<base-2-digits>....8)
         # Default for <escape-digits> = 8
         # Smallest supported range of <escape-digits> is 1-64
@@ -406,14 +406,14 @@ Some escape sequences allow a variable number of digits to follow:
         #   \b00110001 = String code 49
         #   \4b0001 = String code 1
         #   \16b0001001100110111 = String code 4919
-    escape-sequence += <back-slash>[<escape-digits>]'u'(<base-16-digits>...4) 
+    escape-sequence += <back-slash>[<escape-digits>]'u'(<base-16-digits>...4)
         # Default for <escape-digits> = 4
         # Smallest supported range of <escape-digits> is 1-8
         # Examples:
         #   \u1234 = Unicode 4660
         #   \6u10FFFF = Unicode 1114111
 
-Note that the numeric value of escape sequences corresponds to the *code point*, whose interpretation is dependent upon the encoding of the string. 
+Note that the numeric value of escape sequences corresponds to the *code point*, whose interpretation is dependent upon the encoding of the string.
 
 #### 3.2.2 String Encoding
 
@@ -729,7 +729,7 @@ External Resources are exactly like an External Library, except using a system-d
     resource-identifier := <word>
     resource-definition := 'resource'<whitespace><resource-identifier>'('<external-source>')'
 
-The content of `<external-source>` is defined by the system, as well as the access method which the system should use to import the External Stream. 
+The content of `<external-source>` is defined by the system, as well as the access method which the system should use to import the External Stream.
 
 This keyword may not be supported if the parser does not support any resource access methods.
 
