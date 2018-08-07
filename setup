@@ -1,0 +1,89 @@
+#!/usr/bin/env python
+"""
+    setup - Setup build environment
+
+    Copyright 2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice, this
+      list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+
+    * Neither the name of the copyright holder nor the names of its
+      contributors may be used to endorse or promote products derived from
+      this software without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+    CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+    OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+"""
+
+import os
+import urllib.request
+import shutil
+import sys
+import zipfile
+
+ARCHIVE_DIR = os.path.join("_out", "archive")
+EXTERNAL_DIR = "external"
+WAF_ZIP = os.path.join(ARCHIVE_DIR, "waf.zip")
+WAF_OUT_DIR = os.path.join(EXTERNAL_DIR, "waf")
+
+def extract_external_zipfile(zip_fn, replace_src=None, replace_dest=None):
+    with zipfile.ZipFile(zip_fn,"r") as zip_fh:
+        for file in zip_fh.infolist():
+            file.filename = file.filename.replace(replace_src + "/", replace_dest + "/")
+            zip_fh.extract(file, EXTERNAL_DIR)
+
+def makedirs(path):
+    try:
+        os.makedirs(path)
+    except FileExistsError:
+        pass
+
+def run_cmd():
+    zip_packages = [
+        dict(
+            name="googletest",
+            url="https://github.com/google/googletest/archive/release-1.8.0.zip",
+            folder="googletest-release-1.8.0"
+        ),
+        dict(
+            name="waf",
+            url="https://gitlab.com/ita1024/waf/-/archive/waf-2.0.10/waf-waf-2.0.10.zip",
+            folder="waf-waf-2.0.10"
+        )
+    ]
+
+    makedirs(ARCHIVE_DIR)
+    makedirs(EXTERNAL_DIR)
+
+    for p in zip_packages:
+        archive_fn = os.path.join(ARCHIVE_DIR, "{}.zip".format(p["name"]))
+        out_dir = os.path.join(EXTERNAL_DIR, "{}".format(p["name"]))
+        if not os.path.isfile(archive_fn):
+            print("Downloading {}".format(p["name"]))
+            with urllib.request.urlopen(p["url"]) as response, open(archive_fn, 'wb') as out_file:
+                shutil.copyfileobj(response, out_file)
+
+        if not os.path.isdir(out_dir):
+            print("Extracting {}".format(p["name"]))
+            extract_external_zipfile(archive_fn, p["folder"], p["name"])
+
+    return 0
+
+if __name__ == "__main__":
+    exit( run_cmd() )

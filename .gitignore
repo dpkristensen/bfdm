@@ -1,0 +1,9 @@
+# Build artifacts
+_out
+external
+.lock-waf*
+build.log
+
+# Python generated files
+__pycache__
+*.pyc
