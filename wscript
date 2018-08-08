@@ -344,15 +344,24 @@ def add_taskgens( bld ):
         features = "cxx cxxstlib warning-level"
         )
 
+    # Bfdp
+    bld(
+        includes = [ "pkg/Bfdp/pub_includes" ],
+        export_includes = "pkg/Bfdp/pub_includes",
+        target = "Bfdp",
+        warning_levels = "max warnings-as-error",
+        features = "cxx warning-level",
+        use = ""
+        )
+
     # BfsdlTests
     bld(
-        source = get_source_files_at( bld, "private/BfsdlTests" ),
-        includes = "source/tests/private",
+        source = get_source_files_at( bld, "pkg/BfsdlTests/source" ),
         export_includes = "",
         target = "BfsdlTests",
         features = "cxx cxxprogram",
         warning_levels = "max warnings-as-error",
-        use = "googletest warning-level",
+        use = "Bfdp googletest warning-level",
         subsystem = "CONSOLE"
         )
 

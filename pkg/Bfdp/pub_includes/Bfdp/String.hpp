@@ -1,7 +1,7 @@
 /**
-    StubTest - Stub test module
+    BFDP String declarations
 
-    Copyright 2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -30,22 +30,60 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "gtest/gtest.h"
+#ifndef Bfdp_String
+#define Bfdp_String
 
-namespace BfsdlTests
+// External includes
+#include <string>
+
+// Internal includes
+#include "Bfdp/Common.hpp"
+
+namespace Bfdp
 {
 
-    class StubTest
-        : public ::testing::Test
-    {
-        void SetUp()
-        {
-        }
-    };
+    //! Represents a single byte of memory
+    typedef unsigned char Byte;
 
-    TEST_F( StubTest, Pass )
+    //! Convert aBuffer into a string
+    inline std::string String
+        (
+        Byte const* const aBuffer,
+        SizeT const aCount
+        )
     {
-        ASSERT_TRUE( true );
+        return std::string( reinterpret_cast< char const* >( aBuffer ), aCount );
     }
 
-} // namespace BfsdlTests
+    //! @return true if aString contains the data at aBuffer up to aCount bytes
+    inline bool StrContains
+        (
+        std::string const& aString,
+        Byte const* const aBuffer,
+        SizeT const aCount
+        )
+    {
+        return std::string::npos != aString.find( reinterpret_cast< char const* >( aBuffer ), 0, aCount );
+    }
+
+    //! Convert Char -> Byte
+    inline Byte Char
+        (
+        char const& aChar
+        )
+    {
+        return *( reinterpret_cast< Byte const* >( &aChar ) );
+    }
+
+    //! Convert Char* -> Byte*
+    inline Byte const* Char
+        (
+        char const* const aCharPtr
+        )
+    {
+        return reinterpret_cast< Byte const* >( aCharPtr );
+    }
+
+} // namespace Bfdp
+
+#endif // Bfdp_String
