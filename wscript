@@ -347,7 +347,7 @@ def add_taskgens( bld ):
     # Bfdp
     bld(
         source = get_source_files_at( bld, "pkg/Bfdp/source" ),
-        includes = [ "pkg/Bfdp/pub_includes" ],
+        includes = [ "pkg/Bfdp/prv_includes", "pkg/Bfdp/pub_includes" ],
         export_includes = "pkg/Bfdp/pub_includes",
         target = "Bfdp",
         warning_levels = "max warnings-as-error",
