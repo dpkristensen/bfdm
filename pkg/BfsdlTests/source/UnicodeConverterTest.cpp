@@ -37,6 +37,7 @@
 // Internal includes
 #include "Bfdp/Macros.hpp"
 #include "Bfdp/String.hpp"
+#include "Bfdp/Unicode/AsciiConverter.hpp"
 #include "Bfdp/Unicode/Ms1252Converter.hpp"
 #include "Bfdp/Unicode/Utf8Converter.hpp"
 #include "BfsdlTests/MockErrorHandler.hpp"
@@ -56,14 +57,76 @@ namespace BfsdlTests
             SetDefaultErrorHandlers();
         }
 
+        Unicode::AsciiConverter ascii;
         Unicode::Ms1252Converter ms1252;
         Unicode::Utf8Converter utf8;
     };
 
     TEST_F( UnicodeConverterTest, ConversionSize )
     {
+        ASSERT_EQ( 1, ascii.GetMaxBytes() );
         ASSERT_EQ( 1, ms1252.GetMaxBytes() );
         ASSERT_EQ( 6, utf8.GetMaxBytes() );
+    }
+
+    TEST_F( UnicodeConverterTest, ASCII )
+    {
+        struct TestData
+        {
+            Byte bVal;
+            Unicode::CodePoint uVal;
+        };
+
+        TestData const test[] =
+        {
+            { 0,              0 },
+            { Char( '0' ),   48 },
+            { Char( '~' ),  126 },
+            { 0x7F,         127 }
+        };
+
+        Byte buf;
+        Unicode::CodePoint cp;
+
+        // Test conversion table of valid values
+        for( SizeT i = 0; i < BFDP_COUNT_OF_ARRAY( test ); ++i )
+        {
+            SCOPED_TRACE( ::testing::Message( "i = " ) << i );
+
+            buf = test[i].bVal;
+            cp = Unicode::InvalidCodePoint;
+            ASSERT_EQ( 1, ascii.ConvertBytes( &buf, 1, cp ) );
+            ASSERT_EQ( test[i].uVal, cp );
+
+            buf = 128; // Not a valid code
+            cp = test[i].uVal;
+            ASSERT_EQ( 1, ascii.ConvertSymbol( cp, &buf, 1 ) );
+            ASSERT_EQ( test[i].bVal, buf );
+        }
+
+        // Test conversion of undefined values
+        Byte const invalidBytes[] = { 0x80, 0xFF };
+        cp = 89; // Valid code point
+        for( SizeT i = 0; i < BFDP_COUNT_OF_ARRAY( invalidBytes ); ++i )
+        {
+            SCOPED_TRACE( ::testing::Message( "i = " ) << i );
+
+            ASSERT_EQ( 0, ascii.ConvertBytes( &invalidBytes[i], 1, cp ) );
+            ASSERT_EQ( 89, cp ); // Unchanged
+        }
+
+        SetMockErrorHandlers();
+        MockErrorHandler::Workspace wksp;
+
+        // Test invalid inputs
+        wksp.ExpectMisuseError();
+        ASSERT_EQ( 0, ascii.ConvertBytes( NULL, 1, cp ) );
+        wksp.ExpectMisuseError();
+        ASSERT_EQ( 0, ascii.ConvertBytes( &buf, 0, cp ) );
+        wksp.ExpectMisuseError();
+        ASSERT_EQ( 0, ascii.ConvertSymbol( cp, NULL, 1 ) );
+        wksp.ExpectMisuseError();
+        ASSERT_EQ( 0, ascii.ConvertSymbol( cp, &buf, 0 ) );
     }
 
     TEST_F( UnicodeConverterTest, MS_1252 )
