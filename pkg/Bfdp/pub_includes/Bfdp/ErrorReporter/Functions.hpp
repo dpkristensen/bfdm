@@ -44,6 +44,38 @@
 #define BFDP_MISUSE_ERROR( _text ) BFDP_MISUSE_ERROR_M( _text, BFDP_MODULE )
 #define BFDP_RUNTIME_ERROR( _text ) BFDP_RUNTIME_ERROR_M( _text, BFDP_MODULE )
 
+//! If condition, report assertion failure (i.e., misuse error) and return
+#define BFDP_RETURNIF_A( _cond, _errmsg ) \
+    if( _cond ) \
+    { \
+        BFDP_MISUSE_ERROR( _errmsg ); \
+        return; \
+    }
+
+//! If condition, report assertion failure (i.e., misuse error) and return a value
+#define BFDP_RETURNIF_VA( _cond, _value, _errmsg ) \
+    if( _cond ) \
+    { \
+        BFDP_MISUSE_ERROR( _errmsg ); \
+        return _value; \
+    }
+
+//! If condition, report runtime error and return
+#define BFDP_RETURNIF_E( _cond, _errmsg ) \
+    if( _cond ) \
+    { \
+        BFDP_RUNTIME_ERROR( _errmsg ); \
+        return; \
+    }
+
+//! If condition, report runtime error and return a value
+#define BFDP_RETURNIF_VE( _cond, _value, _errmsg ) \
+    if( _cond ) \
+    { \
+        BFDP_RUNTIME_ERROR( _errmsg ); \
+        return _value; \
+    }
+
 namespace Bfdp
 {
 

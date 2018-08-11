@@ -58,4 +58,26 @@
         };
 #endif
 
+#if( __cplusplus >= 201103L )
+    #define BFDP_FINAL  final
+#else
+    #define BFDP_FINAL
+#endif
+
+//! If condition, return
+#define BFDP_RETURNIF( _cond ) \
+    if( _cond ) \
+    { \
+        return; \
+    }
+
+//! If condition, return value
+#define BFDP_RETURNIF_V( _cond, _value ) \
+    if( _cond ) \
+    { \
+        return _value; \
+    }
+
+#define BFDP_UNUSED_RETURN( _func ) (void)_func
+
 #endif // Bfdp_Macros
