@@ -116,16 +116,23 @@ namespace BfsdlTests
     class ErrorReporterTest
         : public ::testing::Test
     {
+    private:
         void SetUp()
         {
             gInternalEvents.clear();
             gMisuseEvents.clear();
             gRunTimeEvents.clear();
+
+            ErrorReporter::SetInternalErrorHandler( InternalErrorHandler );
+            ErrorReporter::SetMisuseErrorHandler( MisuseErrorHandler );
+            ErrorReporter::SetRunTimeErrorHandler( RunTimeErrorHandler );
         }
     };
 
     TEST_F( ErrorReporterTest, NoListeners )
     {
+        ClearErrorHandlers();
+
         BFDP_MISUSE_ERROR( text1 );
         BFDP_RUNTIME_ERROR( text2 );
 
@@ -136,10 +143,6 @@ namespace BfsdlTests
 
     TEST_F( ErrorReporterTest, Macros )
     {
-        ErrorReporter::SetInternalErrorHandler( InternalErrorHandler );
-        ErrorReporter::SetMisuseErrorHandler( MisuseErrorHandler );
-        ErrorReporter::SetRunTimeErrorHandler( RunTimeErrorHandler );
-
         BFDP_INTERNAL_ERROR( text1 );  UInt internalLine = __LINE__;
         BFDP_MISUSE_ERROR( text2 );   UInt misuseLine = __LINE__;
         BFDP_RUNTIME_ERROR( text3 );  UInt runtimeLine = __LINE__;
@@ -162,10 +165,6 @@ namespace BfsdlTests
 
     TEST_F( ErrorReporterTest, InternalError )
     {
-        ErrorReporter::SetInternalErrorHandler( InternalErrorHandler );
-        ErrorReporter::SetMisuseErrorHandler( MisuseErrorHandler );
-        ErrorReporter::SetRunTimeErrorHandler( RunTimeErrorHandler );
-
         static char const* fakeModule = "InternalErrorModule";
 
         ErrorReporter::ReportInternalError( fakeModule, 123, text3 );
@@ -182,10 +181,6 @@ namespace BfsdlTests
 
     TEST_F( ErrorReporterTest, MisuseError )
     {
-        ErrorReporter::SetInternalErrorHandler( InternalErrorHandler );
-        ErrorReporter::SetMisuseErrorHandler( MisuseErrorHandler );
-        ErrorReporter::SetRunTimeErrorHandler( RunTimeErrorHandler );
-
         static char const* fakeModule = "MisuseErrorModule";
 
         ErrorReporter::ReportMisuseError( fakeModule, 456, text1 );
@@ -202,10 +197,6 @@ namespace BfsdlTests
 
     TEST_F( ErrorReporterTest, RunTimeError )
     {
-        ErrorReporter::SetInternalErrorHandler( InternalErrorHandler );
-        ErrorReporter::SetMisuseErrorHandler( MisuseErrorHandler );
-        ErrorReporter::SetRunTimeErrorHandler( RunTimeErrorHandler );
-
         static char const* fakeModule = "RunTimeErrorModule";
 
         ErrorReporter::ReportRunTimeError( fakeModule, 789, text2 );

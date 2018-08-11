@@ -37,6 +37,7 @@
 // Internal includes
 #include "Bfdp/ErrorReporter/Functions.hpp"
 #include "BfsdlTests/MockErrorHandler.hpp"
+#include "BfsdlTests/TestUtil.hpp"
 
 namespace BfsdlTests
 {
@@ -119,6 +120,7 @@ namespace BfsdlTests
         VerifyExpectations( mMisuseErrorState, "Misuse" );
         VerifyExpectations( mRunTimeErrorState, "Run Time" );
         MockErrorHandler::UnregisterWorkspace();
+        SetDefaultErrorHandlers();
     }
 
     void MockErrorHandler::Workspace::ExpectInternalError()

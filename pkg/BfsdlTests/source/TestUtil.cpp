@@ -58,6 +58,13 @@ namespace BfsdlTests
         return ::testing::AssertionSuccess();
     }
 
+    void ClearErrorHandlers()
+    {
+        ErrorReporter::SetInternalErrorHandler( NULL );
+        ErrorReporter::SetMisuseErrorHandler( NULL );
+        ErrorReporter::SetRunTimeErrorHandler( NULL );
+    }
+
     static void InternalErrorHandler
         (
         char const * const aModuleName,

@@ -51,6 +51,8 @@ namespace BfsdlTests
         Bfdp::SizeT const aCount
         );
 
+    void ClearErrorHandlers();
+
     void SetDefaultErrorHandlers();
 
 } // namespace BfsdlTests
