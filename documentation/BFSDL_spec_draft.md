@@ -204,6 +204,24 @@ A set of literals may be defined as Switchable Content by using the "to" keyword
 
 The BFSDL Stream is comprised of a Header Definition, and a Data Definition.  Both sections are comprised of statements which are evaluated in sequence.
 
+### 1.1 Architecture Independence
+
+The data described by a BFSDL Stream is supposed to be independent of computing architectures; but due to the nature of standardized communication and storage protocols in modern computing systems, some assumptions must be made to achieve this.
+
+For BFSDL to be used on a system which does not adhere to these assumptions, some restrictions may apply and/or system-specific translations must be made.
+
+For example, the specification does not depend on the ordering of bits in RAM, CPU registers, hard disk, physical transmission mediums, etc... so long as there is a defined numeric order to such bits within the medium's specification.
+
+#### 1.1.1 Bit
+
+A Bit is defined as the smallest quantizable element in the data, with states **0** and **1**.  The system must convert symbols into Bits for computing or communication systems that use more than 2 states of analog quantization (quantum computers, QPSK, AM, etc...), and such conversion methods are not defined by this specification.
+
+#### 1.1.2 Byte
+
+A Byte is defined as a collection of **8 bits** with each bit numbered from **0** to **7** (the numeric weight of each bit is configurable).  The system must support a method of enumerating bit positions within a Byte in order to describe Byte-oriented streams, and such methods are not defined by this specification.  If the system supports quantization of Bits, but does not support enumerated Bit positions within a Byte, then a Bit-oriented stream may still be described.
+
+NOTE: In address-oriented mediums such as RAM or a hard disk, a Byte is usually the smallest addressable element. 
+
 ## 2 Common Formatting Elements
 
 Statements are evaluated with various rules, but several formatting elements are common to parsing all statements.
@@ -505,9 +523,14 @@ Each configuration value must be specified exactly once per header section, unle
     * Default value = `"Byte"`
 * DefaultByteOrder - Takes a String Literal value `"LE"` (Little-Endian) or `"BE"`(Big-Endian) specifying the default endian-ness of byte-oriented numeric fields spanning multiple bytes.
     * Default value = `"LE"`
+    * For clarification, on an N-byte field:
+	    * LE := MSB=byte N, LSB=byte 0
+	    * BE := MSB=byte 0, LSB=byte N
 * DefaultBitOrder - Takes a String Literal value `"LE"` or `"BE"` specifying the default endian-ness of bit-oriented numeric fields with defined bits within each Byte element in the Data Stream.
     * Default value = `"LE"`
-    * NOTE: This is independent of the byte-oriented computing system on which the parser is running, due to the nature of byte-oriented computer science (which must have a defined MSB and LSB).
+    * For clarification:
+	    * LE := MSB=bit 7, LSB=bit 0
+	    * BE := MSB=bit 0, LSB=bit 7
     * NOTE: This setting has no effect on bit-oriented fields when used to describe data in a purely bit-oriented computing system.
 * DefaultFloatFormat - Takes a String Literal value specifying the default floating point format
     * No default; if undefined, then all floating point bit formats must specify the format.
