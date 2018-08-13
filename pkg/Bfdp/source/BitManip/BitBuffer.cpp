@@ -124,7 +124,7 @@ namespace Bfdp
             return BitsToBytes( mDataBits );
         }
 
-        Byte const* BitBuffer::GetDataPtr() const
+        Byte* BitBuffer::GetDataPtr()
         {
             return mBuffer;
         }

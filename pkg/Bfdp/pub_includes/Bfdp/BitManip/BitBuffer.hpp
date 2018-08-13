@@ -86,7 +86,7 @@ namespace Bfdp
 
             SizeT GetDataBytes() const;
 
-            Byte const* GetDataPtr() const;
+            Byte* GetDataPtr();
 
         private:
             //! Copy aOther into this object

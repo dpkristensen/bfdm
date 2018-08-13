@@ -113,4 +113,22 @@ namespace BfsdlTests
         ASSERT_TRUE( ArraysMatch( buf.GetDataPtr(), data, dataSizeBytes ) );
     }
 
+    TEST_F( BitManipBufferTest, WriteToBuffer )
+    {
+        static Byte const data[] = { 0x65, 0x66, 0x67 };
+        static SizeT const dataSizeBytes = BFDP_COUNT_OF_ARRAY( data );
+        static SizeT const dataSizeBits = BitManip::BytesToBits( BFDP_COUNT_OF_ARRAY( data ) );
+        BitManip::BitBuffer buf( data, dataSizeBits );
+
+        buf.GetDataPtr()[1] = 0x42;
+
+        static Byte const newData[] = { 0x65, 0x42, 0x67 };
+        BFDP_CTIME_ASSERT
+            (
+            BFDP_COUNT_OF_ARRAY( data ) == BFDP_COUNT_OF_ARRAY( newData ),
+            Data_Size_Mismatch
+            );
+        ASSERT_TRUE( ArraysMatch( buf.GetDataPtr(), newData, dataSizeBytes ) );
+    }
+
 } // namespace BfsdlTests
