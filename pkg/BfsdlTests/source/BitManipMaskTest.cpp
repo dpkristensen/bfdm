@@ -50,7 +50,24 @@ namespace BfsdlTests
         }
     };
 
-    TEST_F( BitManipMaskTest, WidthZOffsetZ )
+    TEST_F( BitManipMaskTest, ExtractBits )
+    {
+        UInt8 const v8 = 0xa7;
+        ASSERT_EQ( 0x7, BitManip::ExtractBits< UInt8 >( v8, 4 ) );
+        ASSERT_EQ( 0x7, BitManip::ExtractBits< UInt8 >( v8, 4, 0 ) );
+        ASSERT_EQ( 0x9, BitManip::ExtractBits< UInt8 >( v8, 4, 2 ) );
+        ASSERT_EQ( 0xa, BitManip::ExtractBits< UInt8 >( v8, 4, 4 ) );
+        ASSERT_EQ( 0x5, BitManip::ExtractBits< UInt8 >( v8, 3, 5 ) );
+
+        UInt32 const v32 = 0x12345678UL;
+        ASSERT_EQ( 0x00000008UL, BitManip::ExtractBits< UInt32 >( v32, 4 ) );
+        ASSERT_EQ( 0x00000018UL, BitManip::ExtractBits< UInt32 >( v32, 5, 0 ) );
+        ASSERT_EQ( 0x0000159eUL, BitManip::ExtractBits< UInt32 >( v32, 16, 2 ) );
+        ASSERT_EQ( 0x00000145UL, BitManip::ExtractBits< UInt32 >( v32, 9, 12 ) );
+        ASSERT_EQ( 0x091a2b3cUL, BitManip::ExtractBits< UInt32 >( v32, 31, 1 ) );
+    }
+
+    TEST_F( BitManipMaskTest, MaskWidthZOffsetZ )
     {
         // Implicit offset = 0
         ASSERT_EQ( 0U, ( BitManip::CreateMask< UInt8  >( 0 ) ) );
@@ -65,7 +82,7 @@ namespace BfsdlTests
         ASSERT_EQ( 0U, ( BitManip::CreateMask< UInt64 >( 0, 0 ) ) );
     }
 
-    TEST_F( BitManipMaskTest, WidthNzOffsetZ )
+    TEST_F( BitManipMaskTest, MaskWidthNzOffsetZ )
     {
         // Implicit offset = 0
         ASSERT_EQ( 0x0000000000000001ULL, ( BitManip::CreateMask< UInt64 >( 1  ) ) );
@@ -82,7 +99,7 @@ namespace BfsdlTests
         ASSERT_EQ( 0xffffffffffffffffULL, ( BitManip::CreateMask< UInt64 >( 64, 0 ) ) );
     }
 
-    TEST_F( BitManipMaskTest, WidthNzOffsetNZ )
+    TEST_F( BitManipMaskTest, MaskWidthNzOffsetNZ )
     {
         ASSERT_EQ( 0x0000000000000000ULL, ( BitManip::CreateMask< UInt64 >( 0,  1  ) ) );
         ASSERT_EQ( 0x0000000000000000ULL, ( BitManip::CreateMask< UInt64 >( 0,  63 ) ) );
@@ -103,6 +120,23 @@ namespace BfsdlTests
         ASSERT_EQ( 0xfffffffffffffffcULL, ( BitManip::CreateMask< UInt64 >( 62,  2 ) ) );
         ASSERT_EQ( 0xfffffffffffffff8ULL, ( BitManip::CreateMask< UInt64 >( 61,  3 ) ) );
         ASSERT_EQ( 0xfffffffffffffff0ULL, ( BitManip::CreateMask< UInt64 >( 60,  4 ) ) );
+    }
+
+    TEST_F( BitManipMaskTest, ReplaceBits )
+    {
+        UInt8 const v8 = 0xa7;
+        ASSERT_EQ( 0xaf, BitManip::ReplaceBits< UInt8 >( v8, 0xfU, 4 ) );
+        ASSERT_EQ( 0xaf, BitManip::ReplaceBits< UInt8 >( v8, 0xfU, 4, 0 ) );
+        ASSERT_EQ( 0x9b, BitManip::ReplaceBits< UInt8 >( v8, 0x6U, 4, 2 ) );
+        ASSERT_EQ( 0x77, BitManip::ReplaceBits< UInt8 >( v8, 0x7U, 4, 4 ) );
+        ASSERT_EQ( 0x27, BitManip::ReplaceBits< UInt8 >( v8, 0x1U, 3, 5 ) );
+
+        UInt32 const v32 = 0x12345678UL;
+        ASSERT_EQ( 0x1234567eUL, BitManip::ReplaceBits< UInt32 >( v32, 0xeUL, 4 ) );
+        ASSERT_EQ( 0x1234566eUL, BitManip::ReplaceBits< UInt32 >( v32, 0xeUL, 5, 0 ) );
+        ASSERT_EQ( 0x1236af34UL, BitManip::ReplaceBits< UInt32 >( v32, 0xabcdUL, 16, 2 ) );
+        ASSERT_EQ( 0x122ff678UL, BitManip::ReplaceBits< UInt32 >( v32, 0x0ffUL, 9, 12 ) );
+        ASSERT_EQ( 0x12345678UL, BitManip::ReplaceBits< UInt32 >( v32, 0x91a2b3cUL, 31, 1 ) );
     }
 
 } // namespace BfsdlTests

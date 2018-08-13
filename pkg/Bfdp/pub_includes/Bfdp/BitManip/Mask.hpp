@@ -73,6 +73,46 @@ namespace Bfdp
                 );
         }
 
+        //! Extract Bits
+        //!
+        //! @note This only works with unsigned types
+        //! @return Numeric value of aWidth bits from aValue starting at bit aOffset
+        template
+            <
+            class T
+            >
+        inline T ExtractBits
+            (
+            T const aValue,
+            SizeT const aWidth,
+            SizeT const aOffset = 0
+            )
+        {
+            return ( aValue & CreateMask< T >( aWidth, aOffset ) ) >> aOffset;
+        }
+
+        //! Replace Bits
+        //!
+        //! @note This only works with unsigned types
+        //! @return aDestValue, with aWidth bits at aOffset replaced by lowest-order aWidth bits
+        //!     from aSrcValue.
+        template
+            <
+            class T
+            >
+        inline T ReplaceBits
+            (
+            T const aDestValue,
+            T const aSrcValue,
+            SizeT const aWidth,
+            SizeT const aOffset = 0
+            )
+        {
+            T const srcMask = CreateMask< T >( aWidth );
+            T const destMask = ~CreateMask< T >( aWidth, aOffset );
+            return ( aDestValue & destMask ) | ( ( aSrcValue & srcMask ) << aOffset );
+        }
+
     } // namespace BitManip
 
 } // namespace Bfdp
