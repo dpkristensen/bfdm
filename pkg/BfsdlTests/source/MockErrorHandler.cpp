@@ -159,6 +159,66 @@ namespace BfsdlTests
         }
     }
 
+    void MockErrorHandler::Workspace::VerifyInternalError
+        (
+        bool const aFired
+        )
+    {
+        if( mInternalErrorState == ErrorState::Unexpected )
+        {
+            FAIL() << "Test error: cannot verify without setting expectation.";
+        }
+
+        bool wasFired = ( mInternalErrorState == ErrorState::Fired );
+
+        if( wasFired != aFired )
+        {
+            FAIL() << "Internal Error check failed: expected=" << aFired << " actual=" << wasFired;
+        }
+
+        mInternalErrorState = ErrorState::Unexpected;
+    }
+
+    void MockErrorHandler::Workspace::VerifyMisuseError
+        (
+        bool const aFired
+        )
+    {
+        if( mMisuseErrorState == ErrorState::Unexpected )
+        {
+            FAIL() << "Test error: cannot verify without setting expectation.";
+        }
+
+        bool wasFired = ( mMisuseErrorState == ErrorState::Fired );
+
+        if( wasFired != aFired )
+        {
+            FAIL() << "Misuse Error check failed: expected=" << aFired << " actual=" << wasFired;
+        }
+
+        mMisuseErrorState = ErrorState::Unexpected;
+    }
+
+    void MockErrorHandler::Workspace::VerifyRunTimeError
+        (
+        bool const aFired
+        )
+    {
+        if( mRunTimeErrorState == ErrorState::Unexpected )
+        {
+            FAIL() << "Test error: cannot verify without setting expectation.";
+        }
+
+        bool wasFired = ( mRunTimeErrorState == ErrorState::Fired );
+
+        if( wasFired != aFired )
+        {
+            FAIL() << "RunTime Error check failed: expected=" << aFired << " actual=" << wasFired;
+        }
+
+        mRunTimeErrorState = ErrorState::Unexpected;
+    }
+
     /* static */ void MockErrorHandler::FireError
         (
         ErrorState::Type& aState,
@@ -218,6 +278,10 @@ namespace BfsdlTests
         if( aState == ErrorState::Expected )
         {
             FAIL() << "Expected " << aErrorType << " Error did not occur";
+        }
+        else if( aState == ErrorState::Fired )
+        {
+            FAIL() << aErrorType << " Error was caught, but not verified.";
         }
     }
 

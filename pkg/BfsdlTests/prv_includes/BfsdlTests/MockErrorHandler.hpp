@@ -94,8 +94,26 @@ namespace BfsdlTests
             //! Expect a single Misuse Error on the next call.
             void ExpectMisuseError();
 
-            //! Expect a single Misuse Error on the next call.
+            //! Expect a single RunTime Error on the next call.
             void ExpectRunTimeError();
+
+            //! Verify that an Internal Error was fired or not
+            void VerifyInternalError
+                (
+                bool const aFired = true
+                );
+
+            //! Verify that a Misuse Error was fired or not
+            void VerifyMisuseError
+                (
+                bool const aFired = true
+                );
+
+            //! Verify that a RunTime Error was fired or not
+            void VerifyRunTimeError
+                (
+                bool const aFired = true
+                );
 
         private:
             friend class MockErrorHandler;

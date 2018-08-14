@@ -79,6 +79,7 @@ namespace BfsdlTests
 
         wksp.ExpectMisuseError();
         ASSERT_EQ( BitManip::MaxBytes, BitManip::BitsToBytes( std::numeric_limits< SizeT >::max() ) );
+        ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
     }
 
     TEST_F( BitManipConversionTest, BytesToBits )
@@ -94,6 +95,7 @@ namespace BfsdlTests
 
         wksp.ExpectMisuseError();
         ASSERT_EQ( BitManip::MaxBits, BitManip::BytesToBits( std::numeric_limits< SizeT >::max() ) );
+        ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
     }
 
 } // namespace BfsdlTests

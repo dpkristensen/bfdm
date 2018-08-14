@@ -121,12 +121,19 @@ namespace BfsdlTests
         // Test invalid inputs
         wksp.ExpectMisuseError();
         ASSERT_EQ( 0, ascii.ConvertBytes( NULL, 1, cp ) );
+        ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
+
         wksp.ExpectMisuseError();
         ASSERT_EQ( 0, ascii.ConvertBytes( &buf, 0, cp ) );
+        ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
+
         wksp.ExpectMisuseError();
         ASSERT_EQ( 0, ascii.ConvertSymbol( cp, NULL, 1 ) );
+        ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
+
         wksp.ExpectMisuseError();
         ASSERT_EQ( 0, ascii.ConvertSymbol( cp, &buf, 0 ) );
+        ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
     }
 
     TEST_F( UnicodeConverterTest, MS_1252 )
@@ -188,12 +195,19 @@ namespace BfsdlTests
         // Test invalid inputs
         wksp.ExpectMisuseError();
         ASSERT_EQ( 0, ms1252.ConvertBytes( NULL, 1, cp ) );
+        ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
+
         wksp.ExpectMisuseError();
         ASSERT_EQ( 0, ms1252.ConvertBytes( &buf, 0, cp ) );
+        ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
+
         wksp.ExpectMisuseError();
         ASSERT_EQ( 0, ms1252.ConvertSymbol( cp, NULL, 1 ) );
+        ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
+
         wksp.ExpectMisuseError();
         ASSERT_EQ( 0, ms1252.ConvertSymbol( cp, &buf, 0 ) );
+        ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
     }
 
     TEST_F( UnicodeConverterTest, UTF8 )
@@ -271,14 +285,23 @@ namespace BfsdlTests
         // Test invalid inputs
         wksp.ExpectMisuseError();
         ASSERT_EQ( 0, utf8.ConvertBytes( NULL, 6, cp ) );
+        ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
+
         wksp.ExpectMisuseError();
         ASSERT_EQ( 0, utf8.ConvertBytes( buf, 0, cp ) );
+        ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
+
         wksp.ExpectMisuseError();
         ASSERT_EQ( 0, utf8.ConvertSymbol( cp, NULL, 6 ) );
+        ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
+
         wksp.ExpectMisuseError();
         ASSERT_EQ( 0, utf8.ConvertSymbol( cp, buf, 5 ) );
+        ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
+
         wksp.ExpectMisuseError();
         ASSERT_EQ( 0, utf8.ConvertSymbol( cp, buf, 0 ) );
+        ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
     }
 
 } // namespace BfsdlTests
