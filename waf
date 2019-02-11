@@ -30,4 +30,13 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-python external/waf/waf-light "$@"
+set -eu
+
+WAF_LIGHT="_out/waf/extract/waf-light"
+
+if [ ! -f $WAF_LIGHT ]
+then
+    python setup
+fi
+
+python $WAF_LIGHT "$@"

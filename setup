@@ -2,7 +2,7 @@
 """
     setup - Setup build environment
 
-    Copyright 2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2018-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -31,57 +31,86 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+import hashlib
 import os
-import urllib.request
 import shutil
+import subprocess
 import sys
+import urllib.request
 import zipfile
 
-ARCHIVE_DIR = os.path.join("_out", "archive")
-EXTERNAL_DIR = "external"
-WAF_ZIP = os.path.join(ARCHIVE_DIR, "waf.zip")
-WAF_OUT_DIR = os.path.join(EXTERNAL_DIR, "waf")
+TOP_DIR = os.path.dirname(os.path.normpath(os.path.abspath(__file__)))
+BUILD_DIR = os.path.join(TOP_DIR, "build")
+OUT_DIR = os.path.join(TOP_DIR, "_out")
+OUT_SETUP_DIR = os.path.join(OUT_DIR, "setup")
+GLOBIFEST_DIR = os.path.join(OUT_DIR, "globifest")
+
+GLOBIFEST_ZIP = os.path.join(OUT_SETUP_DIR, "globifest.zip")
 
 def extract_external_zipfile(zip_fn, replace_src=None, replace_dest=None):
+    print("  {}".format(zip_fn.replace(replace_src + "/", replace_dest + "/")))
     with zipfile.ZipFile(zip_fn,"r") as zip_fh:
         for file in zip_fh.infolist():
             file.filename = file.filename.replace(replace_src + "/", replace_dest + "/")
-            zip_fh.extract(file, EXTERNAL_DIR)
+            zip_fh.extract(file, OUT_DIR)
 
-def makedirs(path):
-    try:
-        os.makedirs(path)
-    except FileExistsError:
-        pass
+def hash_file(file_name, algorithm):
+    """Hash the given file with the given algorithm"""
+    BUF_SIZE = 4096
+    hash_fn = getattr(hashlib, algorithm)
+    calc = hash_fn()
+    data = True
+    with open(file_name, "rb") as file_to_hash:
+        while data:
+            data = file_to_hash.read(BUF_SIZE)
+            if data:
+                calc.update(data)
+
+    return calc.hexdigest()
 
 def run_cmd():
+    # The only package that should be manually downloaded is Globifest, since it can manage
+    # dependencies better than this script.
     zip_packages = [
         dict(
-            name="googletest",
-            url="https://github.com/google/googletest/archive/release-1.8.0.zip",
-            folder="googletest-release-1.8.0"
-        ),
-        dict(
-            name="waf",
-            url="https://gitlab.com/ita1024/waf/-/archive/waf-2.0.10/waf-waf-2.0.10.zip",
-            folder="waf-waf-2.0.10"
+            name="globifest",
+            url="https://github.com/dpkristensen/globifest/archive/v0.0.0-alpha.zip",
+            # From PS: Get-FileHash -Algorithm SHA256 globifest.zip
+            sha256="C57350EBAD005053474B4AF32AD3E2F0B23EF4C27700CDA9655569602006042D",
+            folder="globifest-0.0.0-alpha"
         )
     ]
 
-    makedirs(ARCHIVE_DIR)
-    makedirs(EXTERNAL_DIR)
+    os.makedirs(OUT_SETUP_DIR, exist_ok=True)
 
     for p in zip_packages:
-        archive_fn = os.path.join(ARCHIVE_DIR, "{}.zip".format(p["name"]))
-        out_dir = os.path.join(EXTERNAL_DIR, "{}".format(p["name"]))
+        archive_fn = os.path.join(OUT_SETUP_DIR, "{}.zip".format(p["name"]))
+        out_dir = os.path.join(OUT_DIR, "{}".format(p["name"]))
+        # Check hash
+        if os.path.isfile(archive_fn):
+            hash_str = hash_file(archive_fn, "sha256")
+            if hash_str != p["sha256"].lower():
+                # Rename the file before deleting to avoid OS race conditions
+                tmp_file = archive_fn + ".old"
+                os.rename(archive_fn, archive_fn + ".old")
+                os.unlink(tmp_file)
         if not os.path.isfile(archive_fn):
-            print("Downloading {}".format(p["name"]))
+            print("Downloading {} ({})".format(p["name"], p["url"]))
             with urllib.request.urlopen(p["url"]) as response, open(archive_fn, 'wb') as out_file:
                 shutil.copyfileobj(response, out_file)
 
         if not os.path.isdir(out_dir):
             print("Extracting {}".format(p["name"]))
             extract_external_zipfile(archive_fn, p["folder"], p["name"])
+
+    os.chdir(GLOBIFEST_DIR)
+
+    os.system("build -i {} -o {}".format(
+        os.path.join(BUILD_DIR, "setup.gproj"),
+        OUT_DIR
+        ))
+
+    os.chdir(TOP_DIR)
 
     return 0
 

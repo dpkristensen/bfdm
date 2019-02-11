@@ -152,6 +152,7 @@ def configure( conf ):
 
     # Load MSVC tool
     conf.load('msvc')
+    conf.load('globitool', tooldir='_out/globifest/waf')
 
     # Load the WarningLevel tool
     conf.load('WarningLevel', tooldir='waftools')
@@ -180,7 +181,7 @@ def configure( conf ):
     for p in my_platforms:
         for m in my_modes:
             variant_name = p.name + "_" + m.name
-            Logs.debug( APPNAME + ": configuring variant " + variant_name );
+            Logs.debug( APPNAME + ": configuring variant " + variant_name )
 
             # Derive from the base ConfigSet and detach.  This creates a new ConfigSet, which is
             # then used as the current set.
@@ -250,7 +251,7 @@ def build( bld ):
 
             variant_name = effective_options["platform"] + "_" + effective_options["mode"]
             variant_cmd = bld.cmd + "_" + variant_name
-            Logs.debug( APPNAME + ": executing " + variant_cmd  );
+            Logs.debug( APPNAME + ": executing " + variant_cmd  )
 
             # TODO: Turn the parameters into lists to allow multiple variants to be built at once
             Scripting.run_command( variant_cmd )
@@ -284,25 +285,7 @@ def build( bld ):
         add_taskgens( bld )
 
 def dist(ctx):
-    ctx.base_name = APPNAME + '_' + VERSION
-    ctx.algo = "zip"
-    ctx.files = [
-        ctx.path.find_node( "./README.md" ),
-        ctx.path.find_node( "./LICENSE.md" ),
-        ctx.path.find_node( "./setup" ),
-        ctx.path.find_node( "./setup.bat" ),
-        ctx.path.find_node( "./waf" ),
-        ctx.path.find_node( "./waf.bat" ),
-        ctx.path.find_node( "./wscript" )
-        ];
-    ctx.files.extend( ctx.path.ant_glob( "documentation/**/*" ) )
-    ctx.files.extend( ctx.path.ant_glob( "source/**/*" ) )
-    ctx.files.extend( ctx.path.ant_glob( "waftools/**/*" ) )
-
-    # TODO: Use git clean or make submodule
-    for f in ctx.files:
-        if( str( f ).endswith( ".pyc" ) ):
-            ctx.files.remove( f )
+    raise Errors.WafError("Dist not supported yet")
 
 # Create classes for each variant based off of Waf's internal classes
 # This is necessary because WAF doesn't like having a single command for build variants
@@ -319,63 +302,43 @@ for p in my_platforms:
 # LOCAL METHODS BELOW THIS LINE #
 
 def add_taskgens( bld ):
-    # TODO: Use better packaging method for files using external manifest
-
-    # Google Test
-    gtest_private_includes = [
-        "external/googletest/googletest",
-        "external/googletest/googlemock"
-        ]
-    gtest_public_includes = [
-        "external/googletest/googletest/include",
-        "external/googletest/googlemock/include"
-        ]
-    bld(
-        includes = gtest_private_includes + gtest_public_includes,
-        export_includes = gtest_public_includes,
-        source = [
-            "external/googletest/googletest/src/gtest-all.cc",
-            "external/googletest/googlemock/src/gmock-all.cc",
-             # Include gmock entry point since this is only used for the test application
-            "external/googletest/googlemock/src/gmock_main.cc"
-            ],
-        target = "googletest",
-        warning_levels = "high",
-        features = "cxx cxxstlib warning-level"
+    # Common
+    bld.GLOBITOOL(
+        target="Common",
+        project="proj/Common.gproj",
+        tgt_params=dict(
+            warning_levels="max warnings-as-error",
+            features="cxx warning-level"
+            ),
+        lnk_params=dict(
+            warning_levels="max warnings-as-error",
+            features="cxx cxxstlib warning-level"
+            )
         )
 
-    # Bfdp
-    bld(
-        source = get_source_files_at( bld, "pkg/Bfdp/source" ),
-        includes = [ "pkg/Bfdp/prv_includes", "pkg/Bfdp/pub_includes" ],
-        export_includes = "pkg/Bfdp/pub_includes",
-        target = "Bfdp",
-        warning_levels = "max warnings-as-error",
-        features = "cxx cxxstlib warning-level",
-        use = ""
+    # Building googletest separately to apply different warning level
+    bld.GLOBITOOL(
+        target="GoogleTest",
+        project="proj/GoogleTest.gproj",
+        tgt_params=dict(
+            warning_levels="high",
+            features="cxx warning-level"
+            )
         )
 
-    # BfsdlParser
-    bld(
-        source = get_source_files_at( bld, "pkg/BfsdlParser/source" ),
-        includes = [ "pkg/BfsdlParser/prv_includes", "pkg/BfsdlParser/pub_includes" ],
-        export_includes = "pkg/BfsdlParser/pub_includes",
-        target = "BfsdlParser",
-        warning_levels = "max warnings-as-error",
-        features = "cxx cxxstlib warning-level",
-        use = "Bfdp"
-        )
-
-    # BfsdlTests
-    bld(
-        source = get_source_files_at( bld, "pkg/BfsdlTests/source" ),
-        includes = [ "pkg/BfsdlTests/prv_includes" ],
-        export_includes = "",
-        target = "BfsdlTests",
-        features = "cxx cxxprogram",
-        warning_levels = "max warnings-as-error",
-        use = "Bfdp BfsdlParser googletest warning-level",
-        subsystem = "CONSOLE"
+    bld.GLOBITOOL(
+        target="BfsdlTests",
+        project="proj/BfsdlTests.gproj",
+        use="Common GoogleTest",
+        tgt_params=dict(
+            warning_levels="max warnings-as-error",
+            features="cxx warning-level"
+            ),
+        lnk_params=dict(
+            warning_levels="max warnings-as-error",
+            features="cxx cxxprogram warning-level",
+            subsystem = "CONSOLE"
+            )
         )
 
 def check_arguments():
@@ -390,13 +353,6 @@ def check_arguments():
             print( "Unknown value for --" + v.parameter + ", select one of the following:")
             list_parameter_values( v.collection )
             raise Errors.WafError("Bad argument to --" + v.parameter + ": '" + getattr( Options.options, v.parameter) + "'" )
-
-def get_source_files_at( bld, path ):
-    files = bld.path.ant_glob( "**/" + path + "/**/*.c" )
-    files.extend( bld.path.ant_glob( "**/" + path + "/**/*.cpp" ) )
-    sourceNode = bld.path.find_node( path )
-    Logs.debug( "Source files found at " + path + ": " + ','.join(x.path_from( sourceNode ) for x in files) );
-    return files
 
 def list_parameter_values( collection ):
     for v in collection:

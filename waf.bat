@@ -29,5 +29,13 @@
 :: OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 @echo off
+SETLOCAL
 
-python external/waf/waf-light %*
+SET WAF_LIGHT=_out\waf\extract\waf-light
+
+IF EXIST %WAF_LIGHT% GOTO run_waf
+
+CALL setup.bat
+
+:run_waf
+python %WAF_LIGHT% %*
