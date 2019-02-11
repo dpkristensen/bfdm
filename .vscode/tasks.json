@@ -1,0 +1,67 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "win-auto-development",
+            "type": "shell",
+            "command": "./waf -p win-auto -m development",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$msCompile", "$gcc"]
+        },
+        {
+            "label": "win-auto-release",
+            "type": "shell",
+            "command": "./waf -p win-auto -m release",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$msCompile", "$gcc"]
+        },
+        {
+            "label": "win32-development",
+            "type": "shell",
+            "command": "./waf -p win32 -m development",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$msCompile", "$gcc"]
+        },
+        {
+            "label": "win32-release",
+            "type": "shell",
+            "command": "./waf -p win32 -m release",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$msCompile", "$gcc"]
+        },
+        {
+            "label": "win64-development",
+            "type": "shell",
+            "command": "./waf -p win64 -m development",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$msCompile", "$gcc"]
+        },
+        {
+            "label": "win64-release",
+            "type": "shell",
+            "command": "./waf -p win64 -m release",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$msCompile", "$gcc"]
+        }
+    ]
+}
