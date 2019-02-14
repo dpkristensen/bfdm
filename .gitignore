@@ -7,3 +7,6 @@ build.log
 # Python generated files
 __pycache__
 *.pyc
+
+# User settings
+.vscode/settings.json
