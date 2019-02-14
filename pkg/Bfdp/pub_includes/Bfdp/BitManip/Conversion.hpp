@@ -58,7 +58,7 @@ namespace Bfdp
         static SizeT const MaxBytes = MaxBits / BitsPerByte;
 
         //! @return The number of bytes needed to store aBits of data
-        static __inline SizeT BitsToBytes
+        static inline SizeT BitsToBytes
             (
             SizeT const aBits
             )
@@ -75,7 +75,7 @@ namespace Bfdp
         }
 
         //! @return The number of bytes needed to store aBits of data
-        static __inline SizeT BytesToBits
+        static inline SizeT BytesToBits
             (
             SizeT const aBytes
             )
