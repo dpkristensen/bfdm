@@ -1,7 +1,7 @@
 /**
     BFDP BitManip BitBuffer Definition
 
-    Copyright 2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2018-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -92,7 +92,7 @@ namespace Bfdp
 
         BitBuffer::~BitBuffer()
         {
-            delete [] mBuffer;
+            DeleteBuffer();
         }
 
         BitBuffer& BitBuffer::operator=
@@ -129,6 +129,36 @@ namespace Bfdp
             return mBuffer;
         }
 
+        void BitBuffer::MemSet
+            (
+            Byte const aByte
+            )
+        {
+            SizeT numBytes = GetCapacityBytes();
+            if( numBytes )
+            {
+                std::memset( mBuffer, aByte, numBytes );
+            }
+        }
+
+        bool BitBuffer::ResizeNoPreserve
+            (
+            SizeT const aNumBits
+            )
+        {
+            if( aNumBits <= mCapacityBits )
+            {
+                mDataBits = aNumBits;
+                return true;
+            }
+
+            DeleteBuffer();
+            BFDP_RETURNIF_VE( CreateBuffer( aNumBits ) == 0, false, "Resize failure" );
+
+            mDataBits = aNumBits;
+            return true;
+        }
+
         void BitBuffer::Copy
             (
             BitBuffer const& aOther
@@ -158,6 +188,14 @@ namespace Bfdp
             mCapacityBits = BytesToBits( numBytes );
             return numBytes;
         }
+
+        void BitBuffer::DeleteBuffer()
+        {
+            delete [] mBuffer;
+            mCapacityBits = 0;
+            mDataBits = 0;
+        }
+
     } // namespace BitManip
 
 } // namespace Bfdp

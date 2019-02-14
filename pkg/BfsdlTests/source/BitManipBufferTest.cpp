@@ -1,7 +1,7 @@
 /**
     BFDP BitManip Buffer Test
 
-    Copyright 2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2018-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -111,6 +111,29 @@ namespace BfsdlTests
         ASSERT_EQ( 20U, buf.GetDataBits() );
         ASSERT_EQ(  3U, buf.GetDataBytes() );
         ASSERT_TRUE( ArraysMatch( buf.GetDataPtr(), data, dataSizeBytes ) );
+    }
+
+    TEST_F( BitManipBufferTest, ResizeBufferNoPreserve )
+    {
+        static SizeT const dataSizeBits = 12;
+        static SizeT const dataSizeBytes = BitManip::BitsToBytes( dataSizeBits );
+
+        BitManip::BitBuffer buf;
+
+        // Ensure no crash occurs when setting with no buffer.
+        buf.MemSet( 0x42 );
+
+        ASSERT_TRUE( buf.ResizeNoPreserve( 12 ) );
+        buf.MemSet( 0x7E );
+
+        ASSERT_EQ( BitManip::BytesToBits( dataSizeBytes ), buf.GetCapacityBits() );
+        ASSERT_EQ( dataSizeBytes, buf.GetCapacityBytes() );
+        ASSERT_EQ( dataSizeBits, buf.GetDataBits() );
+        ASSERT_EQ( dataSizeBytes, buf.GetDataBytes() );
+        for( SizeT i = 0; i < dataSizeBytes; ++i )
+        {
+            ASSERT_EQ( 0x7E, buf.GetDataPtr()[i] );
+        }
     }
 
     TEST_F( BitManipBufferTest, WriteToBuffer )

@@ -1,7 +1,7 @@
 /**
     BFDP BitManip BitBuffer Declaration
 
-    Copyright 2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2018-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -57,6 +57,9 @@ namespace Bfdp
                 );
 
             //! Construct a buffer from existing data
+            //!
+            //! @note This performs a COPY; does not use the provided buffer
+            //!     directly.
             BitBuffer
                 (
                 Byte const* const aBytes,
@@ -88,6 +91,24 @@ namespace Bfdp
 
             Byte* GetDataPtr();
 
+            //! Set all bytes of the buffer to the given value
+            //!
+            //! @note This is safe to call with no allocated buffer.
+            void MemSet
+                (
+                Byte const aByte
+                );
+
+            //! Resize the buffer to aNumBits (no preservation)
+            //!
+            //! @note This does not attempt to preserve the data, but nor does it guarantee any
+            //!     post-condition about the contents of the buffer.
+            //! @return true if successful, false otherwise.
+            bool ResizeNoPreserve
+                (
+                SizeT const aNumBits
+                );
+
         private:
             //! Copy aOther into this object
             void Copy
@@ -102,6 +123,8 @@ namespace Bfdp
                 (
                 SizeT const aNumBits
                 );
+
+            void DeleteBuffer();
 
             Byte* mBuffer;
             SizeT mCapacityBits;
