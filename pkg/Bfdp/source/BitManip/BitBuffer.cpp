@@ -164,6 +164,76 @@ namespace Bfdp
             return true;
         }
 
+        bool BitBuffer::ResizePreserve
+            (
+            SizeT const aNumBits
+            )
+        {
+            if( aNumBits <= mCapacityBits )
+            {
+                mDataBits = aNumBits;
+                return true;
+            }
+
+            Byte* newBuffer;
+            SizeT numBytes;
+            if( !AllocateBits( aNumBits, newBuffer, numBytes ) )
+            {
+                return false;
+            }
+
+            //! Copy existing contents to new buffer
+            if( !IsEmpty() )
+            {
+                std::memcpy( newBuffer, mBuffer, BitsToBytes( mDataBits ) );
+            }
+
+            //! Switch buffers
+            DeleteBuffer();
+            mBuffer = newBuffer;
+
+            // Update counters
+            mCapacityBits = BytesToBits( numBytes );
+            mDataBits = aNumBits;
+            return true;
+        }
+
+        bool BitBuffer::ResizePreserve
+            (
+            SizeT const aNumBits,
+            Byte const aNewByteValue
+            )
+        {
+            SizeT oldCapacityBytes = GetCapacityBytes();
+
+            BFDP_RETURNIF_V( !ResizePreserve( aNumBits ), false );
+
+            SizeT newCapacityBytes = GetCapacityBytes();
+
+            if( newCapacityBytes > oldCapacityBytes )
+            {
+                std::memset( &mBuffer[oldCapacityBytes], aNewByteValue, newCapacityBytes - oldCapacityBytes );
+            }
+        }
+
+        //! Allocate a new buffer
+        bool BitBuffer::AllocateBits
+            (
+            SizeT const aNumBits, //!< [in] Number of bits needed
+            Byte*& aDataPtr, //!< [out] Points to buffer on success
+            SizeT& aNumBytes //!< [out] Holds number of bytes in buffer on success
+            )
+        {
+            SizeT numBytes = BitsToBytes( aNumBits );
+
+            Byte* newBuffer = new( std::nothrow ) Byte[numBytes];
+            BFDP_RETURNIF_VE( newBuffer == NULL, false, "Allocation failure" );
+
+            aNumBytes = numBytes;
+            aDataPtr = newBuffer;
+            return true;
+        }
+
         void BitBuffer::Copy
             (
             BitBuffer const& aOther
@@ -185,10 +255,11 @@ namespace Bfdp
         {
             BFDP_RETURNIF_V( aNumBits == 0, 0 );
 
-            SizeT numBytes = BitsToBytes( aNumBits );
-
-            mBuffer = new( std::nothrow ) Byte[numBytes];
-            BFDP_RETURNIF_VE( mBuffer == NULL, 0, "Allocation failure" );
+            SizeT numBytes;
+            if( !AllocateBits( aNumBits, mBuffer, numBytes ) )
+            {
+                return 0;
+            }
 
             mCapacityBits = BytesToBits( numBytes );
             return numBytes;

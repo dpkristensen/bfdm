@@ -127,7 +127,7 @@ namespace BfsdlTests
         // Ensure no crash occurs when setting with no buffer.
         buf.MemSet( 0x42 );
 
-        ASSERT_TRUE( buf.ResizeNoPreserve( 12 ) );
+        ASSERT_TRUE( buf.ResizeNoPreserve( dataSizeBits ) );
         buf.MemSet( 0x7E );
 
         ASSERT_EQ( BitManip::BytesToBits( dataSizeBytes ), buf.GetCapacityBits() );
@@ -139,6 +139,66 @@ namespace BfsdlTests
         {
             ASSERT_EQ( 0x7E, buf.GetDataPtr()[i] );
         }
+    }
+
+    TEST_F( BitManipBufferTest, ResizeBufferPreserve )
+    {
+        static Byte const initData[] = { 0xab, 0xcd, 0xef };
+        static SizeT const initSizeBytes = BFDP_COUNT_OF_ARRAY( initData );
+        static SizeT const initSizeBits = BitManip::BytesToBits( initSizeBytes );
+
+        BitManip::BitBuffer buf( initData, initSizeBits );
+
+        // Resize smaller
+        ASSERT_TRUE( buf.ResizePreserve( 12 ) );
+        ASSERT_EQ( initSizeBytes, buf.GetCapacityBytes() );
+        ASSERT_EQ( 12, buf.GetDataBits() );
+        ASSERT_EQ( 2, buf.GetDataBytes() );
+        ASSERT_TRUE( ArraysMatch( initData, buf.GetDataPtr(), initSizeBytes ) );
+
+        // Resize EVEN SMALLER
+        ASSERT_TRUE( buf.ResizePreserve( 6 ) );
+        ASSERT_EQ( initSizeBytes, buf.GetCapacityBytes() );
+        ASSERT_EQ( 6, buf.GetDataBits() );
+        ASSERT_EQ( 1, buf.GetDataBytes() );
+        ASSERT_TRUE( ArraysMatch( initData, buf.GetDataPtr(), initSizeBytes ) );
+
+        // Resize larger, within capacity
+        ASSERT_TRUE( buf.ResizePreserve( 15 ) );
+        ASSERT_EQ( initSizeBytes, buf.GetCapacityBytes() );
+        ASSERT_EQ( 15, buf.GetDataBits() );
+        ASSERT_EQ( 2, buf.GetDataBytes() );
+        ASSERT_TRUE( ArraysMatch( initData, buf.GetDataPtr(), initSizeBytes ) );
+
+        // Resize larger, beyond capacity by 1 byte
+        ASSERT_TRUE( buf.ResizePreserve( 30 ) );
+        ASSERT_EQ( 4, buf.GetCapacityBytes() );
+        ASSERT_EQ( 30, buf.GetDataBits() );
+        ASSERT_EQ( 4, buf.GetDataBytes() );
+        Byte newData30[] = { 0xab, 0xcd };
+        // Since the new bytes are uninitialized, only verify the original data up to the last
+        // size (the 3rd byte is lost because it is not part of the data)
+        ASSERT_TRUE( ArraysMatch( newData30, buf.GetDataPtr(), BFDP_COUNT_OF_ARRAY( newData30 ) ) );
+
+        // For sanity in cases below, initialize the new byte
+        buf.GetDataPtr()[2] = 0x88;
+        buf.GetDataPtr()[3] = 0x99;
+
+        // Resize again, initializing the new memory
+        ASSERT_TRUE( buf.ResizePreserve( 36, 0x12 ) );
+        ASSERT_EQ( 5, buf.GetCapacityBytes() );
+        ASSERT_EQ( 36, buf.GetDataBits() );
+        ASSERT_EQ( 5, buf.GetDataBytes() );
+        Byte newData36[] = { 0xab, 0xcd, 0x88, 0x99, 0x12 };
+        ASSERT_TRUE( ArraysMatch( newData36, buf.GetDataPtr(), 5 ) );
+
+        // Resize again, initializing the new memory to another value
+        ASSERT_TRUE( buf.ResizePreserve( 50, 0x34 ) );
+        ASSERT_EQ( 7, buf.GetCapacityBytes() );
+        ASSERT_EQ( 50, buf.GetDataBits() );
+        ASSERT_EQ( 7, buf.GetDataBytes() );
+        Byte newData42[] = { 0xab, 0xcd, 0x88, 0x99, 0x12, 0x34, 0x34 };
+        ASSERT_TRUE( ArraysMatch( newData42, buf.GetDataPtr(), 7 ) );
     }
 
     TEST_F( BitManipBufferTest, WriteToBuffer )

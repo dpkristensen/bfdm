@@ -113,7 +113,34 @@ namespace Bfdp
                 SizeT const aNumBits
                 );
 
+            //! Resize the buffer to aNumBits (preserve data)
+            //!
+            //! @return true if successful, false otherwise.
+            bool ResizePreserve
+                (
+                SizeT const aNumBits
+                );
+
+            //! Resize the buffer to aNumBits (preserve data)
+            //!
+            //! Also uses aNewByteValue to initialize any newly allocated memory.
+            //!
+            //! @return true if successful, false otherwise.
+            bool ResizePreserve
+                (
+                SizeT const aNumBits,
+                Byte const aNewByteValue
+                );
+
         private:
+            //! Allocate a new buffer
+            bool AllocateBits
+                (
+                SizeT const aNumBits, //!< [in] Number of bits needed
+                Byte*& aDataPtr, //!< [out] Points to buffer on success
+                SizeT& aNumBytes //!< [out] Holds number of bytes in buffer on success
+                );
+
             //! Copy aOther into this object
             void Copy
                 (
