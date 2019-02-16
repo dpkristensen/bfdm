@@ -62,15 +62,15 @@ namespace BfsdlTests
     TEST_F( SignTypeTest, ConstructWithValue )
     {
         SignType unspecifiedSign( SignType::Unspecified );
-        ASSERT_EQ( SignType::Unspecified, unspecifiedSign.value );
+        ASSERT_EQ( SignType::Unspecified, unspecifiedSign );
         ASSERT_FALSE( unspecifiedSign.IsSpecified() );
 
         SignType posSign( SignType::Positive );
-        ASSERT_EQ( SignType::Positive, posSign.value );
+        ASSERT_EQ( SignType::Positive, posSign );
         ASSERT_TRUE( posSign.IsSpecified() );
 
         SignType negativeSign( SignType::Negative );
-        ASSERT_EQ( SignType::Negative, negativeSign.value );
+        ASSERT_EQ( SignType::Negative, negativeSign );
         ASSERT_TRUE( negativeSign.IsSpecified() );
     }
 
@@ -78,7 +78,7 @@ namespace BfsdlTests
     {
         SignType defaultSign;
 
-        ASSERT_EQ( SignType::Unspecified, defaultSign.value );
+        ASSERT_EQ( SignType::Unspecified, defaultSign );
         ASSERT_FALSE( defaultSign.IsSpecified() );
     }
 

@@ -43,8 +43,9 @@ namespace BfsdlParser
     {
 
         //! Encapsulates a sign for numeric values
-        struct SignType BFDP_FINAL
+        class SignType BFDP_FINAL
         {
+        public:
             enum Value
             {
                 Unspecified,
@@ -59,44 +60,14 @@ namespace BfsdlParser
 
             bool IsSpecified() const;
 
-            Value value;
+            inline operator Value() const
+            {
+                return mValue;
+            }
+
+        private:
+            Value mValue;
         };
-
-        static inline bool operator==
-            (
-            SignType::Value const aLhs,
-            SignType const& aRhs
-            )
-        {
-            return aLhs == aRhs.value;
-        }
-
-        static inline bool operator==
-            (
-            SignType const& aLhs,
-            SignType::Value aRhs
-            )
-        {
-            return operator==( aRhs, aLhs );
-        }
-
-        static inline bool operator!=
-            (
-            SignType::Value const aLhs,
-            SignType const& aRhs
-            )
-        {
-            return aLhs != aRhs.value;
-        }
-
-        static inline bool operator!=
-            (
-            SignType const& aLhs,
-            SignType::Value aRhs
-            )
-        {
-            return operator!=( aRhs, aLhs );
-        }
 
     } // namespace Data
 

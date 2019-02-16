@@ -43,13 +43,13 @@ namespace BfsdlParser
             (
             Value const aValue
             )
-            : value( aValue )
+            : mValue( aValue )
         {
         }
 
         bool SignType::IsSpecified() const
         {
-            return Unspecified != value;
+            return Unspecified != mValue;
         }
 
     } // namespace Data
