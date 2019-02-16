@@ -63,6 +63,7 @@ namespace BfsdlTests
         ASSERT_EQ( dataSizeBytes, buf.GetCapacityBytes() );
         ASSERT_EQ( dataSizeBits, buf.GetDataBits() );
         ASSERT_EQ( dataSizeBytes, buf.GetDataBytes() );
+        ASSERT_FALSE( buf.IsEmpty() );
         ASSERT_TRUE( ArraysMatch( buf.GetDataPtr(), data, dataSizeBytes ) );
     }
 
@@ -75,6 +76,7 @@ namespace BfsdlTests
         ASSERT_EQ( 0U, buf.GetDataBits() );
         ASSERT_EQ( 0U, buf.GetDataBytes() );
         ASSERT_EQ( NULL, buf.GetDataPtr() );
+        ASSERT_TRUE( buf.IsEmpty() );
     }
 
     TEST_F( BitManipBufferTest, CreateEmptyBuffer1 )
@@ -86,6 +88,7 @@ namespace BfsdlTests
         ASSERT_EQ( 0U, buf.GetDataBits() );
         ASSERT_EQ( 0U, buf.GetDataBytes() );
         ASSERT_EQ( NULL, buf.GetDataPtr() );
+        ASSERT_TRUE( buf.IsEmpty() );
     }
 
     TEST_F( BitManipBufferTest, CreateEmptyBuffer2 )
@@ -110,6 +113,7 @@ namespace BfsdlTests
         ASSERT_EQ( dataSizeBytes, buf.GetCapacityBytes() );
         ASSERT_EQ( 20U, buf.GetDataBits() );
         ASSERT_EQ(  3U, buf.GetDataBytes() );
+        ASSERT_FALSE( buf.IsEmpty() );
         ASSERT_TRUE( ArraysMatch( buf.GetDataPtr(), data, dataSizeBytes ) );
     }
 
@@ -130,6 +134,7 @@ namespace BfsdlTests
         ASSERT_EQ( dataSizeBytes, buf.GetCapacityBytes() );
         ASSERT_EQ( dataSizeBits, buf.GetDataBits() );
         ASSERT_EQ( dataSizeBytes, buf.GetDataBytes() );
+        ASSERT_FALSE( buf.IsEmpty() );
         for( SizeT i = 0; i < dataSizeBytes; ++i )
         {
             ASSERT_EQ( 0x7E, buf.GetDataPtr()[i] );

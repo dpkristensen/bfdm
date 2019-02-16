@@ -91,6 +91,10 @@ namespace Bfdp
 
             Byte* GetDataPtr();
 
+            //! @note Memory may still be allocated
+            //! @return Whether the number of data bits is 0
+            bool BitBuffer::IsEmpty() const;
+
             //! Set all bytes of the buffer to the given value
             //!
             //! @note This is safe to call with no allocated buffer.

@@ -129,6 +129,11 @@ namespace Bfdp
             return mBuffer;
         }
 
+        bool BitBuffer::IsEmpty() const
+        {
+            return mDataBits == 0;
+        }
+
         void BitBuffer::MemSet
             (
             Byte const aByte
