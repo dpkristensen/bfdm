@@ -1,7 +1,7 @@
 /**
     BFDP BitManip Conversion Declarations
 
-    Copyright 2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -57,6 +57,13 @@ namespace Bfdp
         //! Max number of bytes (theoretical) for bitwise operations
         static SizeT const MaxBytes = MaxBits / BitsPerByte;
 
+        //! Typedef used to represent radices, in case it needs to change later...
+        typedef UInt RadixType;
+
+        static RadixType const InvalidRadix = 0;
+        static RadixType const MinRadix = 2;
+        static RadixType const MaxRadix = 36;
+
         //! @return The number of bytes needed to store aBits of data
         static inline SizeT BitsToBytes
             (
@@ -87,6 +94,28 @@ namespace Bfdp
             }
 
             return aBytes * BitsPerByte;
+        }
+
+        //! Convert character to numeric value with specified radix
+        bool ConvertBase
+            (
+            RadixType const aRadix,
+            char const aChar,
+            UInt8& aValue
+            );
+
+        //! @return The number of bits needed to store a digit in the given radix, or 0 on error.
+        SizeT GetRadixBits
+            (
+            RadixType const aRadix
+            );
+
+        inline bool IsValidRadix
+            (
+            RadixType const aRadix
+            )
+        {
+            return IsWithinRange( MinRadix, aRadix, MaxRadix );
         }
 
     } // namespace BitManip
