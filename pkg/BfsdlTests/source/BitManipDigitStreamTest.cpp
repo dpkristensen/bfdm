@@ -75,8 +75,8 @@ namespace BfsdlTests
             { "0", 37, false, "" },
 
             // Empty string
-            { "", 2, true, "" },
-            { "", 8, true, "" },
+            { "", 2, true, "0" },
+            { "", 8, true, "0" },
 
             // Invalid input
             { "1.", 2, false, "" },
@@ -116,6 +116,7 @@ namespace BfsdlTests
             BitManip::DigitStream stream;
 
             ASSERT_EQ( testData[i].result, stream.Set( testData[i].input, testData[i].radix ) );
+            ASSERT_EQ( testData[i].result, stream.IsDefined() );
             if( testData[i].result )
             {
                 ASSERT_EQ( testData[i].radix, stream.GetRadix() );

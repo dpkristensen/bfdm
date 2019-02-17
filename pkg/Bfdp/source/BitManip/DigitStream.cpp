@@ -56,6 +56,11 @@ namespace Bfdp
             return mRadix;
         }
 
+        bool DigitStream::IsDefined() const
+        {
+            return mRadix != InvalidRadix;
+        }
+
         std::string DigitStream::GetStr()
         {
             SizeT bitsPerDigit = BitManip::GetRadixBits( mRadix );
@@ -91,6 +96,11 @@ namespace Bfdp
                 return std::string();
             }
 
+            // Return "0" if no digits present
+            if( digits.empty() )
+            {
+                digits = "0";
+            }
             return digits;
         }
 

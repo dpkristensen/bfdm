@@ -60,6 +60,9 @@ namespace Bfdp
             //!     string on error.
             std::string GetStr();
 
+            //! @return true if a value has been set
+            bool IsDefined() const;
+
             //! Set the value of the string
             bool Set
                 (
