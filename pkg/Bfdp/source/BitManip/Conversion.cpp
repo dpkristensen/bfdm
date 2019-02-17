@@ -76,6 +76,35 @@ namespace Bfdp
             return true;
         }
 
+        bool ConvertBase
+            (
+            RadixType const aRadix,
+            UInt8 const aValue,
+            char& aSymbol
+            )
+        {
+            BFDP_RETURNIF_V( !IsValidRadix( aRadix ), false );
+            BFDP_RETURNIF_V( aValue >= aRadix, false );
+
+            char out = 0;
+            if( IsWithinRange< UInt8 >( 0, aValue, 9 ) )
+            {
+                out = '0' + static_cast< char >( aValue );
+            }
+            else if( IsWithinRange< UInt8 >( 10, aValue, 35 ) )
+            {
+                out = 'a' + static_cast< char >( aValue - 10 );
+            }
+            else
+            {
+                BFDP_CTIME_ASSERT( MaxRadix == 36, "Unsupported conversion" );
+                return false;
+            }
+
+            aSymbol = out;
+            return true;
+        }
+
         SizeT GetRadixBits
             (
             RadixType const aRadix

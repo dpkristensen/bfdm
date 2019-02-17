@@ -31,6 +31,7 @@
 */
 
 // External includes
+#include <cctype>
 #include "gtest/gtest.h"
 
 // Internal Includes
@@ -101,8 +102,6 @@ namespace BfsdlTests
 
     TEST_F( BitManipConversionTest, ConvertBase )
     {
-        static UInt8 const X = 0; // "Don't care" value
-
         struct TestDataType
         {
             BitManip::RadixType radix;
@@ -112,45 +111,45 @@ namespace BfsdlTests
         } TestData[] =
         {
             // Base-1 number system not computationally possible
-            {  1, '0', false, X },
+            {  1, '0', false, 0 },
 
             // Base-2
             {  2, '0', true, 0 },
             {  2, '1', true, 1 },
-            {  2, '2', false, X },
+            {  2, '2', false, 2 },
 
             // Base-8
             {  8, '0', true, 0 },
             {  8, '7', true, 7 },
-            {  8, '8', false, X },
+            {  8, '8', false, 8 },
 
             // Base-10
             { 10, '0', true, 0 },
             { 10, '9', true, 9 },
-            { 10, 'A', false, X },
-            { 10, 'a', false, X },
+            { 10, 'A', false, 10 },
+            { 10, 'a', false, 10 },
 
             // Base-16
             { 16, '0', true, 0 },
             { 16, 'f', true, 15 },
             { 16, 'F', true, 15 },
-            { 16, 'g', false, X },
-            { 16, 'g', false, X },
+            { 16, 'g', false, 17 },
+            { 16, 'G', false, 17 },
 
             // Base-36
             { 36, '0', true, 0 },
             { 36, 'z', true, 35 },
             { 36, 'Z', true, 35 },
-            { 36, '[', false, X },
-            { 36, '{', false, X },
+            { 36, '[', false, 36 },
+            { 36, '{', false, 36 },
 
             // Base-37 (not supported)
-            { 37, '0', false, X },
-            { 37, '9', false, X },
-            { 37, 'a', false, X },
-            { 37, 'A', false, X },
-            { 37, 'z', false, X },
-            { 37, 'Z', false, X },
+            { 37, '0', false, 0 },
+            { 37, '9', false, 9 },
+            { 37, 'a', false, 10 },
+            { 37, 'A', false, 10 },
+            { 37, 'z', false, 35 },
+            { 37, 'Z', false, 35 },
         };
         static SizeT const TestCount = BFDP_COUNT_OF_ARRAY( TestData );
 
@@ -162,13 +161,22 @@ namespace BfsdlTests
                 ::testing::Message( "[" ) << i << "]"
                 << " radix=" << t.radix
                 << " char=" << t.symbol
+                << " value=" << static_cast< UInt >( t.value )
                 );
 
-            UInt8 out;
-            ASSERT_EQ( t.result, BitManip::ConvertBase( t.radix, t.symbol, out ) );
+            UInt8 outValue;
+            ASSERT_EQ( t.result, BitManip::ConvertBase( t.radix, t.symbol, outValue ) );
             if( t.result )
             {
-                ASSERT_EQ( t.value, out );
+                ASSERT_EQ( t.value, outValue );
+            }
+
+            char outChar;
+            ASSERT_EQ( t.result, BitManip::ConvertBase( t.radix, t.value, outChar ) );
+            if( t.result )
+            {
+                // Symbol output is lowercase
+                ASSERT_EQ( std::tolower(t.symbol), outChar );
             }
         }
     }

@@ -104,6 +104,14 @@ namespace Bfdp
             UInt8& aValue
             );
 
+        //! Convert numeric value to character with the specified radix
+        bool ConvertBase
+            (
+            RadixType const aRadix,
+            UInt8 const aValue,
+            char& aSymbol
+            );
+
         //! @return The number of bits needed to store a digit in the given radix, or 0 on error.
         SizeT GetRadixBits
             (
