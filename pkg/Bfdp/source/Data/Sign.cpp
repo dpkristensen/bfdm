@@ -33,6 +33,9 @@
 // Base Includes
 #include "Bfdp/Data/Sign.hpp"
 
+// Internal Includes
+#include "Bfdp/Macros.hpp"
+
 namespace Bfdp
 {
 
@@ -45,6 +48,24 @@ namespace Bfdp
             )
             : mValue( aValue )
         {
+        }
+
+        char const* Sign::GetExplicitStr() const
+        {
+            static char const* text[] = { "+", "-" };
+            BFDP_CTIME_ASSERT( BFDP_COUNT_OF_ARRAY( text ) == Count, "Table count mismatch" );
+
+            if( mValue < Count )
+            {
+                return text[mValue];
+            }
+
+            return "?";
+        }
+
+        char const* Sign::GetStr() const
+        {
+            return ( Negative == mValue ) ? "-" : "";
         }
 
         bool Sign::IsSpecified() const

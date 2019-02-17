@@ -48,15 +48,21 @@ namespace Bfdp
         public:
             enum Value
             {
-                Unspecified,
                 Positive,
-                Negative
+                Negative,
+
+                Count,
+                Unspecified = Count
             };
 
             Sign
                 (
                 Value const aValue = Unspecified
                 );
+
+            char const* GetExplicitStr() const;
+
+            char const* GetStr() const;
 
             bool IsSpecified() const;
 

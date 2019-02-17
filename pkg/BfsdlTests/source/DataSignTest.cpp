@@ -64,14 +64,20 @@ namespace BfsdlTests
         Sign unspecifiedSign( Sign::Unspecified );
         ASSERT_EQ( Sign::Unspecified, unspecifiedSign );
         ASSERT_FALSE( unspecifiedSign.IsSpecified() );
+        ASSERT_STREQ( "?", unspecifiedSign.GetExplicitStr() );
+        ASSERT_STREQ( "", unspecifiedSign.GetStr() );
 
         Sign posSign( Sign::Positive );
         ASSERT_EQ( Sign::Positive, posSign );
         ASSERT_TRUE( posSign.IsSpecified() );
+        ASSERT_STREQ( "+", posSign.GetExplicitStr() );
+        ASSERT_STREQ( "", posSign.GetStr() );
 
         Sign negativeSign( Sign::Negative );
         ASSERT_EQ( Sign::Negative, negativeSign );
         ASSERT_TRUE( negativeSign.IsSpecified() );
+        ASSERT_STREQ( "-", negativeSign.GetExplicitStr() );
+        ASSERT_STREQ( "-", negativeSign.GetStr() );
     }
 
     TEST_F( DataSignTest, DefaultState )
@@ -80,6 +86,8 @@ namespace BfsdlTests
 
         ASSERT_EQ( Sign::Unspecified, defaultSign );
         ASSERT_FALSE( defaultSign.IsSpecified() );
+        ASSERT_STREQ( "?", defaultSign.GetExplicitStr() );
+        ASSERT_STREQ( "", defaultSign.GetStr() );
     }
 
 } // namespace BfsdlTests
