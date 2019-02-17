@@ -1,7 +1,7 @@
 /**
-    BFSDL Parser Sign Type Declarations
+    BFDP Data Sign Declarations
 
-    Copyright 2016-2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -30,28 +30,47 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// Base Includes
-#include "BfsdlParser/Data/SignType.hpp"
+#ifndef Bfdp_Data_Sign
+#define Bfdp_Data_Sign
 
-namespace BfsdlParser
+// Internal Includes
+#include "Bfdp/Macros.hpp"
+
+namespace Bfdp
 {
 
     namespace Data
     {
 
-        SignType::SignType
-            (
-            Value const aValue
-            )
-            : mValue( aValue )
+        //! Encapsulates a sign for numeric values
+        class Sign BFDP_FINAL
         {
-        }
+        public:
+            enum Value
+            {
+                Unspecified,
+                Positive,
+                Negative
+            };
 
-        bool SignType::IsSpecified() const
-        {
-            return Unspecified != mValue;
-        }
+            Sign
+                (
+                Value const aValue = Unspecified
+                );
+
+            bool IsSpecified() const;
+
+            inline operator Value() const
+            {
+                return mValue;
+            }
+
+        private:
+            Value mValue;
+        };
 
     } // namespace Data
 
-} // namespace BfsdlParser
+} // namespace Bfdp
+
+#endif // Bfdp_Data_Sign

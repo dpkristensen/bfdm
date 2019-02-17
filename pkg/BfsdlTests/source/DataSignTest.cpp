@@ -1,7 +1,7 @@
 /**
-    BFDP BitManip Buffer Test
+    BFDP Data Sign Test
 
-    Copyright 2016-2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -32,13 +32,13 @@
 
 #include "gtest/gtest.h"
 
-#include "BfsdlParser/Data/SignType.hpp"
+#include "Bfdp/Data/Sign.hpp"
 #include "BfsdlTests/TestUtil.hpp"
 
 namespace BfsdlTests
 {
 
-    class SignTypeTest
+    class DataSignTest
         : public ::testing::Test
     {
     public:
@@ -48,37 +48,37 @@ namespace BfsdlTests
         }
     };
 
-    using BfsdlParser::Data::SignType;
+    using Bfdp::Data::Sign;
 
-    TEST_F( SignTypeTest, Compare )
+    TEST_F( DataSignTest, Compare )
     {
-        ASSERT_TRUE( SignType::Positive == SignType( SignType::Positive ) );
-        ASSERT_FALSE( SignType::Negative == SignType( SignType::Positive ) );
+        ASSERT_TRUE( Sign::Positive == Sign( Sign::Positive ) );
+        ASSERT_FALSE( Sign::Negative == Sign( Sign::Positive ) );
 
-        ASSERT_TRUE( SignType::Negative != SignType( SignType::Positive ) );
-        ASSERT_FALSE( SignType::Positive != SignType( SignType::Positive ) );
+        ASSERT_TRUE( Sign::Negative != Sign( Sign::Positive ) );
+        ASSERT_FALSE( Sign::Positive != Sign( Sign::Positive ) );
     }
 
-    TEST_F( SignTypeTest, ConstructWithValue )
+    TEST_F( DataSignTest, ConstructWithValue )
     {
-        SignType unspecifiedSign( SignType::Unspecified );
-        ASSERT_EQ( SignType::Unspecified, unspecifiedSign );
+        Sign unspecifiedSign( Sign::Unspecified );
+        ASSERT_EQ( Sign::Unspecified, unspecifiedSign );
         ASSERT_FALSE( unspecifiedSign.IsSpecified() );
 
-        SignType posSign( SignType::Positive );
-        ASSERT_EQ( SignType::Positive, posSign );
+        Sign posSign( Sign::Positive );
+        ASSERT_EQ( Sign::Positive, posSign );
         ASSERT_TRUE( posSign.IsSpecified() );
 
-        SignType negativeSign( SignType::Negative );
-        ASSERT_EQ( SignType::Negative, negativeSign );
+        Sign negativeSign( Sign::Negative );
+        ASSERT_EQ( Sign::Negative, negativeSign );
         ASSERT_TRUE( negativeSign.IsSpecified() );
     }
 
-    TEST_F( SignTypeTest, DefaultState )
+    TEST_F( DataSignTest, DefaultState )
     {
-        SignType defaultSign;
+        Sign defaultSign;
 
-        ASSERT_EQ( SignType::Unspecified, defaultSign );
+        ASSERT_EQ( Sign::Unspecified, defaultSign );
         ASSERT_FALSE( defaultSign.IsSpecified() );
     }
 
