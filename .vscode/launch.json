@@ -5,17 +5,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "win-auto-test",
-            "type": "cppvsdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/_out/win-auto_development/BfsdlTests.exe",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false
-        },
-        {
             "name": "win32-test",
             "type": "cppvsdbg",
             "request": "launch",

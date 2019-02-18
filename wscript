@@ -56,7 +56,6 @@ SupportedMode = collections.namedtuple( 'SupportedMode', ['name', 'msvc_defines'
 
 # Configure platforms; the first entry is the default if none is specified.
 my_platforms = [
-    SupportedPlatform( name='win-auto', cxx_target="", description="Windows (auto-detect)" ),
     SupportedPlatform( name='win32', cxx_target="x86", description="Windows 32-bit x86 architecture" ),
     SupportedPlatform( name='win64', cxx_target="x86_64", description="Windows 64-bit x86 architecture" )
     ]

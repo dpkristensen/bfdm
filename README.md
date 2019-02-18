@@ -35,6 +35,3 @@ For example:
 
     # Build win64 targets in release
     ./waf -p win64 -m release
-
-    # Build with whatever windows compiler can be found:
-    ./waf -p winauto

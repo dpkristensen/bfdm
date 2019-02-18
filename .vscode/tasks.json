@@ -4,26 +4,6 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "win-auto-development",
-            "type": "shell",
-            "command": "./waf -p win-auto -m development",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": ["$msCompile", "$gcc"]
-        },
-        {
-            "label": "win-auto-release",
-            "type": "shell",
-            "command": "./waf -p win-auto -m release",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": ["$msCompile", "$gcc"]
-        },
-        {
             "label": "win32-development",
             "type": "shell",
             "command": "./waf -p win32 -m development",
