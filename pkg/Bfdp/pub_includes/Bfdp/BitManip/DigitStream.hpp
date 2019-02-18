@@ -38,7 +38,7 @@
 
 // Internal Includes
 #include "Bfdp/BitManip/BitBuffer.hpp"
-#include "Bfdp/BitManip/Conversion.hpp"
+#include "Bfdp/Data/Radix.hpp"
 
 namespace Bfdp
 {
@@ -54,7 +54,7 @@ namespace Bfdp
         public:
             DigitStream();
 
-            RadixType GetRadix() const;
+            Data::RadixType GetRadix() const;
 
             //! @return A string representation of the digits, or an empty
             //!     string on error.
@@ -67,12 +67,12 @@ namespace Bfdp
             bool Set
                 (
                 std::string const aDigits,
-                RadixType const aRadix
+                Data::RadixType const aRadix
                 );
 
         private:
             BitBuffer mBuffer;
-            RadixType mRadix;
+            Data::RadixType mRadix;
         };
 
     } // namespace BitManip

@@ -48,7 +48,7 @@ namespace BfsdlParser
         using namespace Bfdp;
 
         NumericLiteral::NumericLiteral()
-            : mRadix( BitManip::InvalidRadix )
+            : mRadix( Data::InvalidRadix )
         {
         }
 
@@ -119,7 +119,7 @@ namespace BfsdlParser
 
         void NumericLiteral::SetRadix
             (
-            BitManip::RadixType const aRadix
+            Data::RadixType const aRadix
             )
         {
             mRadix = aRadix;

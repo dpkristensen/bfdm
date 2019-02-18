@@ -55,7 +55,7 @@ namespace BfsdlTests
     {
         BitManip::DigitStream stream;
 
-        ASSERT_EQ( BitManip::InvalidRadix, stream.GetRadix() );
+        ASSERT_EQ( Data::InvalidRadix, stream.GetRadix() );
         std::string outStr = stream.GetStr();
         ASSERT_STREQ( "", outStr.c_str() );
     }
@@ -65,7 +65,7 @@ namespace BfsdlTests
         struct TestDataType
         {
             std::string input;
-            BitManip::RadixType radix;
+            Data::RadixType radix;
             bool result;
             char const* output;
         } const testData[] =

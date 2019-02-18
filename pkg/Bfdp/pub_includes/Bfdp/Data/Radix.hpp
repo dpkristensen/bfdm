@@ -1,5 +1,5 @@
 /**
-    BFDP BitManip Conversion Definitions
+    BFDP Data Radix Declarations
 
     Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
@@ -30,102 +30,61 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// Base Includes
-#include "Bfdp/BitManip/Conversion.hpp"
+#ifndef Bfdp_Data_Radix
+#define Bfdp_Data_Radix
 
-// Internal Includes
-#include "Bfdp/Macros.hpp"
+// External Includes
+#include <limits>
+
+// Internal includes
+#include "Bfdp/Common.hpp"
+#include "Bfdp/ErrorReporter/Functions.hpp"
 
 namespace Bfdp
 {
 
-    namespace BitManip
+    namespace Data
     {
 
+        //! Typedef used to represent radices, in case it needs to change later...
+        typedef UInt RadixType;
+
+        static RadixType const InvalidRadix = 0;
+        static RadixType const MinRadix = 2;
+        static RadixType const MaxRadix = 36;
+
+        //! Convert character to numeric value with specified radix
         bool ConvertBase
             (
             RadixType const aRadix,
             char const aChar,
             UInt8& aValue
-            )
-        {
-            BFDP_RETURNIF_V( !IsValidRadix( aRadix ), false );
+            );
 
-            UInt8 digit = 0;
-            if( IsWithinRange( '0', aChar, '9' ) )
-            {
-                digit = static_cast< UInt8 >( aChar - '0' );
-            }
-            else if( IsWithinRange( 'a', aChar, 'z' ) )
-            {
-                digit = static_cast< UInt8 >( aChar - 'a' ) + 10;
-            }
-            else if( IsWithinRange( 'A', aChar, 'Z' ) )
-            {
-                digit = static_cast< UInt8 >( aChar - 'A' ) + 10;
-            }
-            else
-            {
-                BFDP_CTIME_ASSERT( MaxRadix == 36, "Unsupported conversion" );
-                return false;
-            }
-
-            BFDP_RETURNIF_V( digit >= aRadix, false );
-
-            aValue = digit;
-            return true;
-        }
-
+        //! Convert numeric value to character with the specified radix
         bool ConvertBase
             (
             RadixType const aRadix,
             UInt8 const aValue,
             char& aSymbol
-            )
-        {
-            BFDP_RETURNIF_V( !IsValidRadix( aRadix ), false );
-            BFDP_RETURNIF_V( aValue >= aRadix, false );
+            );
 
-            char out = 0;
-            if( IsWithinRange< UInt8 >( 0, aValue, 9 ) )
-            {
-                out = '0' + static_cast< char >( aValue );
-            }
-            else if( IsWithinRange< UInt8 >( 10, aValue, 35 ) )
-            {
-                out = 'a' + static_cast< char >( aValue - 10 );
-            }
-            else
-            {
-                BFDP_CTIME_ASSERT( MaxRadix == 36, "Unsupported conversion" );
-                return false;
-            }
-
-            aSymbol = out;
-            return true;
-        }
-
+        //! @return The number of bits needed to store a digit in the given radix, or 0 on error.
         SizeT GetRadixBits
+            (
+            RadixType const aRadix
+            );
+
+        inline bool IsValidRadix
             (
             RadixType const aRadix
             )
         {
-            if( !IsValidRadix( aRadix ) )
-            {
-                return 0;
-            }
-
-            RadixType limit = 2;
-            SizeT bits = 1;
-            while( aRadix > limit )
-            {
-                limit <<= 1U;
-                ++bits;
-            }
-
-            return bits;
+            return IsWithinRange( MinRadix, aRadix, MaxRadix );
         }
 
     } // namespace Data
 
 } // namespace Bfdp
+
+#endif // Bfdp_Data_Radix

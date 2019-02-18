@@ -46,24 +46,24 @@ namespace Bfdp
     {
 
         DigitStream::DigitStream()
-            : mRadix( InvalidRadix )
+            : mRadix( Data::InvalidRadix )
         {
 
         }
 
-        RadixType DigitStream::GetRadix() const
+        Data::RadixType DigitStream::GetRadix() const
         {
             return mRadix;
         }
 
         bool DigitStream::IsDefined() const
         {
-            return mRadix != InvalidRadix;
+            return mRadix != Data::InvalidRadix;
         }
 
         std::string DigitStream::GetStr()
         {
-            SizeT bitsPerDigit = BitManip::GetRadixBits( mRadix );
+            SizeT bitsPerDigit = Data::GetRadixBits( mRadix );
             BFDP_RETURNIF_V( bitsPerDigit == 0, std::string() );
             BFDP_RETURNIF_VA
                 (
@@ -81,7 +81,7 @@ namespace Bfdp
             while( bs.ReadBits( &value, bitsPerDigit ) )
             {
                 char symbol;
-                if( !BitManip::ConvertBase( mRadix, value, symbol ) )
+                if( !Data::ConvertBase( mRadix, value, symbol ) )
                 {
                     return std::string();
                 }
@@ -107,10 +107,10 @@ namespace Bfdp
         bool DigitStream::Set
             (
             std::string const aDigits,
-            RadixType const aRadix
+            Data::RadixType const aRadix
             )
         {
-            SizeT bitsPerDigit = BitManip::GetRadixBits( aRadix );
+            SizeT bitsPerDigit = Data::GetRadixBits( aRadix );
             BFDP_RETURNIF_V( bitsPerDigit == 0, false );
 
             BitBuffer buffer;
@@ -124,7 +124,7 @@ namespace Bfdp
             for( ; iter != aDigits.end(); ++iter )
             {
                 UInt8 value;
-                ok = BitManip::ConvertBase( aRadix, *iter, value );
+                ok = Data::ConvertBase( aRadix, *iter, value );
                 if( !ok )
                 {
                     break;

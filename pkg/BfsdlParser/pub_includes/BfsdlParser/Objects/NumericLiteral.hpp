@@ -91,7 +91,7 @@ namespace BfsdlParser
 
             void SetRadix
                 (
-                Bfdp::BitManip::RadixType const aRadix
+                Bfdp::Data::RadixType const aRadix
                 );
 
         private:
@@ -99,7 +99,7 @@ namespace BfsdlParser
             Bfdp::Data::FlexNumber mNumber;
 
             // Temporary value for radix
-            Bfdp::BitManip::RadixType mRadix;
+            Bfdp::Data::RadixType mRadix;
         };
 
     } // namespace Objects
