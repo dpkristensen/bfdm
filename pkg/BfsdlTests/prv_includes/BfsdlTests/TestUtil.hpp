@@ -55,6 +55,19 @@ namespace BfsdlTests
 
     void SetDefaultErrorHandlers();
 
+    template< class T >
+    T const* PtrValueOrNull( T const* aPtr, T const* aNullValue )
+    {
+        return ( aPtr == NULL )
+            ? aNullValue
+            : aPtr;
+    }
+
+    static inline char const* StrOrNull( char const* aString )
+    {
+        return PtrValueOrNull( aString, "(null)" );
+    }
+
 } // namespace BfsdlTests
 
 #endif // BfsdlTests_TestUtil
