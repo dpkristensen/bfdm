@@ -31,5 +31,8 @@
 :sources
     source/**/*.cpp
 
+:prv_includes
+    prv_includes
+
 :pub_includes
     pub_includes

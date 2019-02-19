@@ -1,7 +1,7 @@
 /**
     BFDP Lexer Symbolizer Definition
 
-    Copyright 2016-2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -161,8 +161,9 @@ namespace Bfdp
                 }
                 else if( bytesRead == 0 )
                 {
-                    // Wide NULL character, mark bytes as read
-                    bytesRead = bytesToConvert;
+                    BFDP_RUNTIME_ERROR( "Invalid multi-byte character sequence" );
+                    aBytesRead = curPos;
+                    return false;
                 }
 
                 /* Categorize the symbol */

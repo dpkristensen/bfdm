@@ -1,7 +1,7 @@
 /**
     BFDP Unicode to ASCII Converter
 
-    Copyright 2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2018-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -80,7 +80,7 @@ namespace Bfdp
                 return 0;
             }
 
-            CodePoint ascii = reinterpret_cast< CodePoint const& >( aBytesIn[0] ) & 0xFF;
+            CodePoint ascii = static_cast< CodePoint >( aBytesIn[0] );
             return Transcode( false, Conv, NumConv, ascii, aSymbolOut );
         }
 

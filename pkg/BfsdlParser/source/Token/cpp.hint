@@ -1,0 +1,5 @@
+#define BFDP_STATE_MAP_BEGIN( _bool_result, _engine, _num_states ) @<
+
+#define BFDP_STATE_ACTION( _id, _trigger, _action ) @=
+
+#define BFDP_STATE_MAP_END() @>
