@@ -46,7 +46,7 @@ namespace Bfdp
 
         bool FlexNumber::Component::IsDefined() const
         {
-            return integral.IsDefined() || fractional.IsDefined();
+            return sign.IsSpecified() && ( integral.IsDefined() || fractional.IsDefined() );
         }
 
         std::string FlexNumber::Component::GetStr

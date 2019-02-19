@@ -71,15 +71,15 @@ namespace BfsdlTests
             { Sign::Negative, NULL, NULL, false, "-0" },
 
             // Variations of integral values
-            { Sign::Unspecified, "123", NULL, true, "?123" },
+            { Sign::Unspecified, "123", NULL, false, "?123" },
             { Sign::Positive, "123", NULL, true, "+123" },
 
             // Variations of fractional values
-            { Sign::Unspecified, NULL, "456", true, "?0.456" },
+            { Sign::Unspecified, NULL, "456", false, "?0.456" },
             { Sign::Negative, NULL, "456", true, "-0.456" },
 
             // Variations of combined values
-            { Sign::Unspecified, "123", "456", true, "?123.456" },
+            { Sign::Unspecified, "123", "456", false, "?123.456" },
             { Sign::Positive, "123", "456", true, "+123.456" },
             { Sign::Negative, "123", "456", true, "-123.456" }
         };
