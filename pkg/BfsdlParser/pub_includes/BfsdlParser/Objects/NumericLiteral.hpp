@@ -64,6 +64,8 @@ namespace BfsdlParser
 
             bool IsDefined() const;
 
+            void Reset();
+
             bool SetExponentDigits
                 (
                 std::string const aDigits

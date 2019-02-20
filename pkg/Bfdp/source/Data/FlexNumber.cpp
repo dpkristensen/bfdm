@@ -68,6 +68,13 @@ namespace Bfdp
             return out.str();
         }
 
+        void FlexNumber::Component::Reset()
+        {
+            sign = Sign::Unspecified;
+            integral.Reset();
+            fractional.Reset();
+        }
+
         std::string FlexNumber::GetStr
             (
             bool const aVerbose
@@ -99,6 +106,13 @@ namespace Bfdp
         bool FlexNumber::IsDefined() const
         {
             return significand.IsDefined() || ( base.IsDefined() && exponent.IsDefined() );
+        }
+
+        void FlexNumber::Reset()
+        {
+            significand.Reset();
+            base.Reset();
+            exponent.Reset();
         }
 
     } // namespace Data

@@ -63,6 +63,8 @@ namespace Bfdp
             //! @return true if a value has been set
             bool IsDefined() const;
 
+            void Reset();
+
             //! Set the value of the string
             bool Set
                 (

@@ -104,6 +104,12 @@ namespace Bfdp
             return digits;
         }
 
+        void DigitStream::Reset()
+        {
+            mRadix = Data::InvalidRadix;
+            BFDP_UNUSED_RETURN( mBuffer.ResizeNoPreserve( 0 ) );
+        }
+
         bool DigitStream::Set
             (
             std::string const aDigits,

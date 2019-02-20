@@ -67,6 +67,25 @@ namespace BfsdlTests
         ASSERT_STREQ( "", literal.GetStr( true ).c_str() );
     }
 
+    TEST_F( NumericLiteralTest, Reset )
+    {
+        BfsdlParser::Objects::NumericLiteral literal;
+
+        literal.SetSignificandSign( Data::Sign::Positive );
+        literal.SetRadix( 8 );
+        ASSERT_TRUE( literal.SetSignificandIntegralDigits( "123" ) );
+        ASSERT_TRUE( literal.SetSignificandFractionalDigits( "456" ) );
+        literal.SetExponentSign( Data::Sign::Negative );
+        ASSERT_TRUE( literal.SetExponentDigits( "70" ) );
+
+        ASSERT_TRUE( literal.IsDefined() );
+        ASSERT_STREQ( "+123.456 x +2 ^ -70", literal.GetStr( true ).c_str() );
+
+        literal.Reset();
+        ASSERT_FALSE( literal.IsDefined() );
+        ASSERT_STREQ( "", literal.GetStr( true ).c_str() );
+    }
+
     TEST_F( NumericLiteralTest, SetValueBase10 )
     {
         BfsdlParser::Objects::NumericLiteral literal;

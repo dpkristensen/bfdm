@@ -80,10 +80,13 @@ namespace Bfdp
             struct Component
             {
                 bool IsDefined() const;
+
                 std::string GetStr
                     (
                     bool const aVerbose = false
                     );
+
+                void Reset();
 
                 Sign sign;
                 BitManip::DigitStream integral;
@@ -96,6 +99,8 @@ namespace Bfdp
                 (
                 bool const aVerbose = false
                 );
+
+            void Reset();
 
             Component significand;
             Component base;

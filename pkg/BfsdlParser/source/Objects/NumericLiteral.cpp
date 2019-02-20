@@ -65,6 +65,11 @@ namespace BfsdlParser
             return mNumber.IsDefined();
         }
 
+        void NumericLiteral::Reset()
+        {
+            mNumber.Reset();
+        }
+
         bool NumericLiteral::SetExponentDigits
             (
             std::string const aDigits

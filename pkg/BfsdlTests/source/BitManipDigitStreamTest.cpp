@@ -62,6 +62,8 @@ namespace BfsdlTests
 
     TEST_F( BitManipDigitStreamTest, SetDigits )
     {
+        BitManip::DigitStream stream;
+
         struct TestDataType
         {
             std::string input;
@@ -113,8 +115,6 @@ namespace BfsdlTests
                     << " radix=" << testData[i].radix
                 );
 
-            BitManip::DigitStream stream;
-
             ASSERT_EQ( testData[i].result, stream.Set( testData[i].input, testData[i].radix ) );
             ASSERT_EQ( testData[i].result, stream.IsDefined() );
             if( testData[i].result )
@@ -123,6 +123,8 @@ namespace BfsdlTests
             }
             std::string outStr = stream.GetStr();
             ASSERT_STREQ( testData[i].output, outStr.c_str() );
+
+            stream.Reset();
         }
     }
 
