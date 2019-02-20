@@ -1,6 +1,5 @@
 # Build artifacts
 _out
-external
 .lock-waf*
 build.log
 
