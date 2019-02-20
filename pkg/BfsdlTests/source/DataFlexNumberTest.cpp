@@ -119,6 +119,104 @@ namespace BfsdlTests
         ASSERT_STREQ( "", defaultNumber.GetStr( true ).c_str() );
     }
 
+    TEST_F( DataFlexNumberTest, Set )
+    {
+        FlexNumber number;
+
+        // Significand
+
+        number.significand.sign = Data::Sign::Positive;
+        ASSERT_FALSE( number.IsDefined() );
+        ASSERT_FALSE( number.significand.IsDefined() );
+        ASSERT_FALSE( number.significand.integral.IsDefined() );
+        ASSERT_FALSE( number.significand.fractional.IsDefined() );
+        ASSERT_STREQ( "", number.GetStr( true ).c_str() );
+
+        ASSERT_TRUE( number.significand.integral.Set( "135", 16 ) );
+        ASSERT_TRUE( number.IsDefined() );
+        ASSERT_TRUE( number.significand.IsDefined() );
+        ASSERT_TRUE( number.significand.integral.IsDefined() );
+        ASSERT_FALSE( number.significand.fractional.IsDefined() );
+        ASSERT_STREQ( "+135", number.GetStr( true ).c_str() );
+
+        number.significand.integral.Reset();
+        ASSERT_FALSE( number.IsDefined() );
+        ASSERT_FALSE( number.significand.IsDefined() );
+        ASSERT_FALSE( number.significand.integral.IsDefined() );
+        ASSERT_FALSE( number.significand.fractional.IsDefined() );
+        ASSERT_STREQ( "", number.GetStr( true ).c_str() );
+
+        ASSERT_TRUE( number.significand.fractional.Set( "def", 16 ) );
+        ASSERT_TRUE( number.IsDefined() );
+        ASSERT_TRUE( number.significand.IsDefined() );
+        ASSERT_FALSE( number.significand.integral.IsDefined() );
+        ASSERT_TRUE( number.significand.fractional.IsDefined() );
+        ASSERT_STREQ( "+0.def", number.GetStr( true ).c_str() );
+
+        ASSERT_TRUE( number.significand.integral.Set( "abc", 16 ) );
+        ASSERT_TRUE( number.IsDefined() );
+        ASSERT_TRUE( number.significand.IsDefined() );
+        ASSERT_TRUE( number.significand.integral.IsDefined() );
+        ASSERT_TRUE( number.significand.fractional.IsDefined() );
+        ASSERT_STREQ( "+abc.def", number.GetStr( true ).c_str() );
+
+        // Base
+
+        ASSERT_TRUE( number.base.fractional.Set( "456", 16 ) );
+        ASSERT_TRUE( number.IsDefined() );
+        ASSERT_FALSE( number.base.IsDefined() );
+        ASSERT_FALSE( number.base.integral.IsDefined() );
+        ASSERT_TRUE( number.base.fractional.IsDefined() );
+        ASSERT_STREQ( "+abc.def", number.GetStr( true ).c_str() );
+
+        ASSERT_TRUE( number.base.integral.Set( "123", 16 ) );
+        ASSERT_TRUE( number.IsDefined() );
+        ASSERT_FALSE( number.base.IsDefined() );
+        ASSERT_TRUE( number.base.integral.IsDefined() );
+        ASSERT_TRUE( number.base.fractional.IsDefined() );
+        ASSERT_STREQ( "+abc.def", number.GetStr( true ).c_str() );
+
+        number.base.sign = Data::Sign::Positive;
+        ASSERT_TRUE( number.IsDefined() );
+        ASSERT_TRUE( number.base.IsDefined() );
+        ASSERT_TRUE( number.base.integral.IsDefined() );
+        ASSERT_TRUE( number.base.fractional.IsDefined() );
+        ASSERT_STREQ( "+abc.def", number.GetStr( true ).c_str() );
+
+        // Exponent
+
+        number.exponent.sign = Data::Sign::Negative;
+        ASSERT_TRUE( number.IsDefined() );
+        ASSERT_FALSE( number.exponent.IsDefined() );
+        ASSERT_FALSE( number.exponent.integral.IsDefined() );
+        ASSERT_FALSE( number.exponent.fractional.IsDefined() );
+        ASSERT_STREQ( "+abc.def", number.GetStr( true ).c_str() );
+
+        ASSERT_TRUE( number.exponent.integral.Set( "78", 16 ) );
+        ASSERT_TRUE( number.IsDefined() );
+        ASSERT_TRUE( number.exponent.IsDefined() );
+        ASSERT_TRUE( number.exponent.integral.IsDefined() );
+        ASSERT_FALSE( number.exponent.fractional.IsDefined() );
+        ASSERT_STREQ( "+abc.def x +123.456 ^ -78", number.GetStr( true ).c_str() );
+
+        ASSERT_TRUE( number.exponent.fractional.Set( "90", 16 ) );
+        ASSERT_TRUE( number.IsDefined() );
+        ASSERT_TRUE( number.exponent.IsDefined() );
+        ASSERT_TRUE( number.exponent.integral.IsDefined() );
+        ASSERT_TRUE( number.exponent.fractional.IsDefined() );
+        ASSERT_STREQ( "+abc.def x +123.456 ^ -78.90", number.GetStr( true ).c_str() );
+
+        ASSERT_TRUE( number.significand.IsDefined() );
+        ASSERT_TRUE( number.significand.integral.IsDefined() );
+        ASSERT_TRUE( number.significand.fractional.IsDefined() );
+        ASSERT_TRUE( number.base.IsDefined() );
+        ASSERT_TRUE( number.base.integral.IsDefined() );
+        ASSERT_TRUE( number.base.fractional.IsDefined() );
+        ASSERT_TRUE( number.exponent.IsDefined() );
+        ASSERT_TRUE( number.exponent.integral.IsDefined() );
+        ASSERT_TRUE( number.exponent.fractional.IsDefined() );
+    }
+
     TEST_F( DataFlexNumberTest, Reset )
     {
         FlexNumber number;
@@ -136,16 +234,6 @@ namespace BfsdlTests
         ASSERT_TRUE( number.exponent.fractional.Set( "90", 16 ) );
 
         ASSERT_STREQ( "+abc.def x +123.456 ^ -78.90", number.GetStr( true ).c_str() );
-
-        ASSERT_TRUE( number.significand.IsDefined() );
-        ASSERT_TRUE( number.significand.integral.IsDefined() );
-        ASSERT_TRUE( number.significand.fractional.IsDefined() );
-        ASSERT_TRUE( number.base.IsDefined() );
-        ASSERT_TRUE( number.base.integral.IsDefined() );
-        ASSERT_TRUE( number.base.fractional.IsDefined() );
-        ASSERT_TRUE( number.exponent.IsDefined() );
-        ASSERT_TRUE( number.exponent.integral.IsDefined() );
-        ASSERT_TRUE( number.exponent.fractional.IsDefined() );
 
         number.Reset();
         ASSERT_STREQ( "", number.GetStr( true ).c_str() );

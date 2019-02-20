@@ -83,7 +83,7 @@ namespace Bfdp
             std::stringstream out;
 
             bool hasSignificand = significand.IsDefined();
-            bool hasOrder = base.IsDefined() || exponent.IsDefined();
+            bool hasOrder = base.IsDefined() && exponent.IsDefined();
 
             if( hasSignificand )
             {

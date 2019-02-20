@@ -52,12 +52,32 @@ namespace BfsdlParser
         {
         }
 
+        Data::FlexNumber::Component const& NumericLiteral::GetBase() const
+        {
+            return mNumber.base;
+        }
+
+        Data::FlexNumber::Component const& NumericLiteral::GetExponent() const
+        {
+            return mNumber.exponent;
+        }
+
+        Data::FlexNumber::Component const& NumericLiteral::GetSignificand() const
+        {
+            return mNumber.significand;
+        }
+
         std::string NumericLiteral::GetStr
             (
             bool const aVerbose
             )
         {
             return mNumber.GetStr( aVerbose );
+        }
+
+        bool NumericLiteral::HasRadix() const
+        {
+            return mRadix != Data::InvalidRadix;
         }
 
         bool NumericLiteral::IsDefined() const
@@ -70,23 +90,26 @@ namespace BfsdlParser
             mNumber.Reset();
         }
 
+        bool NumericLiteral::SetDefaultBase()
+        {
+            char const* base2 = ( mRadix == 2 ) ? "10" : "2";
+            // IEEE floats always use base 2
+            mNumber.base.sign = Data::Sign::Positive;
+            return mNumber.base.integral.Set( base2, mRadix );
+        }
+
         bool NumericLiteral::SetExponentDigits
             (
             std::string const aDigits
             )
         {
+            BFDP_RETURNIF_V( !mNumber.base.IsDefined(), false );
+
             if( !mNumber.exponent.integral.Set( aDigits, mRadix ) )
             {
                 return false;
             }
 
-            // Set other pre-defined values associated with the exponent
-            mNumber.base.sign = Data::Sign::Positive;
-            mNumber.base.integral.Set
-                (
-                ( ( mRadix == 2 ) ? "10" : "2" ),
-                mRadix
-                ); // IEEE floats always use base 2
             return true;
         }
 

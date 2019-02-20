@@ -57,15 +57,27 @@ namespace BfsdlParser
         public:
             NumericLiteral();
 
+            Bfdp::Data::FlexNumber::Component const& GetBase() const;
+
+            Bfdp::Data::FlexNumber::Component const& GetExponent() const;
+
+            Bfdp::Data::FlexNumber::Component const& GetSignificand() const;
+
             std::string GetStr
                 (
                 bool const aVerbose
                 );
 
+            //! @return true if a radix has been set (not necessarily valid)
+            bool HasRadix() const;
+
             bool IsDefined() const;
 
             void Reset();
 
+            bool SetDefaultBase();
+
+            //! @pre Base must be set first
             bool SetExponentDigits
                 (
                 std::string const aDigits

@@ -75,6 +75,7 @@ namespace BfsdlTests
         literal.SetRadix( 8 );
         ASSERT_TRUE( literal.SetSignificandIntegralDigits( "123" ) );
         ASSERT_TRUE( literal.SetSignificandFractionalDigits( "456" ) );
+        ASSERT_TRUE( literal.SetDefaultBase() );
         literal.SetExponentSign( Data::Sign::Negative );
         ASSERT_TRUE( literal.SetExponentDigits( "70" ) );
 
@@ -98,7 +99,7 @@ namespace BfsdlTests
         ASSERT_FALSE( literal.IsDefined() );
         ASSERT_STREQ( "", literal.GetStr( true ).c_str() );
 
-        // Can't set digits without radix--no effect on output
+        // Can't set digits without radix
         ASSERT_FALSE( literal.SetSignificandIntegralDigits( "13" ) );
         ASSERT_FALSE( literal.SetSignificandFractionalDigits( "24" ) );
         ASSERT_FALSE( literal.IsDefined() );
@@ -112,36 +113,63 @@ namespace BfsdlTests
         // Can't set digits outside of range--no effect on output
         ASSERT_FALSE( literal.SetSignificandIntegralDigits( "1abc" ) );
         ASSERT_FALSE( literal.IsDefined() );
+        ASSERT_FALSE( literal.GetSignificand().IsDefined() );
+        ASSERT_FALSE( literal.GetSignificand().integral.IsDefined() );
         ASSERT_STREQ( "", literal.GetStr( true ).c_str() );
 
         // 3) Significand integral digits
         ASSERT_TRUE( literal.SetSignificandIntegralDigits( "123" ) );
         ASSERT_TRUE( literal.IsDefined() );
+        ASSERT_TRUE( literal.GetSignificand().IsDefined() );
+        ASSERT_TRUE( literal.GetSignificand().integral.IsDefined() );
+        ASSERT_FALSE( literal.GetSignificand().fractional.IsDefined() );
         ASSERT_STREQ( "+123", literal.GetStr( true ).c_str() );
 
         // Can't set digits outside of range--no effect on output
         ASSERT_FALSE( literal.SetSignificandFractionalDigits( "1abc" ) );
         ASSERT_TRUE( literal.IsDefined() );
+        ASSERT_TRUE( literal.GetSignificand().IsDefined() );
+        ASSERT_FALSE( literal.GetSignificand().fractional.IsDefined() );
         ASSERT_STREQ( "+123", literal.GetStr( true ).c_str() );
 
         // 4) Significand fractional digits
         ASSERT_TRUE( literal.SetSignificandFractionalDigits( "456" ) );
         ASSERT_TRUE( literal.IsDefined() );
+        ASSERT_TRUE( literal.GetSignificand().IsDefined() );
+        ASSERT_TRUE( literal.GetSignificand().fractional.IsDefined() );
         ASSERT_STREQ( "+123.456", literal.GetStr( true ).c_str() );
 
-        // 5) Exponent sign
+        // 5) Exponent sign (does not make the base or exponent valid, though)
         literal.SetExponentSign( Data::Sign::Negative );
         ASSERT_TRUE( literal.IsDefined() );
+        ASSERT_FALSE( literal.GetBase().IsDefined() );
+        ASSERT_FALSE( literal.GetExponent().IsDefined() );
+        ASSERT_STREQ( "+123.456", literal.GetStr( true ).c_str() );
+
+        // Can't set exponent digits prior to base
+        ASSERT_FALSE( literal.SetExponentDigits( "789" ) );
+        ASSERT_TRUE( literal.IsDefined() );
+        ASSERT_FALSE( literal.GetBase().IsDefined() );
+        ASSERT_FALSE( literal.GetExponent().IsDefined() );
+        ASSERT_STREQ( "+123.456", literal.GetStr( true ).c_str() );
+
+        // 6) Base
+        ASSERT_TRUE( literal.SetDefaultBase() );
+        ASSERT_TRUE( literal.IsDefined() );
+        ASSERT_TRUE( literal.GetBase().IsDefined() );
+        ASSERT_FALSE( literal.GetExponent().IsDefined() );
         ASSERT_STREQ( "+123.456", literal.GetStr( true ).c_str() );
 
         // Can't set exponent digits out of range
         ASSERT_FALSE( literal.SetExponentDigits( "1abc" ) );
         ASSERT_TRUE( literal.IsDefined() );
+        ASSERT_FALSE( literal.GetExponent().IsDefined() );
         ASSERT_STREQ( "+123.456", literal.GetStr( true ).c_str() );
 
-        // 6) Exponent digits
+        // 7) Exponent digits
         ASSERT_TRUE( literal.SetExponentDigits( "789" ) );
         ASSERT_TRUE( literal.IsDefined() );
+        ASSERT_TRUE( literal.GetExponent().IsDefined() );
         ASSERT_STREQ( "+123.456 x +2 ^ -789", literal.GetStr( true ).c_str() );
     }
 
@@ -149,11 +177,12 @@ namespace BfsdlTests
     {
         BfsdlParser::Objects::NumericLiteral literal;
 
-        // Like SetValueBase10, but shorter and with base 2.
+        // Like SetValueBase10, but only happy path with base 2.
 
         literal.SetSignificandSign( Data::Sign::Negative );
         literal.SetRadix( 2 );
         ASSERT_TRUE( literal.SetSignificandIntegralDigits( "101" ) );
+        ASSERT_TRUE( literal.SetDefaultBase() );
         ASSERT_TRUE( literal.SetSignificandFractionalDigits( "110" ) );
         literal.SetExponentSign( Data::Sign::Positive );
         ASSERT_TRUE( literal.SetExponentDigits( "011" ) );
