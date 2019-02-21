@@ -59,6 +59,14 @@ namespace BfsdlParser
                 std::string const& aControlCharacter
                 ) = 0;
 
+            //! Signal emitted for numeric literal expressions
+            //!
+            //! @return true if parsing should continue, false otherwise.
+            virtual bool OnNumericLiteral
+                (
+                Objects::NumericLiteral const& aValue
+                ) = 0;
+
         protected:
             virtual ~ITokenObserver()
             {

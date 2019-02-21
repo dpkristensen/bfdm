@@ -44,7 +44,9 @@
 #include "Bfdp/StateMachine/Engine.hpp"
 #include "Bfdp/Unicode/AsciiConverter.hpp"
 #include "Bfdp/Unicode/Utf8Converter.hpp"
+#include "BfsdlParser/Objects/NumericLiteral.hpp"
 #include "BfsdlParser/Token/ITokenObserver.hpp"
+#include "BfsdlParser/Token/NumericLiteralParser.hpp"
 
 namespace BfsdlParser
 {
@@ -118,12 +120,17 @@ namespace BfsdlParser
 
             // States
             void StateMainSequenceEvaluate();
+            void StateNumericLiteralEntry();
+            void StateNumericLiteralEvaluate();
 
             //! Converter for ASCII (initial format)
             Bfdp::Unicode::AsciiConverter mAsciiConverter;
 
             //! Whether initialization was performed successfully
             bool mInitOk;
+
+            //! Parser for handling Numeric Literals
+            NumericLiteralParser mNumericLiteralParser;
 
             //! Reference to observer
             ITokenObserver& mObserver;

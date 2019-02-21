@@ -61,6 +61,17 @@ namespace BfsdlTests
         return true;
     }
 
+    /* virtual */ bool MockTokenObserver::OnNumericLiteral
+        (
+        BfsdlParser::Objects::NumericLiteral const& aValue
+        )
+    {
+        std::stringstream ss;
+        ss << "NumericLiteral: " << aValue.GetStr( true );
+        mValues.push_back( ss.str() );
+        return true;
+    }
+
     ::testing::AssertionResult MockTokenObserver::VerifyNext
         (
         std::string const aNextValue

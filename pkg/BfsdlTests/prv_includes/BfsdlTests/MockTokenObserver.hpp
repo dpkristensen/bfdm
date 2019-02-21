@@ -63,6 +63,11 @@ namespace BfsdlTests
             std::string const& aControlCharacter
             );
 
+        virtual bool OnNumericLiteral
+            (
+            BfsdlParser::Objects::NumericLiteral const& aValue
+            );
+
         ::testing::AssertionResult VerifyNext
             (
             std::string const aNextValue

@@ -43,13 +43,13 @@ namespace BfsdlParser
         {
             enum Type
             {
-                Caret,
                 Control,
                 DecimalDigits,
                 Hash,
                 Letters,
                 Operators,
                 Period,
+                Tilde,
                 Whitespace
             };
         };

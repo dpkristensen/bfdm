@@ -220,7 +220,7 @@ A Bit is defined as the smallest quantizable element in the data, with states **
 
 A Byte is defined as a collection of **8 bits** with each bit numbered from **0** to **7** (the numeric weight of each bit is configurable).  The system must support a method of enumerating bit positions within a Byte in order to describe Byte-oriented streams, and such methods are not defined by this specification.  If the system supports quantization of Bits, but does not support enumerated Bit positions within a Byte, then a Bit-oriented stream may still be described.
 
-NOTE: In address-oriented mediums such as RAM or a hard disk, a Byte is usually the smallest addressable element. 
+NOTE: In address-oriented mediums such as RAM or a hard disk, a Byte is usually the smallest addressable element.
 
 ## 2 Common Formatting Elements
 
@@ -292,14 +292,14 @@ The numeral digits are defined for the set of number systems which are supported
 The formatting characters which are common to multiple types of numeric literals are defined as:
 
     hash := '#'
-    base-marker := ('b'|'o'|'d'|'x')
+    radix-marker := ('b'|'o'|'d'|'x')
     sign-marker := ('+'|'-')
     period := '.'
-    exponent-marker := ('^')
+    exponent-marker := ('~')
 
 ##### 3.1.2.1 Numeric Bases
 
-The `base-marker` values correlate to a number system as follows:
+The `radix-marker` values correlate to a number system as follows:
 
 * 'b' = Binary (radix 2)
 * 'o' = Octal (radix 8)
@@ -319,24 +319,25 @@ Zero is a special case in which the value can be either positive or negative.  I
 
 Numeric literals must contain an real integer component.  Optionally, they may also contain a real fractional component and a real exponential component, but all numeric components must be in the same base:
 
-    integral-component := [<base-marker>':'][<sign-marker>]<numerals>
+    integral-component := [<radix-marker>':'][<sign-marker>]<numerals>
     fractional-component := <period><numerals>
     exponential-component := <exponent-marker>[<sign-marker>]<numerals>
 
     numeric-literal := <hash><integral-component>[<fractional-component>][<exponential-component>](<hash>|<whitespace>)
 
 * The default value for `<sign-marker>` is `+`.
-* The default value for `<base-marker>` is `d`.
+* The default value for `<radix-marker>` is `d`.
 * The default value for `<fractional-component>` is `0`
 * The default value for `<exponential-component>` is `0`
 
 The resulting number value is the result of the following *mathematical* expression:
 
-    ( <integral-component>.<fractional-component> ) * ( b ^ <exponential-component> ),
+    ( <integral-component>.<fractional-component> ) * ( b ^ <exponential-component> )
 
 where:
-* Digits from `<integral-component>`, `<fractional-component>`, and `<exponential-component>` are interpreted according to `<base-marker>`
-* `b` is the exponential power base defined by an associated floating-point bit format
+* Digits from `<integral-component>`, `<fractional-component>`, and `<exponential-component>` are interpreted according to `<radix-marker>`
+* `b` is the exponential power base defined by an associated floating-point bit format.
+  * NOTE: This value is undefined for a Numeric Literal until a specific floating-point format is applied.
 
 #### 3.1.4 Exceptions for Support of Fractional Values
 
@@ -351,7 +352,7 @@ Since the constraints of the exponential-component are dependent upon the defini
 
 Although it may be tempting to do so as an extension, `<exponential-component>` must not be used as shorthand for allowing abbreviated numeric definitions because the resultant value may not have a deterministically-defined translation to a storage type.  A system that does not include floating-point support may fail to parse Numeric Literals with exponents.
 
-For example, use `#1000000#` instead of `#10^6#`
+For example, use `#1000000#` instead of `#10~6#`
 
 #### 3.1.4.2 Representation of Negative Values
 
@@ -364,7 +365,7 @@ Examples:
 
 -10.5 stored as fixed-point integer with 6 integral bits and 2 fractional bits in 2's complement format would have the following binary format:
 
-`11011010` or -1 * 2^5^ + 2^4^ + 2^2^ + 2^1^ + 2^-1^
+`11011010` or -1 * 2<sup>5</sup> + 2<sup>4</sup> + 2<sup>2</sup> + 2<sup>1</sup> + 2<sup>-1</sup>
 
 #### 3.1.5 Bitwise Representation of Numeric Literals
 
@@ -400,31 +401,31 @@ It is possible to build a string literal across multiple lines using Concatenati
 Escape sequences may be used with `<string-literal-value>` to store characters in a string literal that are otherwise difficult to represent.
 
     back-slash := '\'
-    escape-sequence := <back-slash><double-quote>            # Ex: \" = Unicode 34
-                       <back-slash><back-slash>              # Ex: \\ = Unicode 92
-                       <back-slash>'t'                       # Ex: \t = Unicode 8
-                       <back-slash>'r'                       # Ex: \r = Unicode 13
-                       <back-slash>'n'                       # Ex: \n = Unicode 10
-                       <back-slash>'a'(<base-16-digits>...2) # Ex: \a38 = ASCII 38
-                       <back-slash>'w'(<base-16-digits>...2) # Ex: \w7f = Windows CP-1252 127
+    escape-sequence := <back-slash><double-quote>               # Ex: \" = Unicode 34
+                       <back-slash><back-slash>                 # Ex: \\ = Unicode 92
+                       <back-slash>'t'                          # Ex: \t = Unicode 8
+                       <back-slash>'r'                          # Ex: \r = Unicode 13
+                       <back-slash>'n'                          # Ex: \n = Unicode 10
+                       <back-slash>'a'(<radix-16-digits>...2)   # Ex: \a38 = ASCII 38
+                       <back-slash>'w'(<radix-16-digits>...2)   # Ex: \w7f = MS-1252 127
 
 Some escape sequences allow a variable number of digits to follow:
 
-    escape-digits := <base-10-digits>...
-    escape-sequence += <back-slash>[<escape-digits>]'x'(<base-16-digits>...2)
+    escape-digits := <radix-10-digits>...
+    escape-sequence += <back-slash>[<escape-digits>]'x'(<radix-16-digits>...2)
         # Default for <escape-digits> = 2
         # Smallest supported range of <escape-digits> is 1-8
         # Examples:
         #   \x34 = String code 52
         #   \4x1234 = String code 4660
-    escape-sequence += <back-slash>[<escape-digits>]'b'(<base-2-digits>....8)
+    escape-sequence += <back-slash>[<escape-digits>]'b'(<radix-2-digits>....8)
         # Default for <escape-digits> = 8
         # Smallest supported range of <escape-digits> is 1-64
         # Examples:
         #   \b00110001 = String code 49
         #   \4b0001 = String code 1
         #   \16b0001001100110111 = String code 4919
-    escape-sequence += <back-slash>[<escape-digits>]'u'(<base-16-digits>...4)
+    escape-sequence += <back-slash>[<escape-digits>]'u'(<radix-16-digits>...4)
         # Default for <escape-digits> = 4
         # Smallest supported range of <escape-digits> is 1-8
         # Examples:
@@ -581,8 +582,8 @@ To parse the Data Stream, it is necessary to define types which correlate to a p
 Numeric bit formats are capable of storing real numeric values using a fixed-point representation.  The type identifiers are defined as follows:
 
     fixed-point-type := ('s'|'u')
-    format-width := <base-10-digits>
-    fractional-width := <base-10-digits>
+    format-width := <radix-10-digits>
+    fractional-width := <radix-10-digits>
 
     numeric-format := <fixed-point-type><format-width>[<period><fractional-width>]
 

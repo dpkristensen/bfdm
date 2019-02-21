@@ -60,7 +60,6 @@ namespace BfsdlParser
 
             static SInt const UnknownCategory = -1;
 
-            static Lexer::StringSymbolCategory CatCaret( Category::Caret, "^", false ); // Caret
             static Lexer::StringSymbolCategory CatControl( Category::Control, "[];:", false );
             static Lexer::RangeSymbolCategory CatDecimalDigits( Category::DecimalDigits, 48, 57, true ); // 0-9
             static Lexer::RangeSymbolCategory CatHash( Category::Hash, 35, false ); // Hash
@@ -68,6 +67,7 @@ namespace BfsdlParser
             static Lexer::RangeSymbolCategory CatLetters2( Category::Letters, 97, 122, true ); // a-z
             static Lexer::StringSymbolCategory CatOperators( Category::Operators, "+-", false );
             static Lexer::RangeSymbolCategory CatPeriod( Category::Period, 46, false ); // Period
+            static Lexer::StringSymbolCategory CatTilde( Category::Tilde, "~", false ); // Tilde
             static Lexer::StringSymbolCategory CatWhitespace( Category::Whitespace, " \t\n\r", true );
 
             struct ParseState
@@ -75,6 +75,7 @@ namespace BfsdlParser
                 enum Type
                 {
                     MainSequence,
+                    NumericLiteral,
 
                     Count
                 };
@@ -89,6 +90,7 @@ namespace BfsdlParser
             ITokenObserver& aObserver
             )
             : mInitOk( false )
+            , mNumericLiteralParser( aObserver )
             , mObserver( aObserver )
             , mSymbolizer( *this, mSymbolBuffer, mAsciiConverter )
         {
@@ -113,6 +115,8 @@ namespace BfsdlParser
             BFDP_STATE_MAP_BEGIN( ok, mStateMachine, ParseState::Count );
 
             BFDP_STATE_ACTION( ParseState::MainSequence, Evaluate, CallMethod( *this, &Tokenizer::StateMainSequenceEvaluate ) );
+            BFDP_STATE_ACTION( ParseState::NumericLiteral, Entry, CallMethod( *this, &Tokenizer::StateNumericLiteralEntry ) );
+            BFDP_STATE_ACTION( ParseState::NumericLiteral, Evaluate, CallMethod( *this, &Tokenizer::StateNumericLiteralEvaluate ) );
 
             BFDP_STATE_MAP_END();
 
@@ -196,6 +200,10 @@ namespace BfsdlParser
                 mObserver.OnControlCharacter( mState.inputSymbol );
                 break;
 
+            case Category::Hash:
+                mStateMachine.Transition( ParseState::NumericLiteral );
+                break;
+
             case Category::Whitespace:
                 break;
 
@@ -203,6 +211,36 @@ namespace BfsdlParser
                 BFDP_RUNTIME_ERROR( "Unexpected symbol(s) at beginning of statement" );
                 mState.keepParsing = false;
                 break;
+            }
+        }
+
+        void Tokenizer::StateNumericLiteralEntry()
+        {
+            mNumericLiteralParser.Reset();
+        }
+
+        void Tokenizer::StateNumericLiteralEvaluate()
+        {
+            mNumericLiteralParser.ParseMappedSymbol( mState.inputCategory, mState.inputSymbol );
+            switch( mNumericLiteralParser.GetParseResult() )
+            {
+                case ParseResult::Error:
+                    mState.keepParsing = false;
+                    break;
+
+                case ParseResult::NotComplete:
+                    // Nothing to do yet
+                    break;
+
+                case ParseResult::Complete:
+                    mObserver.OnNumericLiteral( mNumericLiteralParser.GetParsedObject() );
+                    mStateMachine.Transition( ParseState::MainSequence );
+                    break;
+
+                default:
+                    BFDP_INTERNAL_ERROR( "Unexpected parse state" );
+                    mState.keepParsing = false;
+                    break;
             }
         }
 

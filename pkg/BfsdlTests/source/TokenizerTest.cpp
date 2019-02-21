@@ -124,4 +124,60 @@ namespace BfsdlTests
         ASSERT_TRUE( observer.VerifyNone() );
     }
 
+    TEST_F( TokenizerTest, NumericLiteral )
+    {
+        MockTokenObserver observer;
+        SetMockErrorHandlers();
+        MockErrorHandler::Workspace errWorkspace;
+
+        struct TestData
+        {
+            char const* input;
+            char const* output;
+        };
+
+        // Test condition table
+        // NOTE: This does not need to be extremely verbose
+        static TestData const testData[] =
+        { //  Input             Output
+            { "##",             NULL },
+            { "#b:01111011#",   "+01111011" },
+            { "#d:123#",        "+123" },
+            { "#x:7b#",         "+7b" },
+            { "#o:8#",          NULL },
+        };
+        static SizeT const numTests = BFDP_COUNT_OF_ARRAY( testData );
+
+        // Loop through test conditions
+        for( SizeT i = 0; i < numTests; ++i )
+        {
+            SCOPED_TRACE( ::testing::Message( "input=" ) << testData[i].input << std::endl );
+
+            Token::Tokenizer tokenizer( observer );
+            SizeT bytesRead = 0;
+            SizeT dataLen = std::strlen( testData[i].input );
+
+            // Set expectations for this iteration
+            errWorkspace.ExpectRunTimeError( testData[i].output == NULL );
+
+            // Parse data for this iteration
+            ASSERT_TRUE( tokenizer.Parse( reinterpret_cast< Byte const * >( testData[i].input ), dataLen, bytesRead ) );
+            tokenizer.EndParsing();
+
+            // Verify postconditions
+            errWorkspace.VerifyRunTimeError();
+            if( testData[i].output )
+            {
+                std::string value = std::string( "NumericLiteral: " ) + testData[i].output;
+                ASSERT_TRUE( observer.VerifyNext( value ) );
+            }
+            ASSERT_TRUE( observer.VerifyNone() );
+
+            if( testData[i].output )
+            {
+                ASSERT_EQ( dataLen, bytesRead );
+            }
+        }
+    }
+
 } // namespace BfsdlTests
