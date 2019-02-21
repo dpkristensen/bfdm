@@ -106,142 +106,131 @@ namespace BfsdlTests
         }
     }
 
+    MockErrorHandler::ErrorState::ErrorState
+        (
+        char const* const aName
+        )
+        : expect( Expectation::None )
+        , fired( false )
+        , name( aName )
+    {
+    }
+
     MockErrorHandler::Workspace::Workspace()
-        : mInternalErrorState( ErrorState::Unexpected )
-        , mMisuseErrorState( ErrorState::Unexpected )
-        , mRunTimeErrorState( ErrorState::Unexpected )
+        : mInternalErrorState( "Internal Error" )
+        , mMisuseErrorState( "Misuse Error" )
+        , mRunTimeErrorState( "Run Time Error" )
     {
         MockErrorHandler::RegisterWorkspace( *this );
     }
 
     MockErrorHandler::Workspace::~Workspace()
     {
-        VerifyExpectations( mInternalErrorState, "Misuse" );
-        VerifyExpectations( mMisuseErrorState, "Misuse" );
-        VerifyExpectations( mRunTimeErrorState, "Run Time" );
+        VerifyExpectation( mInternalErrorState, true );
+        VerifyExpectation( mMisuseErrorState, true );
+        VerifyExpectation( mRunTimeErrorState, true );
         MockErrorHandler::UnregisterWorkspace();
         SetDefaultErrorHandlers();
     }
 
-    void MockErrorHandler::Workspace::ExpectInternalError()
+    void MockErrorHandler::Workspace::ExpectInternalError
+        (
+        bool const aExpected
+        )
     {
-        if( mInternalErrorState != ErrorState::Expected )
+        SetExpectation( mInternalErrorState, aExpected );
+    }
+
+    void MockErrorHandler::Workspace::ExpectMisuseError
+        (
+        bool const aExpected
+        )
+    {
+        SetExpectation( mMisuseErrorState, aExpected );
+    }
+
+    void MockErrorHandler::Workspace::ExpectRunTimeError
+        (
+        bool const aExpected
+        )
+    {
+        SetExpectation( mRunTimeErrorState, aExpected );
+    }
+
+    void MockErrorHandler::Workspace::SetExpectation
+        (
+        ErrorState& aState,
+        bool const aExpected
+        )
+    {
+        Expectation::Type newExpectation = aExpected
+        ? Expectation::Fired
+        : Expectation::NotFired;
+
+        if( aState.expect == Expectation::None )
         {
-            mInternalErrorState = ErrorState::Expected;
+            aState.expect = newExpectation;
         }
         else
         {
-            FAIL() << "Previous Internal Error expectation not fulfilled";
+            FAIL() << "Previous Error expectation not fulfilled";
         }
     }
 
-    void MockErrorHandler::Workspace::ExpectMisuseError()
-    {
-        if( mMisuseErrorState != ErrorState::Expected )
-        {
-            mMisuseErrorState = ErrorState::Expected;
-        }
-        else
-        {
-            FAIL() << "Previous Misuse Error expectation not fulfilled";
-        }
-    }
-
-    void MockErrorHandler::Workspace::ExpectRunTimeError()
-    {
-        if( mRunTimeErrorState != ErrorState::Expected )
-        {
-            mRunTimeErrorState = ErrorState::Expected;
-        }
-        else
-        {
-            FAIL() << "Previous Run Time Error expectation not fulfilled";
-        }
-    }
-
-    void MockErrorHandler::Workspace::VerifyInternalError
+    void MockErrorHandler::Workspace::VerifyExpectation
         (
-        bool const aFired
+        ErrorState& aState,
+        bool const aParanoid
         )
     {
-        if( mInternalErrorState == ErrorState::Unexpected )
+        switch( aState.expect )
         {
-            FAIL() << "Test error: cannot verify without setting expectation.";
+            case Expectation::None:
+                ASSERT_TRUE( aParanoid ) << "Test error: cannot verify without setting expectation.";
+                break;
+
+            case Expectation::Fired:
+                ASSERT_TRUE( aState.fired ) << aState.name;
+                break;
+
+            case Expectation::NotFired:
+                ASSERT_FALSE( aState.fired ) << aState.name;
+                break;
+
+            default:
+                FAIL() << "Internal error: unhandled expectation";
+                break;
         }
 
-        bool wasFired = ( mInternalErrorState == ErrorState::Fired );
-
-        if( wasFired != aFired )
-        {
-            FAIL() << "Internal Error check failed: expected=" << aFired << " actual=" << wasFired;
-        }
-
-        mInternalErrorState = ErrorState::Unexpected;
-    }
-
-    void MockErrorHandler::Workspace::VerifyMisuseError
-        (
-        bool const aFired
-        )
-    {
-        if( mMisuseErrorState == ErrorState::Unexpected )
-        {
-            FAIL() << "Test error: cannot verify without setting expectation.";
-        }
-
-        bool wasFired = ( mMisuseErrorState == ErrorState::Fired );
-
-        if( wasFired != aFired )
-        {
-            FAIL() << "Misuse Error check failed: expected=" << aFired << " actual=" << wasFired;
-        }
-
-        mMisuseErrorState = ErrorState::Unexpected;
-    }
-
-    void MockErrorHandler::Workspace::VerifyRunTimeError
-        (
-        bool const aFired
-        )
-    {
-        if( mRunTimeErrorState == ErrorState::Unexpected )
-        {
-            FAIL() << "Test error: cannot verify without setting expectation.";
-        }
-
-        bool wasFired = ( mRunTimeErrorState == ErrorState::Fired );
-
-        if( wasFired != aFired )
-        {
-            FAIL() << "RunTime Error check failed: expected=" << aFired << " actual=" << wasFired;
-        }
-
-        mRunTimeErrorState = ErrorState::Unexpected;
+        aState.expect = Expectation::None;
+        aState.fired = false;
     }
 
     /* static */ void MockErrorHandler::FireError
         (
-        ErrorState::Type& aState,
+        ErrorState& aState,
         std::string const aErrorMsg
         )
     {
-        switch( aState )
+        if( aState.fired )
         {
-        case ErrorState::Expected:
-            aState = ErrorState::Fired;
-            break;
-
-        case ErrorState::Fired:
             FAIL() << "Duplicate " << aErrorMsg;
+        }
+
+        switch( aState.expect )
+        {
+        case Expectation::Fired:
+            aState.fired = true;
             break;
 
-        case ErrorState::Unexpected:
+        case Expectation::NotFired:
+        case Expectation::None:
             FAIL() << "Unexpected " << aErrorMsg;
             break;
 
         default:
-            FAIL() << "Unknown ErrorState " << aState << " for error:" << std::endl
-                << aErrorMsg;
+            FAIL() << "Unknown state for error:" << std::endl
+                << "    " << aErrorMsg;
             break;
         };
     }
@@ -266,22 +255,6 @@ namespace BfsdlTests
         if( mWorkspace != NULL )
         {
             mWorkspace = NULL;
-        }
-    }
-
-    /* static */ void MockErrorHandler::VerifyExpectations
-        (
-        ErrorState::Type const aState,
-        char const* const aErrorType
-        )
-    {
-        if( aState == ErrorState::Expected )
-        {
-            FAIL() << "Expected " << aErrorType << " Error did not occur";
-        }
-        else if( aState == ErrorState::Fired )
-        {
-            FAIL() << aErrorType << " Error was caught, but not verified.";
         }
     }
 

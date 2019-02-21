@@ -35,6 +35,7 @@
 
 // Internal includes
 #include "Bfdp/ErrorReporter/Functions.hpp"
+#include "BfsdlTests/MockErrorHandler.hpp"
 #include "BfsdlTests/TestUtil.hpp"
 
 #define BFDP_MODULE "ErrorReporterTest"
@@ -209,6 +210,29 @@ namespace BfsdlTests
         ASSERT_EQ( 789, gRunTimeEvents.front().line );
         ASSERT_STREQ( fakeModule, gRunTimeEvents.front().module );
         ASSERT_STREQ( text2, gRunTimeEvents.front().text );
+    }
+
+    TEST_F( ErrorReporterTest, VerifyMockHandler )
+    {
+        SetMockErrorHandlers();
+        MockErrorHandler::Workspace wksp;
+
+        wksp.ExpectInternalError( false );
+        wksp.ExpectMisuseError( false );
+        wksp.ExpectRunTimeError( false );
+        wksp.VerifyInternalError();
+        wksp.VerifyMisuseError();
+        wksp.VerifyRunTimeError();
+
+        wksp.ExpectInternalError( true );
+        wksp.ExpectMisuseError( true );
+        wksp.ExpectRunTimeError( true );
+        BFDP_INTERNAL_ERROR( "Internal error" );
+        BFDP_MISUSE_ERROR( "Misuse error" );
+        BFDP_RUNTIME_ERROR( "Runtime error" );
+        wksp.VerifyInternalError();
+        wksp.VerifyMisuseError();
+        wksp.VerifyRunTimeError();
     }
 
 } // namespace BfsdlTests

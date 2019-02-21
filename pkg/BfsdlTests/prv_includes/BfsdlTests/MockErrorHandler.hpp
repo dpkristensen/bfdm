@@ -66,14 +66,26 @@ namespace BfsdlTests
             char const* const aErrorText
             );
 
-        struct ErrorState
+        struct Expectation
         {
             enum Type
             {
-                Expected,
+                None,
                 Fired,
-                Unexpected
+                NotFired
             };
+        };
+
+        struct ErrorState
+        {
+            ErrorState
+                (
+                char const* const aName
+                );
+
+            Expectation::Type expect;
+            bool fired;
+            char const* const name;
         };
 
         struct Workspace
@@ -89,38 +101,59 @@ namespace BfsdlTests
             ~Workspace();
 
             //! Expect a single Internal Error on the next call.
-            void ExpectInternalError();
+            void ExpectInternalError
+                (
+                bool const aExpected = true
+                );
 
             //! Expect a single Misuse Error on the next call.
-            void ExpectMisuseError();
+            void ExpectMisuseError
+                (
+                bool const aExpected = true
+                );
 
             //! Expect a single RunTime Error on the next call.
-            void ExpectRunTimeError();
-
-            //! Verify that an Internal Error was fired or not
-            void VerifyInternalError
+            void ExpectRunTimeError
                 (
-                bool const aFired = true
+                bool const aExpected = true
                 );
 
-            //! Verify that a Misuse Error was fired or not
-            void VerifyMisuseError
-                (
-                bool const aFired = true
-                );
+            //! Verify the Internal Error expectation
+            inline void VerifyInternalError()
+            {
+                VerifyExpectation( mInternalErrorState );
+            }
 
-            //! Verify that a RunTime Error was fired or not
-            void VerifyRunTimeError
-                (
-                bool const aFired = true
-                );
+            //! Verify the Misuse Error expectation
+            inline void VerifyMisuseError()
+            {
+                VerifyExpectation( mMisuseErrorState );
+            }
+
+            //! Verify the RunTime Error expectation
+            inline void VerifyRunTimeError()
+            {
+                VerifyExpectation( mRunTimeErrorState );
+            }
 
         private:
             friend class MockErrorHandler;
 
-            ErrorState::Type mInternalErrorState;
-            ErrorState::Type mMisuseErrorState;
-            ErrorState::Type mRunTimeErrorState;
+            void SetExpectation
+                (
+                ErrorState& aState,
+                bool const aExpected
+                );
+
+            void VerifyExpectation
+                (
+                ErrorState& aState,
+                bool const aParanoid = false
+                );
+
+            ErrorState mInternalErrorState;
+            ErrorState mMisuseErrorState;
+            ErrorState mRunTimeErrorState;
         };
 
     private:
@@ -130,7 +163,7 @@ namespace BfsdlTests
 
         static void FireError
             (
-            ErrorState::Type& aState,
+            ErrorState& aState,
             std::string const aErrorMsg
             );
 
@@ -140,12 +173,6 @@ namespace BfsdlTests
             );
 
         static void UnregisterWorkspace();
-
-        static void VerifyExpectations
-            (
-            ErrorState::Type const aState,
-            char const* const aErrorType
-            );
 
         static Workspace* mWorkspace;
     };
