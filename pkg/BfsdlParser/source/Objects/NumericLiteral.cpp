@@ -70,9 +70,10 @@ namespace BfsdlParser
         std::string NumericLiteral::GetStr
             (
             bool const aVerbose
-            )
+            ) const
         {
-            return mNumber.GetStr( aVerbose );
+            // Casting away const is safe, GetStr() doesn't modify the underlying objects
+            return const_cast< Data::FlexNumber* >( &mNumber )->GetStr( aVerbose );
         }
 
         bool NumericLiteral::HasRadix() const

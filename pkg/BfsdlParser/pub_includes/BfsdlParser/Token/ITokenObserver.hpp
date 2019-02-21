@@ -36,6 +36,9 @@
 // External Includes
 #include <string>
 
+// Internal includes
+#include "BfsdlParser/Objects/NumericLiteral.hpp"
+
 namespace BfsdlParser
 {
 
@@ -53,7 +56,7 @@ namespace BfsdlParser
             //! @return true if parsing should continue, false otherwise.
             virtual bool OnControlCharacter
                 (
-                std::string aControlCharacter
+                std::string const& aControlCharacter
                 ) = 0;
 
         protected:

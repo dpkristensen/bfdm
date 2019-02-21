@@ -66,7 +66,7 @@ namespace BfsdlParser
             std::string GetStr
                 (
                 bool const aVerbose
-                );
+                ) const;
 
             //! @return true if a radix has been set (not necessarily valid)
             bool HasRadix() const;

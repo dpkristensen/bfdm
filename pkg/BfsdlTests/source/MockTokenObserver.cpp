@@ -1,7 +1,7 @@
 /**
-    BFDP Mock TokenObserver Declaration
+    BFDP Mock TokenObserver Definition
 
-    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -30,52 +30,64 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef BfsdlTests_MockTokenObserver
-#define BfsdlTests_MockTokenObserver
+// Base Includes
+#include "BfsdlTests/MockTokenObserver.hpp"
 
-// Base include
-#include "BfsdlParser/Token/ITokenObserver.hpp"
-
-// External includes
-#include <gtest/gtest.h>
-#include <list>
-#include <string>
-
-// Internal includes
-#include "Bfdp/Common.hpp"
+// External Includes
+#include <sstream>
 
 namespace BfsdlTests
 {
 
-    //! Test double for an ITokenObserver
-    //!
-    //! This class records values in sequence so they can be checked post-call.
-    class MockTokenObserver
-        : public BfsdlParser::Token::ITokenObserver
+    using namespace Bfdp;
+
+    MockTokenObserver::MockTokenObserver()
     {
-    public:
-        MockTokenObserver();
+    }
 
-        virtual ~MockTokenObserver();
+    /* virtual */  MockTokenObserver::~MockTokenObserver()
+    {
+        EXPECT_TRUE( VerifyNone() );
+    }
 
-        virtual bool OnControlCharacter
-            (
-            std::string const& aControlCharacter
-            );
+    /* virtual */ bool MockTokenObserver::OnControlCharacter
+        (
+        std::string const& aControlCharacter
+        )
+    {
+        std::stringstream ss;
+        ss << "Control: " << aControlCharacter;
+        mValues.push_back( ss.str() );
+        return true;
+    }
 
-        ::testing::AssertionResult VerifyNext
-            (
-            std::string const aNextValue
-            );
+    ::testing::AssertionResult MockTokenObserver::VerifyNext
+        (
+        std::string const aNextValue
+        )
+    {
+        if( mValues.empty() )
+        {
+            return ::testing::AssertionFailure() << "Missing expected value: " << aNextValue;
+        }
+        else if( mValues.front() != aNextValue )
+        {
+            return ::testing::AssertionFailure() << "Object mismatch:" << std::endl
+                << "    Actual: " << mValues.front() << std::endl
+                << "  Expected: " << aNextValue;
+        }
 
-        ::testing::AssertionResult VerifyNone();
+        mValues.pop_front();
+        return ::testing::AssertionSuccess();
+    }
 
-    private:
-        typedef std::list< std::string > ValueList;
-
-        ValueList mValues;
-    };
+    ::testing::AssertionResult MockTokenObserver::VerifyNone()
+    {
+        if( !mValues.empty() )
+        {
+            return ::testing::AssertionFailure() << "Unexpected " << mValues.front();
+        }
+        return ::testing::AssertionSuccess();
+    }
 
 } // namespace BfsdlTests
-
-#endif // BfsdlTests_MockTokenObserver

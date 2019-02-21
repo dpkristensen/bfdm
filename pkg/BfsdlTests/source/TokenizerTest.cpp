@@ -44,7 +44,6 @@
 namespace BfsdlTests
 {
 
-    using ::testing::Return;
     using namespace Bfdp;
     using namespace BfsdlParser;
 
@@ -60,7 +59,7 @@ namespace BfsdlTests
 
     TEST_F( TokenizerTest, AsciiTest )
     {
-        MockTokenObserver::Type observer;
+        MockTokenObserver observer;
         Token::Tokenizer tokenizer( observer );
         SetMockErrorHandlers();
         MockErrorHandler::Workspace errWorkspace;
@@ -76,11 +75,12 @@ namespace BfsdlTests
 
         ASSERT_EQ( 0, bytesRead );
         tokenizer.EndParsing();
+        ASSERT_TRUE( observer.VerifyNone() );
     }
 
     TEST_F( TokenizerTest, WhitespaceIgnored )
     {
-        MockTokenObserver::Type observer;
+        MockTokenObserver observer;
         Token::Tokenizer tokenizer( observer );
         SetMockErrorHandlers();
         MockErrorHandler::Workspace errWorkspace;
@@ -94,11 +94,12 @@ namespace BfsdlTests
         ASSERT_TRUE( tokenizer.Parse( reinterpret_cast< Byte const * >( testData ), dataLen, bytesRead ) );
         ASSERT_EQ( dataLen, bytesRead );
         tokenizer.EndParsing();
+        ASSERT_TRUE( observer.VerifyNone() );
     }
 
     TEST_F( TokenizerTest, ControlCharacters )
     {
-        MockTokenObserver::Type observer;
+        MockTokenObserver observer;
         Token::Tokenizer tokenizer( observer );
         SetMockErrorHandlers();
         MockErrorHandler::Workspace errWorkspace;
@@ -106,21 +107,21 @@ namespace BfsdlTests
         // Test control characters in pairs to ensure they are not concatenated
         char const * testData = "]]::[[;;";
 
-        ::testing::Sequence s;
-        EXPECT_CALL( observer, OnControlCharacter( std::string( "]" ) ) ).InSequence( s ).WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnControlCharacter( std::string( "]" ) ) ).InSequence( s ).WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnControlCharacter( std::string( ":" ) ) ).InSequence( s ).WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnControlCharacter( std::string( ":" ) ) ).InSequence( s ).WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnControlCharacter( std::string( "[" ) ) ).InSequence( s ).WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnControlCharacter( std::string( "[" ) ) ).InSequence( s ).WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnControlCharacter( std::string( ";" ) ) ).InSequence( s ).WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnControlCharacter( std::string( ";" ) ) ).InSequence( s ).WillOnce( Return( true ) );
-
         SizeT bytesRead = 0;
         SizeT dataLen = std::strlen( testData );
         ASSERT_TRUE( tokenizer.Parse( reinterpret_cast< Byte const * >( testData ), dataLen, bytesRead ) );
         ASSERT_EQ( dataLen, bytesRead );
         tokenizer.EndParsing();
+
+        ASSERT_TRUE( observer.VerifyNext( "Control: ]" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Control: ]" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Control: :" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Control: :" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Control: [" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Control: [" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Control: ;" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Control: ;" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
     }
 
 } // namespace BfsdlTests
