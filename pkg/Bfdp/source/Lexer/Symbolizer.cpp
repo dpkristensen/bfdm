@@ -294,7 +294,6 @@ namespace Bfdp
             Unicode::Utf8Converter utf8Conv;
             SizeT const numBytes = utf8Conv.GetMaxBytes();
 
-            // TODO(GH-9): Fix memory leak.  Smart pointer?  std::string?
             Byte* const buf = new(std::nothrow) Byte[numBytes];
             if( NULL == buf )
             {
@@ -317,6 +316,7 @@ namespace Bfdp
                 }
                 utf8String << std::string( reinterpret_cast< char* >( buf ), bytesConverted );
             }
+            delete [] buf;
 
             bool keepParsing = ( aCategory == Uncategorized )
                 ? mObserver.OnUnmappedSymbol( utf8String.str() )
