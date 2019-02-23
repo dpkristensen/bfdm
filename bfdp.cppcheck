@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="1">
+    <builddir>_out/cppcheck</builddir>
+    <platform>Unspecified</platform>
+    <analyze-all-vs-configs>true</analyze-all-vs-configs>
+    <includedir>
+        <dir name="pkg/Bfdp/prv_includes/"/>
+        <dir name="pkg/Bfdp/pub_includes/"/>
+        <dir name="pkg/BfsdlParser/prv_includes/"/>
+        <dir name="pkg/BfsdlParser/pub_includes/"/>
+        <dir name="pkg/BfsdlTests/prv_includes/"/>
+    </includedir>
+    <exclude>
+        <path name="_out/"/>
+    </exclude>
+    <suppressions>
+        <suppression>noExplicitConstructor</suppression>
+    </suppressions>
+</project>
