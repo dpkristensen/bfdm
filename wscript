@@ -320,6 +320,8 @@ def add_taskgens( bld ):
         target="GoogleTest",
         project="proj/GoogleTest.gproj",
         tgt_params=dict(
+            # Disable multithreaded tests to avoid race conditions in the error handler
+            defines=["GTEST_HAS_PTHREAD=0"],
             warning_levels="high",
             features="cxx warning-level"
             )

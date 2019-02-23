@@ -33,10 +33,6 @@
     ../../_out/GoogleTest/extract/googlemock/src/gmock_main.cc
     ../../_out/GoogleTest/extract/googlemock/src/gmock-all.cc
 
-:prv_defines
-    # Disable multithreaded tests to avoid race conditions in the error handler
-    GTEST_HAS_PTHREAD=0
-
 :prv_includes
     ../../_out/GoogleTest/extract/googlemock/
 
