@@ -147,7 +147,6 @@ namespace Bfdp
             }
 
             SizeT bitsRemain = aNumBits;
-            SizeT i = 0;
             while( bitsRemain )
             {
                 // Determine how many bits can be copied at once.
@@ -161,7 +160,6 @@ namespace Bfdp
                 // Update counters
                 IncrementPos( aOutByteCtr, aOutBitCtr, numBitsToCopy );
                 IncrementPos( aInByteCtr, aInBitCtr, numBitsToCopy );
-                i += numBitsToCopy;
                 bitsRemain -= numBitsToCopy;
             }
 

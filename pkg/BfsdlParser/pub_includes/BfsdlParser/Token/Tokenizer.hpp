@@ -41,6 +41,7 @@
 #include "Bfdp/Lexer/ISymbolObserver.hpp"
 #include "Bfdp/Lexer/StaticSymbolBuffer.hpp"
 #include "Bfdp/Lexer/Symbolizer.hpp"
+#include "Bfdp/Macros.hpp"
 #include "Bfdp/StateMachine/Engine.hpp"
 #include "Bfdp/Unicode/AsciiConverter.hpp"
 #include "Bfdp/Unicode/Utf8Converter.hpp"
@@ -106,17 +107,17 @@ namespace BfsdlParser
             static Bfdp::SizeT const MAX_TOKEN_LENGTH = 256;
 
             //! @copydoc Lexer::ISymbolizer::OnMappedSymbol
-            virtual bool OnMappedSymbol
+            BFDP_OVERRIDE( bool OnMappedSymbol
                 (
                 Bfdp::SInt aCategory,
-                std::string aSymbol
-                );
+                std::string const& aSymbol
+                ) );
 
             //! @copydoc Lexer::ISymbolizer::OnUnmappedSymbol
-            virtual bool OnUnmappedSymbol
+            BFDP_OVERRIDE( bool OnUnmappedSymbol
                 (
-                std::string aSymbol
-                );
+                std::string const& aSymbol
+                ) );
 
             // States
             void StateMainSequenceEvaluate();

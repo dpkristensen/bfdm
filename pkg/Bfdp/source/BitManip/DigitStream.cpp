@@ -112,7 +112,7 @@ namespace Bfdp
 
         bool DigitStream::Set
             (
-            std::string const aDigits,
+            std::string const& aDigits,
             Data::RadixType const aRadix
             )
         {

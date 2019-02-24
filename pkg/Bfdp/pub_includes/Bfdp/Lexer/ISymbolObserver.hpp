@@ -1,7 +1,7 @@
 /**
     BFDP Lexer Symbol Observer Interface
 
-    Copyright 2016-2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -55,7 +55,7 @@ namespace Bfdp
             virtual bool OnMappedSymbol
                 (
                 SInt const aCategory,
-                std::string const aSymbol
+                std::string const& aSymbol
                 ) = 0;
 
             //! Handler for Unmapped Symbols
@@ -63,7 +63,7 @@ namespace Bfdp
             //! @return true if parsing should continue, false otherwise.
             virtual bool OnUnmappedSymbol
                 (
-                std::string const aSymbol
+                std::string const& aSymbol
                 ) = 0;
 
         protected:

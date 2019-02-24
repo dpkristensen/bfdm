@@ -164,7 +164,7 @@ namespace BfsdlTests
         static void FireError
             (
             ErrorState& aState,
-            std::string const aErrorMsg
+            std::string const& aErrorMsg
             );
 
         static void RegisterWorkspace

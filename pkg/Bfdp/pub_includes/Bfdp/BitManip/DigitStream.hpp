@@ -68,7 +68,7 @@ namespace Bfdp
             //! Set the value of the string
             bool Set
                 (
-                std::string const aDigits,
+                std::string const& aDigits,
                 Data::RadixType const aRadix
                 );
 

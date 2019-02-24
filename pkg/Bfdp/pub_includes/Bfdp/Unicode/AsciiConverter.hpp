@@ -1,7 +1,7 @@
 /**
     BFDP Unicode to ASCII Converter
 
-    Copyright 2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2018-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,9 @@
 // Base includes
 #include "Bfdp/Unicode/IConverter.hpp"
 
+// Internal Includes
+#include "Bfdp/Macros.hpp"
+
 namespace Bfdp
 {
 
@@ -50,23 +53,23 @@ namespace Bfdp
             AsciiConverter();
 
             //! @copydoc IConverter::ConvertBytes
-            virtual SizeT ConvertBytes
+            BFDP_OVERRIDE( SizeT ConvertBytes
                 (
                 Byte const* const aBytesIn,
                 SizeT const aByteCount,
                 CodePoint& aSymbolOut
-                );
+                ) );
 
             //! @copydoc IConverter::ConvertSymbol
-            virtual SizeT ConvertSymbol
+            BFDP_OVERRIDE( SizeT ConvertSymbol
                 (
                 CodePoint const& aSymbolIn,
                 Byte* const aBytesOut,
                 SizeT const aByteCount
-                );
+                ) );
 
             //! @copydoc IConverter::GetMaxBytes
-            virtual SizeT GetMaxBytes() const;
+            BFDP_OVERRIDE( SizeT GetMaxBytes() const );
         };
 
     } // namespace Unicode

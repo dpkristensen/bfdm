@@ -36,6 +36,9 @@
 // Base includes
 #include "Bfdp/Lexer/ISymbolCategory.hpp"
 
+// Internal Includes
+#include "Bfdp/Macros.hpp"
+
 namespace Bfdp
 {
 
@@ -52,10 +55,10 @@ namespace Bfdp
             virtual ~SymbolCategoryBase();
 
             //! @copydoc ISymbolCategory::GetCategory()
-            virtual SInt GetCategory() const;
+            BFDP_OVERRIDE( SInt GetCategory() const );
 
             //! @copydoc ISymbolCategory::ShouldConcatenate()
-            virtual bool ShouldConcatenate() const;
+            BFDP_OVERRIDE( bool ShouldConcatenate() const );
 
         protected:
             //! Create SymbolCategoryBase

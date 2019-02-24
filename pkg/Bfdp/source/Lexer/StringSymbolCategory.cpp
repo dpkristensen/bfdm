@@ -1,7 +1,7 @@
 /**
     BFDP Lexer StringSymbolCategory Definition
 
-    Copyright 2016-2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,7 @@ namespace Bfdp
         StringSymbolCategory::StringSymbolCategory
             (
             SInt const aCategory,
-            std::string const aSymbols,
+            std::string const& aSymbols,
             bool const aShouldConcatenate
             )
             : SymbolCategoryBase( aCategory, aShouldConcatenate, BFDP_MODULE )

@@ -1,7 +1,7 @@
 /**
     BFDP Macro Definitinos
 
-    Copyright 2016-2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -58,10 +58,20 @@
         };
 #endif
 
-#if( __cplusplus >= 201103L )
+#if( ( __cplusplus >= 201103L ) || \
+     ( defined( _MSC_VER ) && ( _MSC_VER >= 1600 ) ) )
     #define BFDP_FINAL  final
 #else
     #define BFDP_FINAL
+#endif
+
+#if( ( __cplusplus >= 201103L ) || \
+     ( defined( _MSC_VER ) && ( _MSC_VER >= 1600 ) ) )
+    #define BFDP_OVERRIDE( _declaration ) \
+        _declaration override
+#else
+    #define BFDP_OVERRIDE( _declaration ) \
+        virtual _declaration
 #endif
 
 //! If condition, return

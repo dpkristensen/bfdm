@@ -1,7 +1,7 @@
 /**
     BFDP Lexer StringSymbolCategory Declaration
 
-    Copyright 2016-2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -57,17 +57,17 @@ namespace Bfdp
             StringSymbolCategory
                 (
                 SInt const aCategory, //!< Category to report when one of these symbols is encountered, must be >= 0
-                std::string const aSymbols, //!< A collection of symbols to be loaded
+                std::string const& aSymbols, //!< A collection of symbols to be loaded
                 bool const aShouldConcatenate //!< Whether symbols should be reported in a concatenated form
                 );
 
             virtual ~StringSymbolCategory();
 
             //! @copydoc ISymbolCategory::Contains()
-            virtual bool Contains
+            BFDP_OVERRIDE( bool Contains
                 (
                 Unicode::CodePoint const aSymbol
-                ) const;
+                ) const );
 
         private:
             std::string mSymbols;

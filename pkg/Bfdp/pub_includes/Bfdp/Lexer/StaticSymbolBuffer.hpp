@@ -1,7 +1,7 @@
 /**
     BFDP Lexer StaticSymbolBuffer
 
-    Copyright 2016-2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -43,6 +43,7 @@
 
 // Internal includes
 #include "Bfdp/Common.hpp"
+#include "Bfdp/Macros.hpp"
 #include "Bfdp/ErrorReporter/Functions.hpp"
 #include "Bfdp/Lexer/ISymbolBuffer.hpp"
 
@@ -73,10 +74,10 @@ namespace Bfdp
             }
 
             //! @copydoc ISymbolBuffer::AddSymbol()
-            virtual bool Add
+            BFDP_OVERRIDE( bool Add
                 (
                 Unicode::CodePoint const aSymbol
-                )
+                ) )
             {
                 if( mIndex < MAX_SYMBOL_LENGTH )
                 {
@@ -89,7 +90,7 @@ namespace Bfdp
             }
 
             //! @copydoc ISymbolBuffer::Clear()
-            virtual void Clear()
+            BFDP_OVERRIDE( void Clear() )
             {
                 if( !IsEmpty() )
                 {
@@ -99,16 +100,16 @@ namespace Bfdp
             }
 
             //! @copydoc ISymbolBuffer::GetSize()
-            virtual SizeT GetSize() const
+            BFDP_OVERRIDE( SizeT GetSize() const )
             {
                 return mIndex;
             }
 
             //! @copydoc ISymbolBuffer::GetSymbolAt()
-            virtual Unicode::CodePoint GetSymbolAt
+            BFDP_OVERRIDE( Unicode::CodePoint GetSymbolAt
                 (
                 SizeT const aIndex
-                ) const
+                ) const )
             {
                 if( aIndex >= GetSize() )
                 {
@@ -121,7 +122,7 @@ namespace Bfdp
             }
 
             //! @copydoc ISymbolBuffer::IsEmpty()
-            virtual bool IsEmpty() const
+            BFDP_OVERRIDE( bool IsEmpty() const )
             {
                 return ( mIndex == 0 );
             }

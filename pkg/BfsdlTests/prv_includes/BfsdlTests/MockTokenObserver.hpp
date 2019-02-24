@@ -43,6 +43,7 @@
 
 // Internal includes
 #include "Bfdp/Common.hpp"
+#include "Bfdp/Macros.hpp"
 
 namespace BfsdlTests
 {
@@ -58,15 +59,15 @@ namespace BfsdlTests
 
         virtual ~MockTokenObserver();
 
-        virtual bool OnControlCharacter
+        BFDP_OVERRIDE( bool OnControlCharacter
             (
             std::string const& aControlCharacter
-            );
+            ) );
 
-        virtual bool OnNumericLiteral
+        BFDP_OVERRIDE( bool OnNumericLiteral
             (
             BfsdlParser::Objects::NumericLiteral const& aValue
-            );
+            ) );
 
         ::testing::AssertionResult VerifyNext
             (

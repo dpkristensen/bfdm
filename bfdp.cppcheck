@@ -10,6 +10,10 @@
         <dir name="pkg/BfsdlParser/pub_includes/"/>
         <dir name="pkg/BfsdlTests/prv_includes/"/>
     </includedir>
+    <defines>
+        <define name="UNICODE"/>
+        <define name="_UNICODE"/>
+    </defines>
     <exclude>
         <path name="_out/"/>
     </exclude>

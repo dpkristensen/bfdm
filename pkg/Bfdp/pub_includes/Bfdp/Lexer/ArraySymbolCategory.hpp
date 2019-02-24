@@ -1,7 +1,7 @@
 /**
     BFDP Lexer ArraySymbolCategory Declaration
 
-    Copyright 2016-2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -67,10 +67,10 @@ namespace Bfdp
             virtual ~ArraySymbolCategory();
 
             //! @copydoc ISymbolCategory::Contains()
-            virtual bool Contains
+            BFDP_OVERRIDE( bool Contains
                 (
                 Unicode::CodePoint const aSymbol
-                ) const;
+                ) const );
 
         private:
             Unicode::CodePoint const* mArrayPtr;

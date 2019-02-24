@@ -172,7 +172,7 @@ namespace BfsdlParser
         /* virtual */ bool Tokenizer::OnMappedSymbol
             (
             SInt const aCategory,
-            std::string const aSymbol
+            std::string const& aSymbol
             )
         {
             mState.inputCategory = aCategory;
@@ -185,7 +185,7 @@ namespace BfsdlParser
 
         /* virtual */ bool Tokenizer::OnUnmappedSymbol
             (
-            std::string const /* aSymbol */
+            std::string const& /* aSymbol */
             )
         {
             BFDP_RUNTIME_ERROR( "Unexpected symbol" );

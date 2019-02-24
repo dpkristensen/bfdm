@@ -1,7 +1,7 @@
 /**
     BFDP StateMachine Actions
 
-    Copyright 2016-2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,9 @@
 // Base includes
 #include "Bfdp/StateMachine/IAction.hpp"
 
+// Internal Includes
+#include "Bfdp/Macros.hpp"
+
 namespace Bfdp
 {
 
@@ -68,7 +71,7 @@ namespace Bfdp
             }
 
         private:
-            virtual void Do()
+            BFDP_OVERRIDE( void Do() )
             {
                 ( (*mObject).*mMethod )();
             }
