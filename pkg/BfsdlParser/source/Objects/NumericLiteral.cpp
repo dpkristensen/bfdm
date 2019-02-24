@@ -101,7 +101,7 @@ namespace BfsdlParser
 
         bool NumericLiteral::SetExponentDigits
             (
-            std::string const aDigits
+            std::string const& aDigits
             )
         {
             BFDP_RETURNIF_V( !mNumber.base.IsDefined(), false );
@@ -124,7 +124,7 @@ namespace BfsdlParser
 
         bool NumericLiteral::SetSignificandFractionalDigits
             (
-            std::string const aDigits
+            std::string const& aDigits
             )
         {
             return mNumber.significand.fractional.Set( aDigits, mRadix );
@@ -132,7 +132,7 @@ namespace BfsdlParser
 
         bool NumericLiteral::SetSignificandIntegralDigits
             (
-            std::string const aDigits
+            std::string const& aDigits
             )
         {
             return mNumber.significand.integral.Set( aDigits, mRadix );

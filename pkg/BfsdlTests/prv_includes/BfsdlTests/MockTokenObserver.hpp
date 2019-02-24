@@ -70,7 +70,7 @@ namespace BfsdlTests
 
         ::testing::AssertionResult VerifyNext
             (
-            std::string const aNextValue
+            std::string const& aNextValue
             );
 
         ::testing::AssertionResult VerifyNone();

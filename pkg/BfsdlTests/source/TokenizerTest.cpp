@@ -61,8 +61,10 @@ namespace BfsdlTests
     {
         MockTokenObserver observer;
         Token::Tokenizer tokenizer( observer );
+        ASSERT_TRUE( tokenizer.IsInitOk() );
         SetMockErrorHandlers();
         MockErrorHandler::Workspace errWorkspace;
+
 
         // Test non-ASCII characters are treated as an error
         char const * testData = "\x80";
@@ -82,6 +84,7 @@ namespace BfsdlTests
     {
         MockTokenObserver observer;
         Token::Tokenizer tokenizer( observer );
+        ASSERT_TRUE( tokenizer.IsInitOk() );
         SetMockErrorHandlers();
         MockErrorHandler::Workspace errWorkspace;
 
@@ -101,6 +104,7 @@ namespace BfsdlTests
     {
         MockTokenObserver observer;
         Token::Tokenizer tokenizer( observer );
+        ASSERT_TRUE( tokenizer.IsInitOk() );
         SetMockErrorHandlers();
         MockErrorHandler::Workspace errWorkspace;
 
@@ -154,6 +158,7 @@ namespace BfsdlTests
             SCOPED_TRACE( ::testing::Message( "input=" ) << testData[i].input << std::endl );
 
             Token::Tokenizer tokenizer( observer );
+            ASSERT_TRUE( tokenizer.IsInitOk() );
             SizeT bytesRead = 0;
             SizeT dataLen = std::strlen( testData[i].input );
 

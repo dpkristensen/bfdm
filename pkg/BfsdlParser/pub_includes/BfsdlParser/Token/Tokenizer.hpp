@@ -146,9 +146,6 @@ namespace BfsdlParser
 
             //! State machine engine to use for algorithm control
             Bfdp::StateMachine::Engine mStateMachine;
-
-            //! Converter for UTF-8
-            Bfdp::Unicode::Utf8Converter mUtf8Converter;
         };
 
     } // namespace Token

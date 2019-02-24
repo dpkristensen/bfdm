@@ -36,7 +36,6 @@
 // Internal includes
 #include "Bfdp/ErrorReporter/Functions.hpp"
 #include "Bfdp/Macros.hpp"
-#include "Bfdp/StateMachine/Actions.hpp"
 #include "BfsdlParser/Token/Category.hpp"
 
 #define BFDP_MODULE "Token::NumericLiteralParser"
@@ -362,20 +361,6 @@ namespace BfsdlParser
                 BFDP_RUNTIME_ERROR( "Failed to set default base" );
                 mLastParseResult = ParseResult::Error;
             }
-        }
-
-        void NumericLiteralParser::StateCompleteEntry()
-        {
-            mLastParseResult = ParseResult::Complete;
-
-            UseOrSetDefaultSignificandSign();
-
-            mObserver.OnNumericLiteral( mNumericLiteral );
-            mNumericLiteral = Objects::NumericLiteral();
-        }
-
-        void NumericLiteralParser::StateGetTextEvaluate()
-        {
         }
 
         void NumericLiteralParser::UseOrSetDefaultRadix()

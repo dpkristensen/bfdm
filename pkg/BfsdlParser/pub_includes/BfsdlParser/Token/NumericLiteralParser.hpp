@@ -53,8 +53,7 @@ namespace BfsdlParser
 
         //! Numeric Literal Parser
         //!
-        //! This class encapsulates logic to parse a Numeric Literal as a collection of sub-states
-        //! for the NumericLiteral super-state in the Tokenizer
+        //! This class encapsulates logic to parse a Numeric Literal
         class NumericLiteralParser
             : private Bfdp::NonAssignable
             , private Bfdp::NonCopyable
@@ -101,10 +100,6 @@ namespace BfsdlParser
                 );
 
             void ParseTilde();
-
-            void StateCompleteEntry();
-
-            void StateGetTextEvaluate();
 
             void UseOrSetDefaultRadix();
 

@@ -80,7 +80,7 @@ namespace BfsdlParser
             //! @pre Base must be set first
             bool SetExponentDigits
                 (
-                std::string const aDigits
+                std::string const& aDigits
                 );
 
             void SetExponentSign
@@ -90,12 +90,12 @@ namespace BfsdlParser
 
             bool SetSignificandFractionalDigits
                 (
-                std::string const aDigits
+                std::string const& aDigits
                 );
 
             bool SetSignificandIntegralDigits
                 (
-                std::string const aDigits
+                std::string const& aDigits
                 );
 
             void SetSignificandSign

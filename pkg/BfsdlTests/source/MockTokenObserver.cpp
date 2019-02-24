@@ -74,7 +74,7 @@ namespace BfsdlTests
 
     ::testing::AssertionResult MockTokenObserver::VerifyNext
         (
-        std::string const aNextValue
+        std::string const& aNextValue
         )
     {
         if( mValues.empty() )
