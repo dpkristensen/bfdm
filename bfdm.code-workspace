@@ -1,0 +1,88 @@
+{
+    "folders": [
+        {
+            "name": "Bfdp",
+            "path": "./pkg/Bfdp"
+        },
+        {
+            "name": "BfsdlParser",
+            "path": "pkg/BfsdlParser"
+        },
+        {
+            "name": "BfsdlTests",
+            "path": "pkg/BfsdlTests"
+        },
+        {
+            "name": "Documentation",
+            "path": "documentation"
+        },
+        {
+            "name": "Project",
+            "path": "."
+        }
+    ],
+    "settings": {
+        "files.exclude": {
+            "pkg": true,
+            "_out/cppcheck/*.a*": true
+        },
+        "C_Cpp.default.includePath": [
+            "pkg/Bfdp/prv_includes",
+            "pkg/Bfdp/pub_includes",
+            "pkg/BfsdlParser/prv_includes",
+            "pkg/BfsdlParser/pub_includes",
+            "pkg/BfsdlTests/prv_includes",
+            "pkg/BfsdlTests/pub_includes"
+        ],
+        "files.associations": {
+            "xiosbase": "cpp",
+            "xlocale": "cpp",
+            "system_error": "cpp",
+            "type_traits": "cpp",
+            "xstddef": "cpp",
+            "xtr1common": "cpp",
+            "cctype": "cpp",
+            "cmath": "cpp",
+            "cstddef": "cpp",
+            "cstdint": "cpp",
+            "cstdio": "cpp",
+            "cstdlib": "cpp",
+            "cstring": "cpp",
+            "cwchar": "cpp",
+            "exception": "cpp",
+            "initializer_list": "cpp",
+            "ios": "cpp",
+            "iosfwd": "cpp",
+            "istream": "cpp",
+            "limits": "cpp",
+            "new": "cpp",
+            "ostream": "cpp",
+            "sstream": "cpp",
+            "stdexcept": "cpp",
+            "streambuf": "cpp",
+            "string": "cpp",
+            "typeinfo": "cpp",
+            "utility": "cpp",
+            "xfacet": "cpp",
+            "xlocinfo": "cpp",
+            "xlocnum": "cpp",
+            "xmemory0": "cpp",
+            "xstring": "cpp",
+            "xutility": "cpp",
+            "algorithm": "cpp",
+            "ctime": "cpp",
+            "iomanip": "cpp",
+            "iostream": "cpp",
+            "list": "cpp",
+            "map": "cpp",
+            "set": "cpp",
+            "tuple": "cpp",
+            "vector": "cpp",
+            "xlocmon": "cpp",
+            "xloctime": "cpp",
+            "xmemory": "cpp",
+            "xtree": "cpp"
+        },
+        "C_Cpp.intelliSenseEngineFallback": "Disabled"
+    }
+}

@@ -1,0 +1,22 @@
+{
+
+    "configurations": [
+        {
+            "name": "Win32",
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "includePath": [
+                "${workspaceRoot}/../Bfdp/prv_includes/",
+                "${workspaceRoot}/../Bfdp/pub_includes/",
+                "${workspaceRoot}/prv_includes/",
+                "${workspaceRoot}/pub_includes/"
+            ],
+            "cStandard": "c99",
+            "cppStandard": "c++11"
+        }
+    ],
+    "version": 4
+}
