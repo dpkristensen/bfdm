@@ -48,7 +48,6 @@ namespace Bfdp
 
         //! Create Mask
         //!
-        //! @note This only works with unsigned types
         //! @return a bitmask containing aWidth consecutive bits set, beginning at bit aOffset
         template
             <
@@ -60,7 +59,6 @@ namespace Bfdp
             SizeT const aOffset = 0
             )
         {
-            BFDP_CTIME_ASSERT( !std::numeric_limits< T >::is_signed, Masks_Must_Be_Unsigned );
             if( aWidth == 0 )
             {
                 return 0;
@@ -75,7 +73,6 @@ namespace Bfdp
 
         //! Extract Bits
         //!
-        //! @note This only works with unsigned types
         //! @return Numeric value of aWidth bits from aValue starting at bit aOffset
         template
             <
@@ -88,12 +85,11 @@ namespace Bfdp
             SizeT const aOffset = 0
             )
         {
-            return ( aValue & CreateMask< T >( aWidth, aOffset ) ) >> aOffset;
+            return static_cast< T >( ( aValue >> aOffset ) & CreateMask< T >( aWidth ) );
         }
 
         //! Replace Bits
         //!
-        //! @note This only works with unsigned types
         //! @return aDestValue, with aWidth bits at aOffset replaced by lowest-order aWidth bits
         //!     from aSrcValue.
         template
@@ -109,8 +105,8 @@ namespace Bfdp
             )
         {
             T const srcMask = CreateMask< T >( aWidth );
-            T const destMask = ~CreateMask< T >( aWidth, aOffset );
-            return ( aDestValue & destMask ) | ( ( aSrcValue & srcMask ) << aOffset );
+            T const destMask = static_cast< T >( ~CreateMask< T >( aWidth, aOffset ) );
+            return static_cast< T >( ( aDestValue & destMask ) | ( ( aSrcValue & srcMask ) << aOffset ) );
         }
 
     } // namespace BitManip

@@ -52,19 +52,37 @@ namespace BfsdlTests
 
     TEST_F( BitManipMaskTest, ExtractBits )
     {
-        UInt8 const v8 = 0xa7;
-        ASSERT_EQ( 0x7, BitManip::ExtractBits< UInt8 >( v8, 4 ) );
-        ASSERT_EQ( 0x7, BitManip::ExtractBits< UInt8 >( v8, 4, 0 ) );
-        ASSERT_EQ( 0x9, BitManip::ExtractBits< UInt8 >( v8, 4, 2 ) );
-        ASSERT_EQ( 0xa, BitManip::ExtractBits< UInt8 >( v8, 4, 4 ) );
-        ASSERT_EQ( 0x5, BitManip::ExtractBits< UInt8 >( v8, 3, 5 ) );
+        UInt8 const uv8 = 0xa7;
+        ASSERT_EQ( 0x7U, BitManip::ExtractBits< UInt8 >( uv8, 4 ) );
+        ASSERT_EQ( 0x7U, BitManip::ExtractBits< UInt8 >( uv8, 4, 0 ) );
+        ASSERT_EQ( 0x9U, BitManip::ExtractBits< UInt8 >( uv8, 4, 2 ) );
+        ASSERT_EQ( 0xaU, BitManip::ExtractBits< UInt8 >( uv8, 4, 4 ) );
+        ASSERT_EQ( 0x5U, BitManip::ExtractBits< UInt8 >( uv8, 3, 5 ) );
+        ASSERT_EQ( 0xa7U, BitManip::ExtractBits< UInt8 >( uv8, 8, 0 ) );
 
-        UInt32 const v32 = 0x12345678UL;
-        ASSERT_EQ( 0x00000008UL, BitManip::ExtractBits< UInt32 >( v32, 4 ) );
-        ASSERT_EQ( 0x00000018UL, BitManip::ExtractBits< UInt32 >( v32, 5, 0 ) );
-        ASSERT_EQ( 0x0000159eUL, BitManip::ExtractBits< UInt32 >( v32, 16, 2 ) );
-        ASSERT_EQ( 0x00000145UL, BitManip::ExtractBits< UInt32 >( v32, 9, 12 ) );
-        ASSERT_EQ( 0x091a2b3cUL, BitManip::ExtractBits< UInt32 >( v32, 31, 1 ) );
+        // NOTE: expected value must be cast to SInt8 because the == operator will perform
+        // integer promotion and sign extension on the return value.
+        SInt8 const sv8 = -89; // 0xa7
+        ASSERT_EQ( SInt8( 0x7 ), BitManip::ExtractBits< SInt8 >( sv8, 4 ) );
+        ASSERT_EQ( SInt8( 0x7 ), BitManip::ExtractBits< SInt8 >( sv8, 4, 0 ) );
+        ASSERT_EQ( SInt8( 0x9 ), BitManip::ExtractBits< SInt8 >( sv8, 4, 2 ) );
+        ASSERT_EQ( SInt8( 0xa ), BitManip::ExtractBits< SInt8 >( sv8, 4, 4 ) );
+        ASSERT_EQ( SInt8( 0x5 ), BitManip::ExtractBits< SInt8 >( sv8, 3, 5 ) );
+        ASSERT_EQ( SInt8( -89 ), BitManip::ExtractBits< SInt8 >( sv8, 8, 0 ) );
+
+        UInt32 const uv32 = 0x12345678UL;
+        ASSERT_EQ( 0x00000008UL, BitManip::ExtractBits< UInt32 >( uv32, 4 ) );
+        ASSERT_EQ( 0x00000018UL, BitManip::ExtractBits< UInt32 >( uv32, 5, 0 ) );
+        ASSERT_EQ( 0x0000159eUL, BitManip::ExtractBits< UInt32 >( uv32, 16, 2 ) );
+        ASSERT_EQ( 0x00000145UL, BitManip::ExtractBits< UInt32 >( uv32, 9, 12 ) );
+        ASSERT_EQ( 0x091a2b3cUL, BitManip::ExtractBits< UInt32 >( uv32, 31, 1 ) );
+
+        SInt32 const sv32 = 0x12345678UL;
+        ASSERT_EQ( 0x00000008UL, BitManip::ExtractBits< SInt32 >( sv32, 4 ) );
+        ASSERT_EQ( 0x00000018UL, BitManip::ExtractBits< SInt32 >( sv32, 5, 0 ) );
+        ASSERT_EQ( 0x0000159eUL, BitManip::ExtractBits< SInt32 >( sv32, 16, 2 ) );
+        ASSERT_EQ( 0x00000145UL, BitManip::ExtractBits< SInt32 >( sv32, 9, 12 ) );
+        ASSERT_EQ( 0x091a2b3cUL, BitManip::ExtractBits< SInt32 >( sv32, 31, 1 ) );
     }
 
     TEST_F( BitManipMaskTest, MaskWidthZOffsetZ )
@@ -80,6 +98,12 @@ namespace BfsdlTests
         ASSERT_EQ( 0U, ( BitManip::CreateMask< UInt16 >( 0, 0 ) ) );
         ASSERT_EQ( 0U, ( BitManip::CreateMask< UInt32 >( 0, 0 ) ) );
         ASSERT_EQ( 0U, ( BitManip::CreateMask< UInt64 >( 0, 0 ) ) );
+
+        // Explicit offset = 0
+        ASSERT_EQ( 0, ( BitManip::CreateMask< SInt8  >( 0, 0 ) ) );
+        ASSERT_EQ( 0, ( BitManip::CreateMask< SInt16 >( 0, 0 ) ) );
+        ASSERT_EQ( 0, ( BitManip::CreateMask< SInt32 >( 0, 0 ) ) );
+        ASSERT_EQ( 0, ( BitManip::CreateMask< SInt64 >( 0, 0 ) ) );
     }
 
     TEST_F( BitManipMaskTest, MaskWidthNzOffsetZ )
@@ -97,6 +121,12 @@ namespace BfsdlTests
         ASSERT_EQ( 0x000000000000ffffULL, ( BitManip::CreateMask< UInt64 >( 16, 0 ) ) );
         ASSERT_EQ( 0x00000000ffffffffULL, ( BitManip::CreateMask< UInt64 >( 32, 0 ) ) );
         ASSERT_EQ( 0xffffffffffffffffULL, ( BitManip::CreateMask< UInt64 >( 64, 0 ) ) );
+
+        ASSERT_EQ( 0x0000000000000001LL, ( BitManip::CreateMask< SInt64 >( 1,  0 ) ) );
+        ASSERT_EQ( 0x00000000000000ffLL, ( BitManip::CreateMask< SInt64 >( 8,  0 ) ) );
+        ASSERT_EQ( 0x000000000000ffffLL, ( BitManip::CreateMask< SInt64 >( 16, 0 ) ) );
+        ASSERT_EQ( 0x00000000ffffffffLL, ( BitManip::CreateMask< SInt64 >( 32, 0 ) ) );
+        ASSERT_EQ( 0xffffffffffffffffLL, ( BitManip::CreateMask< SInt64 >( 64, 0 ) ) );
     }
 
     TEST_F( BitManipMaskTest, MaskWidthNzOffsetNZ )
@@ -116,6 +146,12 @@ namespace BfsdlTests
         ASSERT_EQ( 0x0000000000007f00ULL, ( BitManip::CreateMask< UInt64 >( 7,  8  ) ) );
         ASSERT_EQ( 0x000000000007fc00ULL, ( BitManip::CreateMask< UInt64 >( 9,  10 ) ) );
 
+        ASSERT_EQ( 0x0000000000000004LL, ( BitManip::CreateMask< SInt64 >( 1,  2  ) ) );
+        ASSERT_EQ( 0x0000000000000070LL, ( BitManip::CreateMask< SInt64 >( 3,  4  ) ) );
+        ASSERT_EQ( 0x00000000000007c0LL, ( BitManip::CreateMask< SInt64 >( 5,  6  ) ) );
+        ASSERT_EQ( 0x0000000000007f00LL, ( BitManip::CreateMask< SInt64 >( 7,  8  ) ) );
+        ASSERT_EQ( 0x000000000007fc00LL, ( BitManip::CreateMask< SInt64 >( 9,  10 ) ) );
+
         ASSERT_EQ( 0xfffffffffffffffeULL, ( BitManip::CreateMask< UInt64 >( 63,  1 ) ) );
         ASSERT_EQ( 0xfffffffffffffffcULL, ( BitManip::CreateMask< UInt64 >( 62,  2 ) ) );
         ASSERT_EQ( 0xfffffffffffffff8ULL, ( BitManip::CreateMask< UInt64 >( 61,  3 ) ) );
@@ -124,19 +160,35 @@ namespace BfsdlTests
 
     TEST_F( BitManipMaskTest, ReplaceBits )
     {
-        UInt8 const v8 = 0xa7;
-        ASSERT_EQ( 0xaf, BitManip::ReplaceBits< UInt8 >( v8, 0xfU, 4 ) );
-        ASSERT_EQ( 0xaf, BitManip::ReplaceBits< UInt8 >( v8, 0xfU, 4, 0 ) );
-        ASSERT_EQ( 0x9b, BitManip::ReplaceBits< UInt8 >( v8, 0x6U, 4, 2 ) );
-        ASSERT_EQ( 0x77, BitManip::ReplaceBits< UInt8 >( v8, 0x7U, 4, 4 ) );
-        ASSERT_EQ( 0x27, BitManip::ReplaceBits< UInt8 >( v8, 0x1U, 3, 5 ) );
+        UInt8 const uv8 = 0xa7U;
+        ASSERT_EQ( 0xaf, BitManip::ReplaceBits< UInt8 >( uv8, 0xfU, 4 ) );
+        ASSERT_EQ( 0xaf, BitManip::ReplaceBits< UInt8 >( uv8, 0xfU, 4, 0 ) );
+        ASSERT_EQ( 0x9b, BitManip::ReplaceBits< UInt8 >( uv8, 0x6U, 4, 2 ) );
+        ASSERT_EQ( 0x77, BitManip::ReplaceBits< UInt8 >( uv8, 0x7U, 4, 4 ) );
+        ASSERT_EQ( 0x27, BitManip::ReplaceBits< UInt8 >( uv8, 0x1U, 3, 5 ) );
 
-        UInt32 const v32 = 0x12345678UL;
-        ASSERT_EQ( 0x1234567eUL, BitManip::ReplaceBits< UInt32 >( v32, 0xeUL, 4 ) );
-        ASSERT_EQ( 0x1234566eUL, BitManip::ReplaceBits< UInt32 >( v32, 0xeUL, 5, 0 ) );
-        ASSERT_EQ( 0x1236af34UL, BitManip::ReplaceBits< UInt32 >( v32, 0xabcdUL, 16, 2 ) );
-        ASSERT_EQ( 0x122ff678UL, BitManip::ReplaceBits< UInt32 >( v32, 0x0ffUL, 9, 12 ) );
-        ASSERT_EQ( 0x12345678UL, BitManip::ReplaceBits< UInt32 >( v32, 0x91a2b3cUL, 31, 1 ) );
+        // NOTE: expected value must be cast to SInt8 because the == operator will perform
+        // integer promotion and sign extension on the return value.
+        SInt8 const sv8 = -89; // 0xa7
+        ASSERT_EQ( SInt8( -81 ), BitManip::ReplaceBits< SInt8 >( sv8, 0xf, 4 ) );
+        ASSERT_EQ( SInt8( -81 ), BitManip::ReplaceBits< SInt8 >( sv8, 0xf, 4, 0 ) );
+        ASSERT_EQ( SInt8( -101 ), BitManip::ReplaceBits< SInt8 >( sv8, 0x6, 4, 2 ) );
+        ASSERT_EQ( SInt8( 0x77 ), BitManip::ReplaceBits< SInt8 >( sv8, 0x7, 4, 4 ) );
+        ASSERT_EQ( SInt8( 0x27 ), BitManip::ReplaceBits< SInt8 >( sv8, 0x1, 3, 5 ) );
+
+        UInt32 const uv32 = 0x12345678UL;
+        ASSERT_EQ( 0x1234567eUL, BitManip::ReplaceBits< UInt32 >( uv32, 0xeUL, 4 ) );
+        ASSERT_EQ( 0x1234566eUL, BitManip::ReplaceBits< UInt32 >( uv32, 0xeUL, 5, 0 ) );
+        ASSERT_EQ( 0x1236af34UL, BitManip::ReplaceBits< UInt32 >( uv32, 0xabcdUL, 16, 2 ) );
+        ASSERT_EQ( 0x122ff678UL, BitManip::ReplaceBits< UInt32 >( uv32, 0x0ffUL, 9, 12 ) );
+        ASSERT_EQ( 0x12345678UL, BitManip::ReplaceBits< UInt32 >( uv32, 0x91a2b3cUL, 31, 1 ) );
+
+        SInt32 const sv32 = 0x12345678L;
+        ASSERT_EQ( 0x1234567eUL, BitManip::ReplaceBits< SInt32 >( sv32, 0xeL, 4 ) );
+        ASSERT_EQ( 0x1234566eUL, BitManip::ReplaceBits< SInt32 >( sv32, 0xeL, 5, 0 ) );
+        ASSERT_EQ( 0x1236af34UL, BitManip::ReplaceBits< SInt32 >( sv32, 0xabcdL, 16, 2 ) );
+        ASSERT_EQ( 0x122ff678UL, BitManip::ReplaceBits< SInt32 >( sv32, 0x0ffL, 9, 12 ) );
+        ASSERT_EQ( 0x12345678UL, BitManip::ReplaceBits< SInt32 >( sv32, 0x91a2b3cL, 31, 1 ) );
     }
 
 } // namespace BfsdlTests
