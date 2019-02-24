@@ -67,7 +67,7 @@ my_platforms = [
 Configure.autoconfig = True
 
 # TODO: Can we get rid of these?  Would be nice not to depend on it
-common_msvc_defines = [
+common_defines = [
     "UNICODE",
     "_UNICODE"
     ]
@@ -85,7 +85,7 @@ my_modes = [
     SupportedMode
         (
         name='development',
-        msvc_defines=common_msvc_defines,
+        msvc_defines=common_defines,
         # /RTCc is not used because the MSC STL is not guaranteed to be compliant
         msvc_c_flags=common_msvc_c_flags + [ "/Od", "/Z7", "/FS", "/RTCsu" ],
         msvc_cxx_flags=common_msvc_cxx_flags + [ "/Od", "/Z7", "/FS", "/RTCsu" ],
@@ -95,7 +95,7 @@ my_modes = [
     SupportedMode
         (
         name='release',
-        msvc_defines=common_msvc_defines,
+        msvc_defines=common_defines,
         msvc_c_flags=common_msvc_c_flags + [ "/O2" ],
         msvc_cxx_flags=common_msvc_cxx_flags + [ "/O2" ],
         msvc_link_flags=common_msvc_link_flags + [],
@@ -155,23 +155,36 @@ def configure( conf ):
 
     # Load the WarningLevel tool
     conf.load('WarningLevel', tooldir='waftools')
-    conf.env.append_unique( "warning_level_high_cxxflags", [ "/W4" ] )
-    conf.env.append_unique( "warning_level_max_cxxflags", [
+    conf.env.append_unique( "warning_level_high_CXXFLAGS", [ "/W4" ] )
+    conf.env.append_unique( "warning_level_max_CXXFLAGS", [
         "/Wall", # Highest warning level
 
         # Disable warnings:
         "/wd4514",  # unreferenced inline function has been removed (caused by STL headers)
         "/wd4710",  # function not inlined (caused by STL headers)
-        "/wd4373",  # previous versions of the compiler did not override when parameters only differed by const/volatile qualifiers
+        "/wd4373",  # previous versions of the compiler did not override when parameters only
+                    # differed by const/volatile qualifiers
                     # (caused by gmock and extraneous const value qualifiers on declarations)
         "/wd4820",  # 'x' bytes padding added after data member 'y'
         "/wd4625",  # copy constructor was implicitly defined as deleted
         "/wd4626",  # assignment operator was implicitly defined as deleted
         "/wd5026",  # move constructor was implicitly defined as deleted
-        "/wd5027"   # move assignment operator was implicitly defined as deleted
+        "/wd5027",  # move assignment operator was implicitly defined as deleted
+        "/wd4355",  # 'this' used in base member initializer list
+                    # (RAII is usually better than the design tradeoffs and complexity of 2-stage
+                    # initialization of objects)
+                    # TODO: Maybe remove this if using smart pointers with factory methods
+        "/wd4371",  # Layout of class may have changed from a previous version of the compiler
+                    # (structures used for serialization should be packed and use fixed-width
+                    # types, with testing)
+        "/wd4623"   # Default constructor was implicitly defined as deleted
+                    # Known MSVC bug - MS has not prioritized /Wall compliance in the STL; if
+                    # there's a real defect, it will fail to compile.
+                    # - https://stackoverflow.com/questions/34960038/cant-disable-compiler-warning-in-vs2015
+                    # - https://developercommunity.visualstudio.com/content/problem/172561/warning-c4623-triggers-in-new-compiler.html
         ] )
-    conf.env.append_unique( "warning_level_warnings-as-errors_cxxflags", [ "/WX" ] )
-    conf.env.append_unique( "warning_level_warnings-as-errors_linkflags", [ "/WX" ] )
+    conf.env.append_unique( "warning_level_warnings-as-errors_CXXFLAGS", [ "/WX" ] )
+    conf.env.append_unique( "warning_level_warnings-as-errors_LINKFLAGS", [ "/WX" ] )
 
     # Configure flags for each mode; tools are loaded once before the environment is copied to
     # avoid multiple configuration loops
@@ -306,14 +319,18 @@ def add_taskgens( bld ):
         target="Common",
         project="proj/Common.gproj",
         tgt_params=dict(
-            warning_levels="max warnings-as-error",
+            warning_levels="max", # TODO: Re-enable warnings-as-errors
             features="cxx warning-level"
             ),
         lnk_params=dict(
-            warning_levels="max warnings-as-error",
+            warning_levels="max", # TODO: Re-enable warnings-as-errors
             features="cxx cxxstlib warning-level"
             )
         )
+
+    gtest_c_cxx_flags = [
+        "/wd4668" # <identifier> is not defined as a preprocessor macro
+        ]
 
     # Building googletest separately to apply different warning level
     bld.GLOBITOOL(
@@ -323,7 +340,9 @@ def add_taskgens( bld ):
             # Disable multithreaded tests to avoid race conditions in the error handler
             defines=["GTEST_HAS_PTHREAD=0"],
             warning_levels="high",
-            features="cxx warning-level"
+            features="cxx warning-level",
+            cflags=gtest_c_cxx_flags,
+            cxxflags=gtest_c_cxx_flags
             )
         )
 
@@ -332,11 +351,13 @@ def add_taskgens( bld ):
         project="proj/BfsdlTests.gproj",
         use="Common GoogleTest",
         tgt_params=dict(
-            warning_levels="max warnings-as-error",
-            features="cxx warning-level"
+            warning_levels="max", # TODO: Re-enable warnings-as-errors
+            features="cxx warning-level",
+            cflags=gtest_c_cxx_flags,
+            cxxflags=gtest_c_cxx_flags
             ),
         lnk_params=dict(
-            warning_levels="max warnings-as-error",
+            warning_levels="max", # TODO: Re-enable warnings-as-errors
             features="cxx cxxprogram warning-level",
             subsystem = "CONSOLE"
             )
