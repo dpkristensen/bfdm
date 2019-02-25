@@ -214,6 +214,8 @@ namespace Bfdp
             {
                 std::memset( &mBuffer[oldCapacityBytes], aNewByteValue, newCapacityBytes - oldCapacityBytes );
             }
+
+            return true;
         }
 
         //! Allocate a new buffer
