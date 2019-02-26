@@ -1,7 +1,7 @@
 /**
     BFDP Test Utility Definitions
 
-    Copyright 2016-2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -97,7 +97,7 @@ namespace BfsdlTests
 
     void SetDefaultErrorHandlers()
     {
-        ErrorReporter::SetInternalErrorHandler( MisuseErrorHandler );
+        ErrorReporter::SetInternalErrorHandler( InternalErrorHandler );
         ErrorReporter::SetMisuseErrorHandler( MisuseErrorHandler );
         ErrorReporter::SetRunTimeErrorHandler( RunTimeErrorHandler );
     }

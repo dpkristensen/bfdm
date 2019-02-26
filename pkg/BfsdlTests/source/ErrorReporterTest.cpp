@@ -1,7 +1,7 @@
 /**
     BFDP Error Reporter Tests
 
-    Copyright 2016-2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -137,9 +137,9 @@ namespace BfsdlTests
         BFDP_MISUSE_ERROR( text1 );
         BFDP_RUNTIME_ERROR( text2 );
 
-        ASSERT_EQ( 0, gInternalEvents.size() );
-        ASSERT_EQ( 0, gMisuseEvents.size() );
-        ASSERT_EQ( 0, gRunTimeEvents.size() );
+        ASSERT_TRUE( gInternalEvents.empty() );
+        ASSERT_TRUE( gMisuseEvents.empty() );
+        ASSERT_TRUE( gRunTimeEvents.empty() );
     }
 
     TEST_F( ErrorReporterTest, Macros )
@@ -148,17 +148,17 @@ namespace BfsdlTests
         BFDP_MISUSE_ERROR( text2 );   UInt misuseLine = __LINE__;
         BFDP_RUNTIME_ERROR( text3 );  UInt runtimeLine = __LINE__;
 
-        ASSERT_EQ( 1, gInternalEvents.size() );
+        ASSERT_EQ( 1U, gInternalEvents.size() );
         ASSERT_EQ( internalLine, gInternalEvents.front().line );
         ASSERT_STREQ( BFDP_MODULE, gInternalEvents.front().module );
         ASSERT_STREQ( text1, gInternalEvents.front().text );
 
-        ASSERT_EQ( 1, gMisuseEvents.size() );
+        ASSERT_EQ( 1U, gMisuseEvents.size() );
         ASSERT_EQ( misuseLine, gMisuseEvents.front().line );
         ASSERT_STREQ( BFDP_MODULE, gMisuseEvents.front().module );
         ASSERT_STREQ( text2, gMisuseEvents.front().text );
 
-        ASSERT_EQ( 1, gRunTimeEvents.size() );
+        ASSERT_EQ( 1U, gRunTimeEvents.size() );
         ASSERT_EQ( runtimeLine, gRunTimeEvents.front().line );
         ASSERT_STREQ( BFDP_MODULE, gRunTimeEvents.front().module );
         ASSERT_STREQ( text3, gRunTimeEvents.front().text );
@@ -170,14 +170,14 @@ namespace BfsdlTests
 
         ErrorReporter::ReportInternalError( fakeModule, 123, text3 );
 
-        ASSERT_EQ( 1, gInternalEvents.size() );
+        ASSERT_EQ( 1U, gInternalEvents.size() );
         ASSERT_EQ( 123, gInternalEvents.front().line );
         ASSERT_STREQ( fakeModule, gInternalEvents.front().module );
         ASSERT_STREQ( text3, gInternalEvents.front().text );
 
-        ASSERT_EQ( 0, gMisuseEvents.size() );
+        ASSERT_EQ( 0U, gMisuseEvents.size() );
 
-        ASSERT_EQ( 0, gRunTimeEvents.size() );
+        ASSERT_EQ( 0U, gRunTimeEvents.size() );
     }
 
     TEST_F( ErrorReporterTest, MisuseError )
@@ -186,14 +186,14 @@ namespace BfsdlTests
 
         ErrorReporter::ReportMisuseError( fakeModule, 456, text1 );
 
-        ASSERT_EQ( 0, gInternalEvents.size() );
+        ASSERT_EQ( 0U, gInternalEvents.size() );
 
-        ASSERT_EQ( 1, gMisuseEvents.size() );
+        ASSERT_EQ( 1U, gMisuseEvents.size() );
         ASSERT_EQ( 456, gMisuseEvents.front().line );
         ASSERT_STREQ( fakeModule, gMisuseEvents.front().module );
         ASSERT_STREQ( text1, gMisuseEvents.front().text );
 
-        ASSERT_EQ( 0, gRunTimeEvents.size() );
+        ASSERT_EQ( 0U, gRunTimeEvents.size() );
     }
 
     TEST_F( ErrorReporterTest, RunTimeError )
@@ -202,11 +202,11 @@ namespace BfsdlTests
 
         ErrorReporter::ReportRunTimeError( fakeModule, 789, text2 );
 
-        ASSERT_EQ( 0, gInternalEvents.size() );
+        ASSERT_EQ( 0U, gInternalEvents.size() );
 
-        ASSERT_EQ( 0, gMisuseEvents.size() );
+        ASSERT_EQ( 0U, gMisuseEvents.size() );
 
-        ASSERT_EQ( 1, gRunTimeEvents.size() );
+        ASSERT_EQ( 1U, gRunTimeEvents.size() );
         ASSERT_EQ( 789, gRunTimeEvents.front().line );
         ASSERT_STREQ( fakeModule, gRunTimeEvents.front().module );
         ASSERT_STREQ( text2, gRunTimeEvents.front().text );
