@@ -31,7 +31,6 @@
 */
 
 // External includes
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <string>
 
@@ -42,35 +41,13 @@
 #include "Bfdp/Lexer/Symbolizer.hpp"
 #include "Bfdp/Unicode/Ms1252Converter.hpp"
 #include "Bfdp/Unicode/Utf8Converter.hpp"
+#include "BfsdlTests/MockSymbolObserver.hpp"
 #include "BfsdlTests/TestUtil.hpp"
 
 namespace BfsdlTests
 {
 
     using namespace Bfdp;
-
-    namespace LexerTestInternal
-    {
-        // Type declarations are in a namespace to prevent accidental One Definition Rule
-        // violations with other tests
-        class LexerObserver
-            : public Lexer::ISymbolObserver
-        {
-        public:
-            typedef ::testing::StrictMock< LexerObserver > Mock;
-
-            MOCK_METHOD2( OnMappedSymbol, bool( SInt aCategory, std::string const& aSymbol ) );
-            MOCK_METHOD1( OnUnmappedSymbol, bool( std::string const& aSymbol ) );
-
-        protected:
-            LexerObserver()
-            {
-            }
-        };
-
-    }
-
-    using namespace LexerTestInternal;
 
     class LexerTest
         : public ::testing::Test
@@ -101,80 +78,66 @@ namespace BfsdlTests
         }
     };
 
-    using ::testing::Return;
-
     TEST_F( LexerTest, NoCategories )
     {
         Lexer::StaticSymbolBuffer< 3 > buffer;
-        LexerObserver::Mock observer;
+        MockSymbolObserver observer;
         Unicode::Ms1252Converter converter;
 
         Lexer::Symbolizer lexer( observer, buffer, converter );
 
         static Byte const testBytes[] = "abc123xyz"; // implicit NULL at end
 
-        ::testing::Sequence s;
-        EXPECT_CALL( observer, OnUnmappedSymbol( std::string( "abc" )  ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnUnmappedSymbol( std::string( "123" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnUnmappedSymbol( std::string( "xyz" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnUnmappedSymbol( std::string( "\0", 1 ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-
-        SizeT bytesRead = 0;
+        SizeT bytesRead = 0U;
         ASSERT_TRUE( lexer.Parse( testBytes, BFDP_COUNT_OF_ARRAY( testBytes ), bytesRead ) );
-        ASSERT_EQ( 10, bytesRead );
+        ASSERT_EQ( 10U, bytesRead );
         lexer.EndParsing();
+
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: abc" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: 123" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: xyz" ) );
+        ASSERT_TRUE( observer.VerifyNext( std::string( "Unmapped: \0", 11 ) ) );
+        ASSERT_TRUE( observer.VerifyNone() );
     }
 
     TEST_F( LexerTest, OneByte )
     {
         Lexer::StaticSymbolBuffer< 3 > buffer;
-        LexerObserver::Mock observer;
+        MockSymbolObserver observer;
         Unicode::Ms1252Converter converter;
 
         Lexer::Symbolizer lexer( observer, buffer, converter );
 
-        ::testing::Sequence s;
-        EXPECT_CALL( observer, OnUnmappedSymbol( std::string( "X" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-
-        SizeT bytesRead = 0;
+        SizeT bytesRead = 0U;
         ASSERT_TRUE( lexer.Parse( Char( "X" ), 1, bytesRead ) );
-        ASSERT_EQ( 1, bytesRead );
+        ASSERT_EQ( 1U, bytesRead );
         lexer.EndParsing();
+
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: X" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
     }
 
     TEST_F( LexerTest, OneSymbol )
     {
         Lexer::StaticSymbolBuffer< 3 > buffer;
-        LexerObserver::Mock observer;
+        MockSymbolObserver observer;
         Unicode::Ms1252Converter converter;
 
         Lexer::Symbolizer lexer( observer, buffer, converter );
 
-        ::testing::Sequence s;
-        EXPECT_CALL( observer, OnUnmappedSymbol( std::string( "XXX" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-
-        SizeT bytesRead = 0;
+        SizeT bytesRead = 0U;
         ASSERT_TRUE( lexer.Parse( Char( "XXX" ), 3, bytesRead ) );
-        ASSERT_EQ( 3, bytesRead );
+        ASSERT_EQ( 3U, bytesRead );
         lexer.EndParsing();
+
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: XXX" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
     }
 
     TEST_F( LexerTest, OneCategory )
     {
         Lexer::StaticSymbolBuffer< 5 > buffer;
-        LexerObserver::Mock observer;
+        MockSymbolObserver observer;
         Unicode::Ms1252Converter converter;
 
         Lexer::Symbolizer lexer( observer, buffer, converter );
@@ -183,89 +146,64 @@ namespace BfsdlTests
         Lexer::StringSymbolCategory category5( 5, std::string( "A" ), true );
         ASSERT_TRUE( lexer.AddCategory( &category5 ) );
 
-        ::testing::Sequence s;
-        EXPECT_CALL( observer, OnMappedSymbol( 5, std::string( "AAAAA" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-
-        SizeT bytesRead = 0;
+        SizeT bytesRead = 0U;
         ASSERT_TRUE( lexer.Parse( Char( "AAAAA" ), 5, bytesRead ) );
-        ASSERT_EQ( 5, bytesRead );
+        ASSERT_EQ( 5U, bytesRead );
         lexer.EndParsing();
+
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 5/AAAAA" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
     }
 
     TEST_F( LexerTest, Utf8Output )
     {
         Lexer::StaticSymbolBuffer< 1 > buffer;
-        LexerObserver::Mock observer;
+        MockSymbolObserver observer;
         Unicode::Ms1252Converter converter; // NOTE: Input is in Code Page 1252
 
         Lexer::Symbolizer lexer( observer, buffer, converter );
 
         std::string const LEFT_SINGLE_QUOTATION_MARK = "\xE2\x80\x98"; // In UTF-8
 
-        ::testing::Sequence s;
-        EXPECT_CALL( observer, OnUnmappedSymbol( std::string( "A" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnUnmappedSymbol( LEFT_SINGLE_QUOTATION_MARK ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnUnmappedSymbol( std::string( "B" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-
-        SizeT bytesRead = 0;
+        SizeT bytesRead = 0U;
         ASSERT_TRUE( lexer.Parse( Char( "\x41\x91\x42" ), 3, bytesRead ) );
-        ASSERT_EQ( 3, bytesRead );
+        ASSERT_EQ( 3U, bytesRead );
         lexer.EndParsing();
+
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: A" ) );
+        ASSERT_TRUE( observer.VerifyNext( std::string( "Unmapped: " ) + LEFT_SINGLE_QUOTATION_MARK ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: B" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
     }
 
     TEST_F( LexerTest, Utf8Input )
     {
         Lexer::StaticSymbolBuffer< 1 > buffer;
-        LexerObserver::Mock observer;
+        MockSymbolObserver observer;
         Unicode::Utf8Converter converter;
 
         Lexer::Symbolizer lexer( observer, buffer, converter );
 
         std::string const NERD_FACE = "\xF0\x9F\xA4\x93"; // Unicode 0x1f913 in UTF-8
 
-        ::testing::Sequence s;
-        EXPECT_CALL( observer, OnUnmappedSymbol( std::string( "C" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnUnmappedSymbol( NERD_FACE ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnUnmappedSymbol( std::string( "D" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-
-        SizeT bytesRead = 0;
+        SizeT bytesRead = 0U;
         ASSERT_TRUE( lexer.Parse( Char( "\x43\xF0\x9F\xA4\x93\x44" ), 6, bytesRead ) );
-        ASSERT_EQ( 6, bytesRead );
+        ASSERT_EQ( 6U, bytesRead );
         lexer.EndParsing();
+
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: C" ) );
+        ASSERT_TRUE( observer.VerifyNext( std::string( "Unmapped: " ) + NERD_FACE ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: D" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
     }
 
     TEST_F( LexerTest, MultipleBuffersUncategorized )
     {
         Lexer::StaticSymbolBuffer< 5 > buffer; // Larger than the chunks being read
-        LexerObserver::Mock observer;
+        MockSymbolObserver observer;
         Unicode::Ms1252Converter converter;
 
         Lexer::Symbolizer lexer( observer, buffer, converter );
-
-        ::testing::Sequence s;
-        EXPECT_CALL( observer, OnUnmappedSymbol( std::string( "abc" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnUnmappedSymbol( std::string( "123" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnUnmappedSymbol( std::string( "xyz" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
 
         static Byte const * testBytes = Char( "abc123xyz" );
         SizeT chunks[] = { 3, 3, 3 };
@@ -275,12 +213,17 @@ namespace BfsdlTests
             ReadInChunks( lexer, testBytes, chunks, BFDP_COUNT_OF_ARRAY( chunks ) )
             );
         lexer.EndParsing();
+
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: abc" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: 123" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: xyz" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
     }
 
     TEST_F( LexerTest, MultipleBuffersWithOneCategory )
     {
         Lexer::StaticSymbolBuffer< 5 > buffer; // Larger than the chunks being read
-        LexerObserver::Mock observer;
+        MockSymbolObserver observer;
         Unicode::Ms1252Converter converter;
 
         Lexer::Symbolizer lexer( observer, buffer, converter );
@@ -288,17 +231,6 @@ namespace BfsdlTests
         // Add the category; byte order in category does not matter
         Lexer::StringSymbolCategory category42( 42, std::string( "321" ), true );
         ASSERT_TRUE( lexer.AddCategory( &category42 ) );
-
-        ::testing::Sequence s;
-        EXPECT_CALL( observer, OnUnmappedSymbol( std::string( "abc" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnMappedSymbol( 42, std::string( "123" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnUnmappedSymbol( std::string( "xyz" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
 
         static Byte const * testBytes = Char( "abc123xyz" );
         SizeT chunks[] = { 3, 3, 3 };
@@ -308,12 +240,17 @@ namespace BfsdlTests
             ReadInChunks( lexer, testBytes, chunks, BFDP_COUNT_OF_ARRAY( chunks ) )
         );
         lexer.EndParsing();
+
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: abc" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 42/123" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: xyz" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
     }
 
     TEST_F( LexerTest, MultipleBuffersWithMultipleCategories )
     {
         Lexer::StaticSymbolBuffer< 5 > buffer; // Larger than the chunks being read
-        LexerObserver::Mock observer;
+        MockSymbolObserver observer;
         Unicode::Ms1252Converter converter;
 
         Lexer::Symbolizer lexer( observer, buffer, converter );
@@ -326,20 +263,6 @@ namespace BfsdlTests
         Lexer::StringSymbolCategory category3( 3, std::string( "xyz" ), true );
         ASSERT_TRUE( lexer.AddCategory( &category3 ) );
 
-        ::testing::Sequence s;
-        EXPECT_CALL( observer, OnMappedSymbol( 1, std::string( "abc" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnUnmappedSymbol( std::string( "qq" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnMappedSymbol( 2, std::string( "123" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnMappedSymbol( 3, std::string( "xyz" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-
         static Byte const * testBytes = Char( "abcqq123xyz" );
         SizeT chunks[] = { 3, 2, 3, 3 };
 
@@ -348,12 +271,18 @@ namespace BfsdlTests
             ReadInChunks( lexer, testBytes, chunks, BFDP_COUNT_OF_ARRAY( chunks ) )
         );
         lexer.EndParsing();
+
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 1/abc" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: qq" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 2/123" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 3/xyz" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
     }
 
     TEST_F( LexerTest, IntermediateUncategorizedData )
     {
         Lexer::StaticSymbolBuffer< 5 > buffer; // Larger than the chunks being read
-        LexerObserver::Mock observer;
+        MockSymbolObserver observer;
         Unicode::Ms1252Converter converter;
 
         Lexer::Symbolizer lexer( observer, buffer, converter );
@@ -364,17 +293,6 @@ namespace BfsdlTests
         Lexer::StringSymbolCategory category2( 2, std::string( "xyz" ), true );
         ASSERT_TRUE( lexer.AddCategory( &category2 ) );
 
-        ::testing::Sequence s;
-        EXPECT_CALL( observer, OnMappedSymbol( 1, std::string( "abc" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnUnmappedSymbol( std::string( "123" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnMappedSymbol( 2, std::string( "xyz" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-
         static Byte const * testBytes = Char( "abc123xyz" );
         SizeT chunks[] = { 3, 3, 3 };
 
@@ -383,12 +301,17 @@ namespace BfsdlTests
             ReadInChunks( lexer, testBytes, chunks, BFDP_COUNT_OF_ARRAY( chunks ) )
         );
         lexer.EndParsing();
+
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 1/abc" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: 123" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 2/xyz" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
     }
 
     TEST_F( LexerTest, UnconcatenatedCategory )
     {
         Lexer::StaticSymbolBuffer< 5 > buffer; // Larger than the chunks being read
-        LexerObserver::Mock observer;
+        MockSymbolObserver observer;
         Unicode::Ms1252Converter converter;
 
         Lexer::Symbolizer lexer( observer, buffer, converter );
@@ -399,23 +322,6 @@ namespace BfsdlTests
         Lexer::StringSymbolCategory category2( 2, std::string( "xyz" ), true );
         ASSERT_TRUE( lexer.AddCategory( &category2 ) );
 
-        ::testing::Sequence s;
-        EXPECT_CALL( observer, OnMappedSymbol( 1, std::string( "a" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnMappedSymbol( 1, std::string( "b" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnMappedSymbol( 1, std::string( "c" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnUnmappedSymbol( std::string( "123" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-        EXPECT_CALL( observer, OnMappedSymbol( 2, std::string( "xyz" ) ) )
-            .InSequence( s )
-            .WillOnce( Return( true ) );
-
         static Byte const * testBytes = Char( "abc123xyz" );
         SizeT chunks[] = { 3, 3, 3 };
 
@@ -424,6 +330,13 @@ namespace BfsdlTests
             ReadInChunks( lexer, testBytes, chunks, BFDP_COUNT_OF_ARRAY( chunks ) )
         );
         lexer.EndParsing();
+
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 1/a" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 1/b" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 1/c" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: 123" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 2/xyz" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
     }
 
 } // namespace BfsdlTests
