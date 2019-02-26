@@ -51,18 +51,18 @@ namespace Bfdp
         {
             BFDP_RETURNIF_V( !IsValidRadix( aRadix ), false );
 
-            UInt8 digit = 0;
+            UInt8 digit = 0U;
             if( IsWithinRange( '0', aChar, '9' ) )
             {
                 digit = static_cast< UInt8 >( aChar - '0' );
             }
             else if( IsWithinRange( 'a', aChar, 'z' ) )
             {
-                digit = static_cast< UInt8 >( aChar - 'a' ) + 10;
+                digit = static_cast< UInt8 >( aChar - 'a' ) + 10U;
             }
             else if( IsWithinRange( 'A', aChar, 'Z' ) )
             {
-                digit = static_cast< UInt8 >( aChar - 'A' ) + 10;
+                digit = static_cast< UInt8 >( aChar - 'A' ) + 10U;
             }
             else
             {
@@ -87,11 +87,11 @@ namespace Bfdp
             BFDP_RETURNIF_V( aValue >= aRadix, false );
 
             char out = 0;
-            if( IsWithinRange< UInt8 >( 0, aValue, 9 ) )
+            if( IsWithinRange< UInt8 >( 0U, aValue, 9U ) )
             {
                 out = '0' + static_cast< char >( aValue );
             }
-            else if( IsWithinRange< UInt8 >( 10, aValue, 35 ) )
+            else if( IsWithinRange< UInt8 >( 10U, aValue, 35U ) )
             {
                 out = 'a' + static_cast< char >( aValue - 10 );
             }

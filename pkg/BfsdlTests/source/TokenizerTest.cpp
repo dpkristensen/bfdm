@@ -75,7 +75,7 @@ namespace BfsdlTests
         ASSERT_FALSE( tokenizer.Parse( reinterpret_cast< Byte const * >( testData ), dataLen, bytesRead ) );
         errWorkspace.VerifyRunTimeError();
 
-        ASSERT_EQ( 0, bytesRead );
+        ASSERT_EQ( 0U, bytesRead );
         tokenizer.EndParsing();
         ASSERT_TRUE( observer.VerifyNone() );
     }

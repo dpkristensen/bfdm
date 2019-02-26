@@ -177,11 +177,13 @@ def configure( conf ):
         "/wd4371",  # Layout of class may have changed from a previous version of the compiler
                     # (structures used for serialization should be packed and use fixed-width
                     # types, with testing)
-        "/wd4623"   # Default constructor was implicitly defined as deleted
+        "/wd4623",  # Default constructor was implicitly defined as deleted
                     # Known MSVC bug - MS has not prioritized /Wall compliance in the STL; if
                     # there's a real defect, it will fail to compile.
                     # - https://stackoverflow.com/questions/34960038/cant-disable-compiler-warning-in-vs2015
                     # - https://developercommunity.visualstudio.com/content/problem/172561/warning-c4623-triggers-in-new-compiler.html
+        "/wd4711"   # Function selected for inline expansion
+                    # This warning is purely informational, and expected for optimizations
         ] )
     conf.env.append_unique( "warning_level_warnings-as-errors_CXXFLAGS", [ "/WX" ] )
     conf.env.append_unique( "warning_level_warnings-as-errors_LINKFLAGS", [ "/WX" ] )
@@ -319,11 +321,11 @@ def add_taskgens( bld ):
         target="Common",
         project="proj/Common.gproj",
         tgt_params=dict(
-            warning_levels="max", # TODO: Re-enable warnings-as-errors
+            warning_levels="max warnings-as-errors",
             features="cxx warning-level"
             ),
         lnk_params=dict(
-            warning_levels="max", # TODO: Re-enable warnings-as-errors
+            warning_levels="max warnings-as-errors",
             features="cxx cxxstlib warning-level"
             )
         )
@@ -351,13 +353,13 @@ def add_taskgens( bld ):
         project="proj/BfsdlTests.gproj",
         use="Common GoogleTest",
         tgt_params=dict(
-            warning_levels="max", # TODO: Re-enable warnings-as-errors
+            warning_levels="max warnings-as-errors",
             features="cxx warning-level",
             cflags=gtest_c_cxx_flags,
             cxxflags=gtest_c_cxx_flags
             ),
         lnk_params=dict(
-            warning_levels="max", # TODO: Re-enable warnings-as-errors
+            warning_levels="max warnings-as-errors",
             features="cxx cxxprogram warning-level",
             subsystem = "CONSOLE"
             )

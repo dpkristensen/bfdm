@@ -1,7 +1,7 @@
 /**
     BFDP Unicode Converter Tests
 
-    Copyright 2016-2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -64,9 +64,9 @@ namespace BfsdlTests
 
     TEST_F( UnicodeConverterTest, ConversionSize )
     {
-        ASSERT_EQ( 1, ascii.GetMaxBytes() );
-        ASSERT_EQ( 1, ms1252.GetMaxBytes() );
-        ASSERT_EQ( 6, utf8.GetMaxBytes() );
+        ASSERT_EQ( 1U, ascii.GetMaxBytes() );
+        ASSERT_EQ( 1U, ms1252.GetMaxBytes() );
+        ASSERT_EQ( 6U, utf8.GetMaxBytes() );
     }
 
     TEST_F( UnicodeConverterTest, ASCII )
@@ -95,23 +95,23 @@ namespace BfsdlTests
 
             buf = test[i].bVal;
             cp = Unicode::InvalidCodePoint;
-            ASSERT_EQ( 1, ascii.ConvertBytes( &buf, 1, cp ) );
+            ASSERT_EQ( 1U, ascii.ConvertBytes( &buf, 1, cp ) );
             ASSERT_EQ( test[i].uVal, cp );
 
             buf = 128; // Not a valid code
             cp = test[i].uVal;
-            ASSERT_EQ( 1, ascii.ConvertSymbol( cp, &buf, 1 ) );
+            ASSERT_EQ( 1U, ascii.ConvertSymbol( cp, &buf, 1 ) );
             ASSERT_EQ( test[i].bVal, buf );
         }
 
         // Test conversion of undefined values
         Byte const invalidBytes[] = { 0x80, 0xFF };
         cp = 89; // Valid code point
-        for( SizeT i = 0; i < BFDP_COUNT_OF_ARRAY( invalidBytes ); ++i )
+        for( SizeT i = 0U; i < BFDP_COUNT_OF_ARRAY( invalidBytes ); ++i )
         {
             SCOPED_TRACE( ::testing::Message( "i = " ) << i );
 
-            ASSERT_EQ( 0, ascii.ConvertBytes( &invalidBytes[i], 1, cp ) );
+            ASSERT_EQ( 0U, ascii.ConvertBytes( &invalidBytes[i], 1, cp ) );
             ASSERT_EQ( 89, cp ); // Unchanged
         }
 
@@ -120,19 +120,19 @@ namespace BfsdlTests
 
         // Test invalid inputs
         wksp.ExpectMisuseError();
-        ASSERT_EQ( 0, ascii.ConvertBytes( NULL, 1, cp ) );
+        ASSERT_EQ( 0U, ascii.ConvertBytes( NULL, 1, cp ) );
         ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
 
         wksp.ExpectMisuseError();
-        ASSERT_EQ( 0, ascii.ConvertBytes( &buf, 0, cp ) );
+        ASSERT_EQ( 0U, ascii.ConvertBytes( &buf, 0, cp ) );
         ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
 
         wksp.ExpectMisuseError();
-        ASSERT_EQ( 0, ascii.ConvertSymbol( cp, NULL, 1 ) );
+        ASSERT_EQ( 0U, ascii.ConvertSymbol( cp, NULL, 1U ) );
         ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
 
         wksp.ExpectMisuseError();
-        ASSERT_EQ( 0, ascii.ConvertSymbol( cp, &buf, 0 ) );
+        ASSERT_EQ( 0U, ascii.ConvertSymbol( cp, &buf, 0U ) );
         ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
     }
 
@@ -169,12 +169,12 @@ namespace BfsdlTests
 
             buf = test[i].bVal;
             cp = Unicode::InvalidCodePoint;
-            ASSERT_EQ( 1, ms1252.ConvertBytes( &buf, 1, cp ) );
+            ASSERT_EQ( 1U, ms1252.ConvertBytes( &buf, 1, cp ) );
             ASSERT_EQ( test[i].uVal, cp );
 
             buf = 127; // Not a valid code
             cp = test[i].uVal;
-            ASSERT_EQ( 1, ms1252.ConvertSymbol( cp, &buf, 1 ) );
+            ASSERT_EQ( 1U, ms1252.ConvertSymbol( cp, &buf, 1 ) );
             ASSERT_EQ( test[i].bVal, buf );
         }
 
@@ -185,7 +185,7 @@ namespace BfsdlTests
         {
             SCOPED_TRACE( ::testing::Message( "i = " ) << i );
 
-            ASSERT_EQ( 0, ms1252.ConvertBytes( &invalidBytes[i], 1, cp ) );
+            ASSERT_EQ( 0U, ms1252.ConvertBytes( &invalidBytes[i], 1, cp ) );
             ASSERT_EQ( 89, cp ); // Unchanged
         }
 
@@ -194,19 +194,19 @@ namespace BfsdlTests
 
         // Test invalid inputs
         wksp.ExpectMisuseError();
-        ASSERT_EQ( 0, ms1252.ConvertBytes( NULL, 1, cp ) );
+        ASSERT_EQ( 0U, ms1252.ConvertBytes( NULL, 1, cp ) );
         ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
 
         wksp.ExpectMisuseError();
-        ASSERT_EQ( 0, ms1252.ConvertBytes( &buf, 0, cp ) );
+        ASSERT_EQ( 0U, ms1252.ConvertBytes( &buf, 0, cp ) );
         ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
 
         wksp.ExpectMisuseError();
-        ASSERT_EQ( 0, ms1252.ConvertSymbol( cp, NULL, 1 ) );
+        ASSERT_EQ( 0U, ms1252.ConvertSymbol( cp, NULL, 1 ) );
         ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
 
         wksp.ExpectMisuseError();
-        ASSERT_EQ( 0, ms1252.ConvertSymbol( cp, &buf, 0 ) );
+        ASSERT_EQ( 0U, ms1252.ConvertSymbol( cp, &buf, 0 ) );
         ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
     }
 
@@ -275,7 +275,7 @@ namespace BfsdlTests
             std::memset( buf, 0, sizeof( buf ) );
             std::memcpy( buf, invalidBytes[i].bVal, invalidBytes[i].numBytes );
 
-            ASSERT_EQ( 0, utf8.ConvertBytes( buf, invalidBytes[i].numBytes, cp ) );
+            ASSERT_EQ( 0U, utf8.ConvertBytes( buf, invalidBytes[i].numBytes, cp ) );
             ASSERT_EQ( 42, cp ); // Unchanged
         }
 
@@ -284,23 +284,23 @@ namespace BfsdlTests
 
         // Test invalid inputs
         wksp.ExpectMisuseError();
-        ASSERT_EQ( 0, utf8.ConvertBytes( NULL, 6, cp ) );
+        ASSERT_EQ( 0U, utf8.ConvertBytes( NULL, 6, cp ) );
         ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
 
         wksp.ExpectMisuseError();
-        ASSERT_EQ( 0, utf8.ConvertBytes( buf, 0, cp ) );
+        ASSERT_EQ( 0U, utf8.ConvertBytes( buf, 0, cp ) );
         ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
 
         wksp.ExpectMisuseError();
-        ASSERT_EQ( 0, utf8.ConvertSymbol( cp, NULL, 6 ) );
+        ASSERT_EQ( 0U, utf8.ConvertSymbol( cp, NULL, 6U ) );
         ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
 
         wksp.ExpectMisuseError();
-        ASSERT_EQ( 0, utf8.ConvertSymbol( cp, buf, 5 ) );
+        ASSERT_EQ( 0U, utf8.ConvertSymbol( cp, buf, 5U ) );
         ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
 
         wksp.ExpectMisuseError();
-        ASSERT_EQ( 0, utf8.ConvertSymbol( cp, buf, 0 ) );
+        ASSERT_EQ( 0U, utf8.ConvertSymbol( cp, buf, 0U ) );
         ASSERT_NO_FATAL_FAILURE( wksp.VerifyMisuseError() );
     }
 

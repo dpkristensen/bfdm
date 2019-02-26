@@ -1,7 +1,7 @@
 /**
     Tests for BFDP Common Types
 
-    Copyright 2016-2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -52,11 +52,11 @@ namespace BfsdlTests
         ASSERT_TRUE(  IsWithinRange< UInt8 >( 1U, 3U, 3U ) );
         ASSERT_FALSE( IsWithinRange< UInt8 >( 1U, 4U, 3U ) );
 
-        ASSERT_FALSE( IsWithinRange< SInt8 >( -1U, -2U, 1U ) );
-        ASSERT_TRUE(  IsWithinRange< SInt8 >( -1U, -1U, 1U ) );
-        ASSERT_TRUE(  IsWithinRange< SInt8 >( -1U,  0U, 1U ) );
-        ASSERT_TRUE(  IsWithinRange< SInt8 >( -1U,  1U, 1U ) );
-        ASSERT_FALSE( IsWithinRange< SInt8 >( -1U,  2U, 1U ) );
+        ASSERT_FALSE( IsWithinRange< SInt8 >( -1, -2, 1 ) );
+        ASSERT_TRUE(  IsWithinRange< SInt8 >( -1, -1, 1 ) );
+        ASSERT_TRUE(  IsWithinRange< SInt8 >( -1,  0, 1 ) );
+        ASSERT_TRUE(  IsWithinRange< SInt8 >( -1,  1, 1 ) );
+        ASSERT_FALSE( IsWithinRange< SInt8 >( -1,  2, 1 ) );
     }
 
     TEST_F( CommonTypesTest, MemoryTypes )

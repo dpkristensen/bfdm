@@ -68,7 +68,7 @@ namespace BfsdlTests
         ASSERT_FALSE( emptyIter );
         ASSERT_TRUE( !emptyIter );
         ASSERT_FALSE( emptyIter.HasError() );
-        ASSERT_EQ( 0, emptyIter.GetIndex() );
+        ASSERT_EQ( 0U, emptyIter.GetIndex() );
         // Cannot place expectation on address of empty buffer
     }
 
@@ -79,7 +79,7 @@ namespace BfsdlTests
         ASSERT_FALSE( emptyIter );
         ASSERT_TRUE( !emptyIter );
         ASSERT_FALSE( emptyIter.HasError() );
-        ASSERT_EQ( 0, emptyIter.GetIndex() );
+        ASSERT_EQ( 0U, emptyIter.GetIndex() );
         // Cannot place expectation on address of empty buffer
 }
 
@@ -92,7 +92,7 @@ namespace BfsdlTests
         ASSERT_TRUE( iter );
         ASSERT_FALSE( !iter );
         ASSERT_FALSE( iter.HasError() );
-        ASSERT_EQ( 0, iter.GetIndex() );
+        ASSERT_EQ( 0U, iter.GetIndex() );
         ASSERT_NE( NULL_BYTE_CONST_PTR, &iter );
 
         Unicode::CodePoint cp = Unicode::InvalidCodePoint;

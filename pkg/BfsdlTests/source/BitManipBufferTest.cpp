@@ -152,29 +152,29 @@ namespace BfsdlTests
         // Resize smaller
         ASSERT_TRUE( buf.ResizePreserve( 12 ) );
         ASSERT_EQ( initSizeBytes, buf.GetCapacityBytes() );
-        ASSERT_EQ( 12, buf.GetDataBits() );
-        ASSERT_EQ( 2, buf.GetDataBytes() );
+        ASSERT_EQ( 12U, buf.GetDataBits() );
+        ASSERT_EQ( 2U, buf.GetDataBytes() );
         ASSERT_TRUE( ArraysMatch( initData, buf.GetDataPtr(), initSizeBytes ) );
 
         // Resize EVEN SMALLER
         ASSERT_TRUE( buf.ResizePreserve( 6 ) );
         ASSERT_EQ( initSizeBytes, buf.GetCapacityBytes() );
-        ASSERT_EQ( 6, buf.GetDataBits() );
-        ASSERT_EQ( 1, buf.GetDataBytes() );
+        ASSERT_EQ( 6U, buf.GetDataBits() );
+        ASSERT_EQ( 1U, buf.GetDataBytes() );
         ASSERT_TRUE( ArraysMatch( initData, buf.GetDataPtr(), initSizeBytes ) );
 
         // Resize larger, within capacity
         ASSERT_TRUE( buf.ResizePreserve( 15 ) );
         ASSERT_EQ( initSizeBytes, buf.GetCapacityBytes() );
-        ASSERT_EQ( 15, buf.GetDataBits() );
-        ASSERT_EQ( 2, buf.GetDataBytes() );
+        ASSERT_EQ( 15U, buf.GetDataBits() );
+        ASSERT_EQ( 2U, buf.GetDataBytes() );
         ASSERT_TRUE( ArraysMatch( initData, buf.GetDataPtr(), initSizeBytes ) );
 
         // Resize larger, beyond capacity by 1 byte
         ASSERT_TRUE( buf.ResizePreserve( 30 ) );
-        ASSERT_EQ( 4, buf.GetCapacityBytes() );
-        ASSERT_EQ( 30, buf.GetDataBits() );
-        ASSERT_EQ( 4, buf.GetDataBytes() );
+        ASSERT_EQ( 4U, buf.GetCapacityBytes() );
+        ASSERT_EQ( 30U, buf.GetDataBits() );
+        ASSERT_EQ( 4U, buf.GetDataBytes() );
         Byte newData30[] = { 0xab, 0xcd };
         // Since the new bytes are uninitialized, only verify the original data up to the last
         // size (the 3rd byte is lost because it is not part of the data)
@@ -186,17 +186,17 @@ namespace BfsdlTests
 
         // Resize again, initializing the new memory
         ASSERT_TRUE( buf.ResizePreserve( 36, 0x12 ) );
-        ASSERT_EQ( 5, buf.GetCapacityBytes() );
-        ASSERT_EQ( 36, buf.GetDataBits() );
-        ASSERT_EQ( 5, buf.GetDataBytes() );
+        ASSERT_EQ( 5U, buf.GetCapacityBytes() );
+        ASSERT_EQ( 36U, buf.GetDataBits() );
+        ASSERT_EQ( 5U, buf.GetDataBytes() );
         Byte newData36[] = { 0xab, 0xcd, 0x88, 0x99, 0x12 };
         ASSERT_TRUE( ArraysMatch( newData36, buf.GetDataPtr(), 5 ) );
 
         // Resize again, initializing the new memory to another value
         ASSERT_TRUE( buf.ResizePreserve( 50, 0x34 ) );
-        ASSERT_EQ( 7, buf.GetCapacityBytes() );
-        ASSERT_EQ( 50, buf.GetDataBits() );
-        ASSERT_EQ( 7, buf.GetDataBytes() );
+        ASSERT_EQ( 7U, buf.GetCapacityBytes() );
+        ASSERT_EQ( 50U, buf.GetDataBits() );
+        ASSERT_EQ( 7U, buf.GetDataBytes() );
         Byte newData42[] = { 0xab, 0xcd, 0x88, 0x99, 0x12, 0x34, 0x34 };
         ASSERT_TRUE( ArraysMatch( newData42, buf.GetDataPtr(), 7 ) );
     }

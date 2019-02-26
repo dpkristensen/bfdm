@@ -81,7 +81,10 @@
             "xlocmon": "cpp",
             "xloctime": "cpp",
             "xmemory": "cpp",
-            "xtree": "cpp"
+            "xtree": "cpp",
+            "functional": "cpp",
+            "iterator": "cpp",
+            "xfunctional": "cpp"
         },
         "C_Cpp.intelliSenseEngineFallback": "Disabled"
     }

@@ -84,16 +84,16 @@ namespace BfsdlTests
         BitManip::GenericBitStream stream( mBuffer );
         RwTestElement const inputData[] =
         {
-            { 0x5, 3, true },
-            { 0xa, 4, true },
-            { 0x0, 2, true },
-            { 0x1, 1, true },
-            { 0x1, 1, false }
+            { 0x5, 3U, true },
+            { 0xa, 4U, true },
+            { 0x0, 2U, true },
+            { 0x1, 1U, true },
+            { 0x1, 1U, false }
         };
         SizeT const testCount = BFDP_COUNT_OF_ARRAY( inputData );
 
         // Write some data elements as const input
-        for( SizeT i = 0; i < testCount; ++i )
+        for( SizeT i = 0u; i < testCount; ++i )
         {
             RwTestElement const& e = inputData[i];
             SCOPED_TRACE( ::testing::Message( "i=" ) << i );
@@ -101,15 +101,15 @@ namespace BfsdlTests
         }
         ASSERT_EQ( NumBits, stream.GetPosBits() );
 
-        stream.SeekBits( 0 );
-        ASSERT_EQ( 0, stream.GetPosBits() );
+        stream.SeekBits( 0u );
+        ASSERT_EQ( 0u, stream.GetPosBits() );
 
         // Create a buffer for output and clear it.
         Byte outputData[testCount];
-        std::memset( outputData, 0, testCount );
+        std::memset( outputData, 0u, testCount );
 
         // Read them back as non-const output
-        for( SizeT i = 0; i < testCount; ++i )
+        for( SizeT i = 0u; i < testCount; ++i )
         {
             RwTestElement const& e = inputData[i];
             SCOPED_TRACE( ::testing::Message( "i=" ) << i );

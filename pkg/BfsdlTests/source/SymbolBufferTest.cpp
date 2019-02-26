@@ -1,7 +1,7 @@
 /**
     BFDP Lexer Symbol Buffer Test
 
-    Copyright 2016-2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -55,26 +55,26 @@ namespace BfsdlTests
         Lexer::StaticSymbolBuffer< 2 > buffer;
 
         // Initial state
-        ASSERT_EQ( 0, buffer.GetSize() );
+        ASSERT_EQ( 0U, buffer.GetSize() );
 
         // Adding values up to boundary
-        ASSERT_TRUE( buffer.Add( 100 ) );
-        ASSERT_TRUE( buffer.Add( 200 ) );
-        ASSERT_FALSE( buffer.Add( 300 ) );
+        ASSERT_TRUE( buffer.Add( 100U ) );
+        ASSERT_TRUE( buffer.Add( 200U ) );
+        ASSERT_FALSE( buffer.Add( 300U ) );
 
         // Modified state
-        ASSERT_EQ( 2, buffer.GetSize() );
-        ASSERT_EQ( 100, buffer.GetSymbolAt( 0 ) );
-        ASSERT_EQ( 200, buffer.GetSymbolAt( 1 ) );
+        ASSERT_EQ( 2U, buffer.GetSize() );
+        ASSERT_EQ( 100U, buffer.GetSymbolAt( 0 ) );
+        ASSERT_EQ( 200U, buffer.GetSymbolAt( 1 ) );
 
         // Reset state
         buffer.Clear();
-        ASSERT_EQ( 0, buffer.GetSize() );
+        ASSERT_EQ( 0U, buffer.GetSize() );
 
         // Re-modified state
         ASSERT_TRUE( buffer.Add( 0x1234 ) );
         ASSERT_TRUE( buffer.Add( 0x5678 ) );
-        ASSERT_EQ( 2, buffer.GetSize() );
+        ASSERT_EQ( 2U, buffer.GetSize() );
         ASSERT_EQ( 0x5678, buffer.GetSymbolAt( 1 ) );
         ASSERT_EQ( 0x1234, buffer.GetSymbolAt( 0 ) );
     }
@@ -84,20 +84,20 @@ namespace BfsdlTests
         Lexer::StaticSymbolBuffer< 5 > buffer;
 
         // Test boundary condition with a different size
-        ASSERT_TRUE( buffer.Add( 100 ) );
-        ASSERT_TRUE( buffer.Add( 200 ) );
-        ASSERT_TRUE( buffer.Add( 300 ) );
-        ASSERT_TRUE( buffer.Add( 400 ) );
-        ASSERT_TRUE( buffer.Add( 500 ) );
-        ASSERT_FALSE( buffer.Add( 600 ) );
+        ASSERT_TRUE( buffer.Add( 100U ) );
+        ASSERT_TRUE( buffer.Add( 200U ) );
+        ASSERT_TRUE( buffer.Add( 300U ) );
+        ASSERT_TRUE( buffer.Add( 400U ) );
+        ASSERT_TRUE( buffer.Add( 500U ) );
+        ASSERT_FALSE( buffer.Add( 600U ) );
 
         // Resulting state
-        ASSERT_EQ( 5, buffer.GetSize() );
-        ASSERT_EQ( 100, buffer.GetSymbolAt( 0 ) );
-        ASSERT_EQ( 200, buffer.GetSymbolAt( 1 ) );
-        ASSERT_EQ( 300, buffer.GetSymbolAt( 2 ) );
-        ASSERT_EQ( 400, buffer.GetSymbolAt( 3 ) );
-        ASSERT_EQ( 500, buffer.GetSymbolAt( 4 ) );
+        ASSERT_EQ( 5U, buffer.GetSize() );
+        ASSERT_EQ( 100U, buffer.GetSymbolAt( 0 ) );
+        ASSERT_EQ( 200U, buffer.GetSymbolAt( 1 ) );
+        ASSERT_EQ( 300U, buffer.GetSymbolAt( 2 ) );
+        ASSERT_EQ( 400U, buffer.GetSymbolAt( 3 ) );
+        ASSERT_EQ( 500U, buffer.GetSymbolAt( 4 ) );
     }
 
 } // namespace BfsdlTests
