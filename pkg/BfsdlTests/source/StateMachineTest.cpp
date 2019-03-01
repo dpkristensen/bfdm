@@ -30,14 +30,23 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// Base Includes
+#include "BfsdlTests/MockObserverBase.hpp"
+
 // External Includes
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
+#include <list>
 
 // Internal Includes
 #include "Bfdp/StateMachine/Actions.hpp"
 #include "Bfdp/StateMachine/Engine.hpp"
 #include "BfsdlTests/TestUtil.hpp"
+
+#define DEF_TEST_STATE( _state, _action ) \
+    void _state##_action##() \
+    { \
+        RecordEvent( BFDP_STRINGIZE( _state ) " " BFDP_STRINGIZE( _action ) ); \
+    }
 
 namespace BfsdlTests
 {
@@ -72,217 +81,259 @@ namespace BfsdlTests
     };
 
     class TestActionObserver
+        : public MockObserverBase
+
     {
     public:
-        typedef ::testing::StrictMock< TestActionObserver > Type;
-
-        MOCK_METHOD0( TestActionOneEntry, void() );
-        MOCK_METHOD0( TestActionOneEvaluate, void() );
-        MOCK_METHOD0( TestActionOneExit, void() );
-        MOCK_METHOD0( TestActionTwoEntry, void() );
-        MOCK_METHOD0( TestActionTwoEvaluate, void() );
-        MOCK_METHOD0( TestActionTwoExit, void() );
-
-    protected:
-        TestActionObserver()
-        {
-        }
+        DEF_TEST_STATE( One, Entry );
+        DEF_TEST_STATE( One, Evaluate );
+        DEF_TEST_STATE( One, Exit );
+        DEF_TEST_STATE( Two, Entry );
+        DEF_TEST_STATE( Two, Evaluate );
+        DEF_TEST_STATE( Two, Exit );
     };
 
     TEST_F( StateMachineTest, Simple )
     {
         StateMachine::Engine engine;
         bool isOk = true;
-        TestActionObserver::Type observer;
-        typedef StateMachine::CallMethod< TestActionObserver::Type > CallMethod;
+        TestActionObserver observer;
+        typedef StateMachine::CallMethod< TestActionObserver > CallMethod;
 
         BFDP_STATE_MAP_BEGIN( isOk, engine, TestState::Count );
-        BFDP_STATE_ACTION( TestState::One, Entry, CallMethod( observer, &TestActionObserver::TestActionOneEntry ) );
-        BFDP_STATE_ACTION( TestState::One, Evaluate, CallMethod( observer, &TestActionObserver::TestActionOneEvaluate ) );
-        BFDP_STATE_ACTION( TestState::One, Exit, CallMethod( observer, &TestActionObserver::TestActionOneExit ) );
-        BFDP_STATE_ACTION( TestState::Two, Entry, CallMethod( observer, &TestActionObserver::TestActionTwoEntry ) );
-        BFDP_STATE_ACTION( TestState::Two, Evaluate, CallMethod( observer, &TestActionObserver::TestActionTwoEvaluate ) );
+        BFDP_STATE_ACTION( TestState::One, Entry, CallMethod( observer, &TestActionObserver::OneEntry ) );
+        BFDP_STATE_ACTION( TestState::One, Evaluate, CallMethod( observer, &TestActionObserver::OneEvaluate ) );
+        BFDP_STATE_ACTION( TestState::One, Exit, CallMethod( observer, &TestActionObserver::OneExit ) );
+        BFDP_STATE_ACTION( TestState::Two, Entry, CallMethod( observer, &TestActionObserver::TwoEntry ) );
+        BFDP_STATE_ACTION( TestState::Two, Evaluate, CallMethod( observer, &TestActionObserver::TwoEvaluate ) );
         // Two has no exit actions
         BFDP_STATE_MAP_END();
         ASSERT_TRUE( isOk );
 
         // No transitions pending
         ASSERT_FALSE( engine.DoTransition() );
+        ASSERT_TRUE( observer.VerifyNone() );
 
         // Call with no active state does nothing
         engine.EvaluateState();
+        ASSERT_TRUE( observer.VerifyNone() );
 
         // Perform the initial transition, which does not take effect immediately
         engine.Transition( TestState::One );
+        ASSERT_TRUE( observer.VerifyNone() );
 
         // Make the transition effective
-        EXPECT_CALL( observer, TestActionOneEntry() );
         ASSERT_TRUE( engine.DoTransition() );
+        ASSERT_TRUE( observer.VerifyNext( "One Entry" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
 
         // A second call to DoTransition() indicates nothing occurred
         ASSERT_FALSE( engine.DoTransition() );
+        ASSERT_TRUE( observer.VerifyNone() );
 
-        EXPECT_CALL( observer, TestActionOneEvaluate() );
+        // Evaluate the state
         engine.EvaluateState();
+        ASSERT_TRUE( observer.VerifyNext( "One Evaluate" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
 
         engine.Transition( TestState::Two );
-        EXPECT_CALL( observer, TestActionOneExit() );
-        EXPECT_CALL( observer, TestActionTwoEntry() );
         ASSERT_TRUE( engine.DoTransition() );
+        ASSERT_TRUE( observer.VerifyNext( "One Exit" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Two Entry" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
 
-        EXPECT_CALL( observer, TestActionTwoEvaluate() );
         engine.EvaluateState();
+        ASSERT_TRUE( observer.VerifyNext( "Two Evaluate" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
 
         // No exit action registered for Two
         engine.Transition( TestState::One );
-        EXPECT_CALL( observer, TestActionOneEntry() );
         ASSERT_TRUE( engine.DoTransition() );
+        ASSERT_TRUE( observer.VerifyNext( "One Entry" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
     }
 
-    class RunToCompletionModel
+    class RunToCompletionObserver
+        : public MockObserverBase
     {
     public:
-        void TransitionToTwo()
+        enum TransitionBehavior
         {
-            stateMachine.Transition( TestState::Two );
-            HasReturned();
+            FROM_ONE_ENTRY,
+            FROM_ONE_EVALUATE,
+            FROM_TWO_EXIT
+        };
+
+        RunToCompletionObserver
+            (
+            StateMachine::Engine& aEngine,
+            TransitionBehavior const aTransitionFrom
+            )
+            : mEngine( aEngine )
+            , mTransitionFrom( aTransitionFrom )
+        {
         }
 
-        MOCK_METHOD0( HasReturned, void() );
+        void OneEntry()
+        {
+            RecordEvent( "One Entry" );
+            if( mTransitionFrom == FROM_ONE_ENTRY )
+            {
+                TransitionToTwo();
+            }
+        }
 
-        StateMachine::Engine stateMachine;
+        void OneEvaluate()
+        {
+            RecordEvent( "One Evaluate" );
+            if( mTransitionFrom == FROM_ONE_EVALUATE )
+            {
+                TransitionToTwo();
+            }
+        }
+
+        DEF_TEST_STATE( One, Exit );
+        DEF_TEST_STATE( Two, Entry );
+        DEF_TEST_STATE( Two, Evaluate );
+
+        void TwoExit()
+        {
+            RecordEvent( "Two Exit" );
+            if( mTransitionFrom == FROM_TWO_EXIT )
+            {
+                TransitionToTwo();
+            }
+        }
+
+    private:
+        void TransitionToTwo()
+        {
+            mEngine.Transition( TestState::Two );
+            RecordEvent( "Return" );
+        }
+
+        TransitionBehavior const mTransitionFrom;
+        StateMachine::Engine& mEngine;
     };
 
     TEST_F( StateMachineTest, RunToCompletionReturnFromTransitionFirst )
     {
+        StateMachine::Engine engine;
         bool isOk = true;
-        RunToCompletionModel model;
-        TestActionObserver::Type observer;
+        RunToCompletionObserver observer( engine, RunToCompletionObserver::FROM_ONE_EVALUATE );
 
-        typedef StateMachine::CallMethod< TestActionObserver::Type > CallMethod;
+        typedef StateMachine::CallMethod< RunToCompletionObserver > CallMethod;
 
-        BFDP_STATE_MAP_BEGIN( isOk, model.stateMachine, TestState::Count );
-        BFDP_STATE_ACTION( TestState::One, Entry, CallMethod( observer, &TestActionObserver::TestActionOneEntry ) );
-        BFDP_STATE_ACTION( TestState::One, Evaluate, CallMethod( observer, &TestActionObserver::TestActionOneEvaluate ) );
-        BFDP_STATE_ACTION( TestState::One, Exit, CallMethod( observer, &TestActionObserver::TestActionOneExit ) );
-        BFDP_STATE_ACTION( TestState::Two, Entry, CallMethod( observer, &TestActionObserver::TestActionTwoEntry ) );
-        BFDP_STATE_ACTION( TestState::Two, Evaluate, CallMethod( observer, &TestActionObserver::TestActionTwoEvaluate ) );
-        BFDP_STATE_ACTION( TestState::Two, Exit, CallMethod( observer, &TestActionObserver::TestActionTwoExit ) );
+        BFDP_STATE_MAP_BEGIN( isOk, engine, TestState::Count );
+        BFDP_STATE_ACTION( TestState::One, Entry, CallMethod( observer, &RunToCompletionObserver::OneEntry ) );
+        BFDP_STATE_ACTION( TestState::One, Evaluate, CallMethod( observer, &RunToCompletionObserver::OneEvaluate ) );
+        BFDP_STATE_ACTION( TestState::One, Exit, CallMethod( observer, &RunToCompletionObserver::OneExit ) );
+        BFDP_STATE_ACTION( TestState::Two, Entry, CallMethod( observer, &RunToCompletionObserver::TwoEntry ) );
+        BFDP_STATE_ACTION( TestState::Two, Evaluate, CallMethod( observer, &RunToCompletionObserver::TwoEvaluate ) );
+        BFDP_STATE_ACTION( TestState::Two, Exit, CallMethod( observer, &RunToCompletionObserver::TwoExit ) );
         BFDP_STATE_MAP_END();
         ASSERT_TRUE( isOk );
 
         // Get into state One first
-        ::testing::Sequence s;
-        model.stateMachine.Transition( TestState::One );
-        EXPECT_CALL( observer, TestActionOneEntry() )
-            .InSequence( s );
-        ASSERT_TRUE( model.stateMachine.DoTransition() );
+        engine.Transition( TestState::One );
+        ASSERT_TRUE( engine.DoTransition() );
+        ASSERT_TRUE( observer.VerifyNext( "One Entry" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
 
         // Cause a transition from Evaluate and verify the method returns prior to the transition.
         // The pending transition take effect automatically.
-        EXPECT_CALL( observer, TestActionOneEvaluate() )
-            .InSequence( s )
-            .WillOnce( ::testing::Invoke( &model, &RunToCompletionModel::TransitionToTwo ) );;
-        EXPECT_CALL( model, HasReturned() )
-            .InSequence( s );
-        EXPECT_CALL( observer, TestActionOneExit() )
-            .InSequence( s );
-        EXPECT_CALL( observer, TestActionTwoEntry() )
-            .InSequence( s );
-        model.stateMachine.EvaluateState();
+        engine.EvaluateState();
+        ASSERT_TRUE( observer.VerifyNext( "One Evaluate" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Return" ) );
+        ASSERT_TRUE( observer.VerifyNext( "One Exit" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Two Entry" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
 
         // Verify no transition is pending.
-        ASSERT_FALSE( model.stateMachine.DoTransition() );
+        ASSERT_FALSE( engine.DoTransition() );
+        ASSERT_TRUE( observer.VerifyNone() );
     }
 
     TEST_F( StateMachineTest, RunToCompletionTransitionOnExit )
     {
+        StateMachine::Engine engine;
         bool isOk = true;
-        RunToCompletionModel model;
-        TestActionObserver::Type observer;
+        RunToCompletionObserver observer( engine, RunToCompletionObserver::FROM_TWO_EXIT );
 
-        typedef StateMachine::CallMethod< TestActionObserver::Type > CallMethod;
+        typedef StateMachine::CallMethod< RunToCompletionObserver > CallMethod;
 
-        BFDP_STATE_MAP_BEGIN( isOk, model.stateMachine, TestState::Count );
-        BFDP_STATE_ACTION( TestState::One, Entry, CallMethod( observer, &TestActionObserver::TestActionOneEntry ) );
-        BFDP_STATE_ACTION( TestState::One, Evaluate, CallMethod( observer, &TestActionObserver::TestActionOneEvaluate ) );
-        BFDP_STATE_ACTION( TestState::One, Exit, CallMethod( observer, &TestActionObserver::TestActionOneExit ) );
-        BFDP_STATE_ACTION( TestState::Two, Entry, CallMethod( observer, &TestActionObserver::TestActionTwoEntry ) );
-        BFDP_STATE_ACTION( TestState::Two, Evaluate, CallMethod( observer, &TestActionObserver::TestActionTwoEvaluate ) );
-        BFDP_STATE_ACTION( TestState::Two, Exit, CallMethod( observer, &TestActionObserver::TestActionTwoExit ) );
+        BFDP_STATE_MAP_BEGIN( isOk, engine, TestState::Count );
+        BFDP_STATE_ACTION( TestState::One, Entry, CallMethod( observer, &RunToCompletionObserver::OneEntry ) );
+        BFDP_STATE_ACTION( TestState::One, Evaluate, CallMethod( observer, &RunToCompletionObserver::OneEvaluate ) );
+        BFDP_STATE_ACTION( TestState::One, Exit, CallMethod( observer, &RunToCompletionObserver::OneExit ) );
+        BFDP_STATE_ACTION( TestState::Two, Entry, CallMethod( observer, &RunToCompletionObserver::TwoEntry ) );
+        BFDP_STATE_ACTION( TestState::Two, Evaluate, CallMethod( observer, &RunToCompletionObserver::TwoEvaluate ) );
+        BFDP_STATE_ACTION( TestState::Two, Exit, CallMethod( observer, &RunToCompletionObserver::TwoExit ) );
         BFDP_STATE_MAP_END();
         ASSERT_TRUE( isOk );
 
         // Get into state Two first
-        ::testing::Sequence s;
-        model.stateMachine.Transition( TestState::Two );
-        EXPECT_CALL( observer, TestActionTwoEntry() )
-            .InSequence( s );
-        ASSERT_TRUE( model.stateMachine.DoTransition() );
+        engine.Transition( TestState::Two );
+        ASSERT_TRUE( engine.DoTransition() );
+        ASSERT_TRUE( observer.VerifyNext( "Two Entry" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
 
         // Cause a transition from Exit and verify the method returns prior to the transition.
         // The pending transition will take effect automatically.
-        model.stateMachine.Transition( TestState::One );
-        EXPECT_CALL( observer, TestActionTwoExit() )
-            .InSequence( s )
-            .WillOnce( ::testing::Invoke( &model, &RunToCompletionModel::TransitionToTwo ) );;
-        EXPECT_CALL( model, HasReturned() )
-            .InSequence( s );
-        EXPECT_CALL( observer, TestActionOneEntry() )
-            .InSequence( s );
-        EXPECT_CALL( observer, TestActionOneExit() )
-            .InSequence( s );
-        EXPECT_CALL( observer, TestActionTwoEntry() )
-            .InSequence( s );
-        ASSERT_TRUE( model.stateMachine.DoTransition() );
+        // TODO: Should it be allowed that the internal transition can completely override the
+        // external transition, such that One is not entered at all?  Maybe as an option flag?
+        engine.Transition( TestState::One );
+        ASSERT_TRUE( engine.DoTransition() );
+        ASSERT_TRUE( observer.VerifyNext( "Two Exit" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Return" ) );
+        ASSERT_TRUE( observer.VerifyNext( "One Entry" ) );
+        ASSERT_TRUE( observer.VerifyNext( "One Exit" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Two Entry" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
 
         // Verify no transition is pending.
-        ASSERT_FALSE( model.stateMachine.DoTransition() );
+        ASSERT_FALSE( engine.DoTransition() );
+        ASSERT_TRUE( observer.VerifyNone() );
     }
 
     TEST_F( StateMachineTest, RunToCompletionTransitionOnEntry )
     {
+        StateMachine::Engine engine;
         bool isOk = true;
-        RunToCompletionModel model;
-        TestActionObserver::Type observer;
+        RunToCompletionObserver observer( engine, RunToCompletionObserver::FROM_ONE_ENTRY );
 
-        typedef StateMachine::CallMethod< TestActionObserver::Type > CallMethod;
+        typedef StateMachine::CallMethod< RunToCompletionObserver > CallMethod;
 
-        BFDP_STATE_MAP_BEGIN( isOk, model.stateMachine, TestState::Count );
-        BFDP_STATE_ACTION( TestState::One, Entry, CallMethod( observer, &TestActionObserver::TestActionOneEntry ) );
-        BFDP_STATE_ACTION( TestState::One, Evaluate, CallMethod( observer, &TestActionObserver::TestActionOneEvaluate ) );
-        BFDP_STATE_ACTION( TestState::One, Exit, CallMethod( observer, &TestActionObserver::TestActionOneExit ) );
-        BFDP_STATE_ACTION( TestState::Two, Entry, CallMethod( observer, &TestActionObserver::TestActionTwoEntry ) );
-        BFDP_STATE_ACTION( TestState::Two, Evaluate, CallMethod( observer, &TestActionObserver::TestActionTwoEvaluate ) );
-        BFDP_STATE_ACTION( TestState::Two, Exit, CallMethod( observer, &TestActionObserver::TestActionTwoExit ) );
+        BFDP_STATE_MAP_BEGIN( isOk, engine, TestState::Count );
+        BFDP_STATE_ACTION( TestState::One, Entry, CallMethod( observer, &RunToCompletionObserver::OneEntry ) );
+        BFDP_STATE_ACTION( TestState::One, Evaluate, CallMethod( observer, &RunToCompletionObserver::OneEvaluate ) );
+        BFDP_STATE_ACTION( TestState::One, Exit, CallMethod( observer, &RunToCompletionObserver::OneExit ) );
+        BFDP_STATE_ACTION( TestState::Two, Entry, CallMethod( observer, &RunToCompletionObserver::TwoEntry ) );
+        BFDP_STATE_ACTION( TestState::Two, Evaluate, CallMethod( observer, &RunToCompletionObserver::TwoEvaluate ) );
+        BFDP_STATE_ACTION( TestState::Two, Exit, CallMethod( observer, &RunToCompletionObserver::TwoExit ) );
         BFDP_STATE_MAP_END();
         ASSERT_TRUE( isOk );
 
         // Get into state Two first
-        ::testing::Sequence s;
-        model.stateMachine.Transition( TestState::Two );
-        EXPECT_CALL( observer, TestActionTwoEntry() )
-            .InSequence( s );
-        ASSERT_TRUE( model.stateMachine.DoTransition() );
+        engine.Transition( TestState::Two );
+        ASSERT_TRUE( engine.DoTransition() );
+        ASSERT_TRUE( observer.VerifyNext( "Two Entry" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
 
         // Cause a transition from Entry and verify the method returns prior to the transition.
         // The pending transition will take effect automatically.
-        model.stateMachine.Transition( TestState::One );
-        EXPECT_CALL( observer, TestActionTwoExit() )
-            .InSequence( s );
-        EXPECT_CALL( observer, TestActionOneEntry() )
-            .InSequence( s )
-            .WillOnce( ::testing::Invoke( &model, &RunToCompletionModel::TransitionToTwo ) );
-        EXPECT_CALL( model, HasReturned() )
-            .InSequence( s );
-        EXPECT_CALL( observer, TestActionOneExit() )
-            .InSequence( s );
-        EXPECT_CALL( observer, TestActionTwoEntry() )
-            .InSequence( s );
-        ASSERT_TRUE( model.stateMachine.DoTransition() );
+        engine.Transition( TestState::One );
+        ASSERT_TRUE( engine.DoTransition() );
+        ASSERT_TRUE( observer.VerifyNext( "Two Exit" ) );
+        ASSERT_TRUE( observer.VerifyNext( "One Entry" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Return" ) );
+        ASSERT_TRUE( observer.VerifyNext( "One Exit" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Two Entry" ) );
+        ASSERT_TRUE( observer.VerifyNone() );
 
         // Verify no transition is pending.
-        ASSERT_FALSE( model.stateMachine.DoTransition() );
+        ASSERT_FALSE( engine.DoTransition() );
+        ASSERT_TRUE( observer.VerifyNone() );
     }
 
     /* TODO: More robust action system to represent as much logic in state map as possible:
