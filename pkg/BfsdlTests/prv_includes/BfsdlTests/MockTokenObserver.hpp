@@ -35,15 +35,7 @@
 
 // Base include
 #include "BfsdlParser/Token/ITokenObserver.hpp"
-
-// External includes
-#include <gtest/gtest.h>
-#include <list>
-#include <string>
-
-// Internal includes
-#include "Bfdp/Common.hpp"
-#include "Bfdp/Macros.hpp"
+#include "BfsdlTests/MockObserverBase.hpp"
 
 namespace BfsdlTests
 {
@@ -52,13 +44,10 @@ namespace BfsdlTests
     //!
     //! This class records values in sequence so they can be checked post-call.
     class MockTokenObserver
-        : public BfsdlParser::Token::ITokenObserver
+        : public MockObserverBase
+        , public BfsdlParser::Token::ITokenObserver
     {
     public:
-        MockTokenObserver();
-
-        virtual ~MockTokenObserver();
-
         BFDP_OVERRIDE( bool OnControlCharacter
             (
             std::string const& aControlCharacter
@@ -68,18 +57,6 @@ namespace BfsdlTests
             (
             BfsdlParser::Objects::NumericLiteral const& aValue
             ) );
-
-        ::testing::AssertionResult VerifyNext
-            (
-            std::string const& aNextValue
-            );
-
-        ::testing::AssertionResult VerifyNone();
-
-    private:
-        typedef std::list< std::string > ValueList;
-
-        ValueList mValues;
     };
 
 } // namespace BfsdlTests

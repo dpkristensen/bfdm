@@ -1,7 +1,7 @@
 /**
-    BFDP Mock TokenObserver Definition
+    BFDP Mock Observer Base Declaration
 
-    Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -30,37 +30,48 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// Base Includes
-#include "BfsdlTests/MockTokenObserver.hpp"
+#ifndef BfsdlTests_MockObserverBase
+#define BfsdlTests_MockObserverBase
 
-// External Includes
-#include <sstream>
+// External includes
+#include <gtest/gtest.h>
+#include <list>
+#include <string>
+
+// Internal includes
+#include "Bfdp/Macros.hpp"
 
 namespace BfsdlTests
 {
 
-    using namespace Bfdp;
-
-    /* override */ bool MockTokenObserver::OnControlCharacter
-        (
-        std::string const& aControlCharacter
-        )
+    //! Base class for observer test doubles
+    //!
+    //! This class records events in sequence so they can be checked post-call.
+    class MockObserverBase
     {
-        std::stringstream ss;
-        ss << "Control: " << aControlCharacter;
-        RecordEvent( ss.str() );
-        return true;
-    }
+    public:
+        typedef std::string ExpectationType;
+        typedef std::list< ExpectationType > ExpectationListType;
 
-    /* override */ bool MockTokenObserver::OnNumericLiteral
-        (
-        BfsdlParser::Objects::NumericLiteral const& aValue
-        )
-    {
-        std::stringstream ss;
-        ss << "NumericLiteral: " << aValue.GetStr( true );
-        RecordEvent( ss.str() );
-        return true;
-    }
+        ::testing::AssertionResult VerifyNext
+            (
+            std::string const& aNextValue
+            );
+
+        ::testing::AssertionResult VerifyNone();
+
+    protected:
+        ~MockObserverBase();
+
+        void RecordEvent
+            (
+            std::string const& aEvent
+            );
+
+    private:
+        ExpectationListType mValues;
+    };
 
 } // namespace BfsdlTests
+
+#endif // BfsdlTests_MockObserverBase

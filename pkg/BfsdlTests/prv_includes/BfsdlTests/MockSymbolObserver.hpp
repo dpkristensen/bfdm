@@ -35,11 +35,7 @@
 
 // Base include
 #include "Bfdp/Lexer/ISymbolObserver.hpp"
-
-// External includes
-#include <gtest/gtest.h>
-#include <list>
-#include <string>
+#include "BfsdlTests/MockObserverBase.hpp"
 
 // Internal includes
 #include "Bfdp/Common.hpp"
@@ -52,13 +48,10 @@ namespace BfsdlTests
     //!
     //! This class records values in sequence so they can be checked post-call.
     class MockSymbolObserver
-        : public Bfdp::Lexer::ISymbolObserver
+        : public MockObserverBase
+        , public Bfdp::Lexer::ISymbolObserver
     {
     public:
-        MockSymbolObserver();
-
-        virtual ~MockSymbolObserver();
-
         BFDP_OVERRIDE( bool OnMappedSymbol
             (
             Bfdp::SInt const aCategory,
@@ -69,18 +62,6 @@ namespace BfsdlTests
             (
             std::string const& aSymbol
             ) );
-
-        ::testing::AssertionResult VerifyNext
-            (
-            std::string const& aNextValue
-            );
-
-        ::testing::AssertionResult VerifyNone();
-
-    private:
-        typedef std::list< std::string > ValueList;
-
-        ValueList mValues;
     };
 
 } // namespace BfsdlTests

@@ -41,16 +41,7 @@ namespace BfsdlTests
 
     using namespace Bfdp;
 
-    MockSymbolObserver::MockSymbolObserver()
-    {
-    }
-
-    /* virtual */  MockSymbolObserver::~MockSymbolObserver()
-    {
-        EXPECT_TRUE( VerifyNone() );
-    }
-
-    /* virtual */ bool MockSymbolObserver::OnMappedSymbol
+    /* override */ bool MockSymbolObserver::OnMappedSymbol
         (
         SInt const aCategory,
         std::string const& aSymbol
@@ -58,48 +49,19 @@ namespace BfsdlTests
     {
         std::stringstream ss;
         ss << "Mapped: " << aCategory << "/" << aSymbol;
-        mValues.push_back( ss.str() );
+        RecordEvent( ss.str() );
         return true;
     }
 
-    /* virtual */ bool MockSymbolObserver::OnUnmappedSymbol
+    /* override */ bool MockSymbolObserver::OnUnmappedSymbol
         (
         std::string const& aSymbol
         )
     {
         std::stringstream ss;
         ss << "Unmapped: " << aSymbol;
-        mValues.push_back( ss.str() );
+        RecordEvent( ss.str() );
         return true;
-    }
-
-    ::testing::AssertionResult MockSymbolObserver::VerifyNext
-        (
-        std::string const& aNextValue
-        )
-    {
-        if( mValues.empty() )
-        {
-            return ::testing::AssertionFailure() << "Missing expected value: " << aNextValue;
-        }
-        else if( mValues.front() != aNextValue )
-        {
-            return ::testing::AssertionFailure() << "Symbol mismatch:" << std::endl
-                << "    Actual: " << mValues.front() << std::endl
-                << "  Expected: " << aNextValue;
-        }
-
-        mValues.pop_front();
-        return ::testing::AssertionSuccess();
-    }
-
-    ::testing::AssertionResult MockSymbolObserver::VerifyNone()
-    {
-        if( !mValues.empty() )
-        {
-            return ::testing::AssertionFailure() << "Unexpected " << mValues.front();
-        }
-        return ::testing::AssertionSuccess();
     }
 
 } // namespace BfsdlTests

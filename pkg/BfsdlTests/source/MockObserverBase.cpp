@@ -1,7 +1,7 @@
 /**
-    BFDP Mock TokenObserver Definition
+    BFDP Mock Observer Base Definition
 
-    Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@
 */
 
 // Base Includes
-#include "BfsdlTests/MockTokenObserver.hpp"
+#include "BfsdlTests/MockObserverBase.hpp"
 
 // External Includes
 #include <sstream>
@@ -39,28 +39,45 @@
 namespace BfsdlTests
 {
 
-    using namespace Bfdp;
-
-    /* override */ bool MockTokenObserver::OnControlCharacter
+    ::testing::AssertionResult MockObserverBase::VerifyNext
         (
-        std::string const& aControlCharacter
+        std::string const& aNextValue
         )
     {
-        std::stringstream ss;
-        ss << "Control: " << aControlCharacter;
-        RecordEvent( ss.str() );
-        return true;
+        if( mValues.empty() )
+        {
+            return ::testing::AssertionFailure() << "Missing expected value: " << aNextValue;
+        }
+        else if( mValues.front() != aNextValue )
+        {
+            return ::testing::AssertionFailure() << "Symbol mismatch:" << std::endl
+                << "    Actual: " << mValues.front() << std::endl
+                << "  Expected: " << aNextValue;
+        }
+
+        mValues.pop_front();
+        return ::testing::AssertionSuccess();
     }
 
-    /* override */ bool MockTokenObserver::OnNumericLiteral
+    ::testing::AssertionResult MockObserverBase::VerifyNone()
+    {
+        if( !mValues.empty() )
+        {
+            return ::testing::AssertionFailure() << "Unexpected " << mValues.front();
+        }
+        return ::testing::AssertionSuccess();
+    }
+
+    MockObserverBase::~MockObserverBase()
+    {
+        EXPECT_TRUE( VerifyNone() );
+    }
+
+    void MockObserverBase::RecordEvent
         (
-        BfsdlParser::Objects::NumericLiteral const& aValue
+        std::string const& aEvent
         )
     {
-        std::stringstream ss;
-        ss << "NumericLiteral: " << aValue.GetStr( true );
-        RecordEvent( ss.str() );
-        return true;
+        mValues.push_back( aEvent );
     }
-
 } // namespace BfsdlTests
