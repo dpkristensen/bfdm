@@ -113,19 +113,23 @@ namespace BfsdlTests
         // No transitions pending
         ASSERT_FALSE( engine.DoTransition() );
         ASSERT_TRUE( observer.VerifyNone() );
+        ASSERT_EQ( TestState::Count, engine.GetCurState() );
 
         // Call with no active state does nothing
         engine.EvaluateState();
         ASSERT_TRUE( observer.VerifyNone() );
+        ASSERT_EQ( TestState::Count, engine.GetCurState() );
 
         // Perform the initial transition, which does not take effect immediately
         engine.Transition( TestState::One );
         ASSERT_TRUE( observer.VerifyNone() );
+        ASSERT_EQ( TestState::Count, engine.GetCurState() );
 
         // Make the transition effective
         ASSERT_TRUE( engine.DoTransition() );
         ASSERT_TRUE( observer.VerifyNext( "One Entry" ) );
         ASSERT_TRUE( observer.VerifyNone() );
+        ASSERT_EQ( TestState::One, engine.GetCurState() );
 
         // A second call to DoTransition() indicates nothing occurred
         ASSERT_FALSE( engine.DoTransition() );
@@ -135,22 +139,26 @@ namespace BfsdlTests
         engine.EvaluateState();
         ASSERT_TRUE( observer.VerifyNext( "One Evaluate" ) );
         ASSERT_TRUE( observer.VerifyNone() );
+        ASSERT_EQ( TestState::One, engine.GetCurState() );
 
         engine.Transition( TestState::Two );
         ASSERT_TRUE( engine.DoTransition() );
         ASSERT_TRUE( observer.VerifyNext( "One Exit" ) );
         ASSERT_TRUE( observer.VerifyNext( "Two Entry" ) );
         ASSERT_TRUE( observer.VerifyNone() );
+        ASSERT_EQ( TestState::Two, engine.GetCurState() );
 
         engine.EvaluateState();
         ASSERT_TRUE( observer.VerifyNext( "Two Evaluate" ) );
         ASSERT_TRUE( observer.VerifyNone() );
+        ASSERT_EQ( TestState::Two, engine.GetCurState() );
 
         // No exit action registered for Two
         engine.Transition( TestState::One );
         ASSERT_TRUE( engine.DoTransition() );
         ASSERT_TRUE( observer.VerifyNext( "One Entry" ) );
         ASSERT_TRUE( observer.VerifyNone() );
+        ASSERT_EQ( TestState::One, engine.GetCurState() );
     }
 
     class RunToCompletionObserver

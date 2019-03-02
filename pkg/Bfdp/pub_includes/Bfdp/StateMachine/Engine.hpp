@@ -114,6 +114,10 @@ namespace Bfdp
             //!     performed.
             void EvaluateState();
 
+            //! @return the currently active state, or the number of registered states if no
+            //!     transitions have occurred yet.
+            SizeT GetCurState() const;
+
             //! Initialize States
             //!
             //! @return true if states are initialized, false otherwise

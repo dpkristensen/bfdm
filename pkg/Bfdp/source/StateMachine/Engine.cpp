@@ -127,6 +127,11 @@ namespace Bfdp
             }
         }
 
+        SizeT Engine::GetCurState() const
+        {
+            return mCurState;
+        }
+
         bool Engine::InitStates
             (
             SizeT const aNumStates
