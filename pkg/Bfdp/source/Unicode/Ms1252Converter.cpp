@@ -85,7 +85,7 @@ namespace Bfdp
                 { 160,      160,    96,       1 }   // 160-255
             };
 
-            static SizeT const NumConv = BFDP_COUNT_OF_ARRAY( Conv );
+            static size_t const NumConv = BFDP_COUNT_OF_ARRAY( Conv );
 
         } // InternalMs1252
 
@@ -95,10 +95,10 @@ namespace Bfdp
         {
         }
 
-        /* virtual */ SizeT Ms1252Converter::ConvertBytes
+        /* virtual */ size_t Ms1252Converter::ConvertBytes
             (
             Byte const* const aBytesIn,
-            SizeT const aByteCount,
+            size_t const aByteCount,
             CodePoint& aSymbolOut
             )
         {
@@ -113,11 +113,11 @@ namespace Bfdp
             return Transcode( false, Conv, NumConv, ms1252, aSymbolOut );
         }
 
-        /* virtual */ SizeT Ms1252Converter::ConvertSymbol
+        /* virtual */ size_t Ms1252Converter::ConvertSymbol
             (
             CodePoint const& aSymbolIn,
             Byte* const aBytesOut,
-            SizeT const aByteCount
+            size_t const aByteCount
             )
         {
             if( ( NULL == aBytesOut          ) ||
@@ -128,7 +128,7 @@ namespace Bfdp
             }
 
             CodePoint ms1252;
-            SizeT bytesUsed = Transcode( true, Conv, NumConv, aSymbolIn, ms1252 );
+            size_t bytesUsed = Transcode( true, Conv, NumConv, aSymbolIn, ms1252 );
 
             if( 0 != bytesUsed )
             {
@@ -138,7 +138,7 @@ namespace Bfdp
             return bytesUsed;
         }
 
-        /* virtual */ SizeT Ms1252Converter::GetMaxBytes() const
+        /* virtual */ size_t Ms1252Converter::GetMaxBytes() const
         {
             return 1;
         }

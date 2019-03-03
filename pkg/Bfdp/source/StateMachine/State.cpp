@@ -54,7 +54,7 @@ namespace Bfdp
 
         State::~State()
         {
-            for( SizeT i = 0; i < ActionTrigger::Count; ++i )
+            for( size_t i = 0; i < ActionTrigger::Count; ++i )
             {
                 while( !mActionList[i].empty() )
                 {

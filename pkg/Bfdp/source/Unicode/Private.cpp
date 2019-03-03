@@ -39,20 +39,20 @@ namespace Bfdp
     namespace Unicode
     {
 
-        SizeT Transcode
+        size_t Transcode
             (
             bool const aFromUnicode,
             ConversionTable const* const aTable,
-            SizeT const aNumEntries,
+            size_t const aNumEntries,
             CodePoint const aCodePointIn,
             CodePoint& aCodePointOut
             )
         {
             // Internal method; input checks omitted for performance
 
-            SizeT bytes = 0; // assume no match
+            size_t bytes = 0; // assume no match
 
-            for( SizeT i = 0; i < aNumEntries; ++i )
+            for( size_t i = 0; i < aNumEntries; ++i )
             {
                 // 1. Determine which code to match the input against to find the conversion block
                 ConversionTable const& entry = aTable[i];

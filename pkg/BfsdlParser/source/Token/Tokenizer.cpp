@@ -58,7 +58,7 @@ namespace BfsdlParser
         namespace InternalTokenizer
         {
 
-            static SInt const UnknownCategory = -1;
+            static int const UnknownCategory = -1;
 
             static Lexer::StringSymbolCategory CatControl( Category::Control, "[];:", false );
             static Lexer::RangeSymbolCategory CatDecimalDigits( Category::DecimalDigits, 48, 57, true ); // 0-9
@@ -160,8 +160,8 @@ namespace BfsdlParser
         bool Tokenizer::Parse
             (
             Byte const * aBytes,
-            SizeT aNumBytes,
-            SizeT& aBytesRead
+            size_t aNumBytes,
+            size_t& aBytesRead
             )
         {
             if( !mInitOk )
@@ -188,7 +188,7 @@ namespace BfsdlParser
 
         /* virtual */ bool Tokenizer::OnMappedSymbol
             (
-            SInt const aCategory,
+            int const aCategory,
             std::string const& aSymbol
             )
         {

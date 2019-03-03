@@ -51,8 +51,8 @@ namespace Bfdp
     namespace Lexer
     {
 
-        static SInt const NoCategory = -2;
-        static SInt const Uncategorized = -1;
+        static int const NoCategory = -2;
+        static int const Uncategorized = -1;
 
         Symbolizer::Symbolizer
             (
@@ -113,8 +113,8 @@ namespace Bfdp
         bool Symbolizer::Parse
             (
             Byte const* const aBytes,
-            SizeT const aNumBytes,
-            SizeT& aBytesRead
+            size_t const aNumBytes,
+            size_t& aBytesRead
             )
         {
             aBytesRead = 0;
@@ -126,14 +126,14 @@ namespace Bfdp
                 return false;
             }
 
-            SizeT curPos = 0;
+            size_t curPos = 0;
             while( curPos < aNumBytes )
             {
                 /* Treat bytes as a multi-byte sequence and convert to a symbol */
 
                 Unicode::CodePoint symbol;
-                SizeT const bytesToConvert = std::min< SizeT >( ( aNumBytes - curPos ), mByteConverter.GetMaxBytes() );
-                SizeT bytesRead = mByteConverter.ConvertBytes( &aBytes[curPos], bytesToConvert, symbol );
+                size_t const bytesToConvert = std::min< size_t >( ( aNumBytes - curPos ), mByteConverter.GetMaxBytes() );
+                size_t bytesRead = mByteConverter.ConvertBytes( &aBytes[curPos], bytesToConvert, symbol );
 
                 if( bytesRead == -2 ) // TODO: Magic number
                 {
@@ -287,12 +287,12 @@ namespace Bfdp
 
         bool Symbolizer::ReportSymbolFound
             (
-            SInt const aCategory
+            int const aCategory
             )
         {
             std::stringstream utf8String;
             Unicode::Utf8Converter utf8Conv;
-            SizeT const numBytes = utf8Conv.GetMaxBytes();
+            size_t const numBytes = utf8Conv.GetMaxBytes();
 
             Byte* const buf = new(std::nothrow) Byte[numBytes];
             if( NULL == buf )
@@ -301,9 +301,9 @@ namespace Bfdp
                 return false;
             }
 
-            for( SizeT i = 0; i < mSymbolBuffer.GetSize(); ++i )
+            for( size_t i = 0; i < mSymbolBuffer.GetSize(); ++i )
             {
-                SizeT bytesConverted = utf8Conv.ConvertSymbol
+                size_t bytesConverted = utf8Conv.ConvertSymbol
                     (
                     mSymbolBuffer.GetSymbolAt( i ),
                     buf,

@@ -132,8 +132,8 @@ namespace Bfdp
             bool Parse
                 (
                 Byte const* const aBytes, //!< [in] Pointer to bytes to read, must not be NULL
-                SizeT const aNumBytes, //!< [in] Number of bytes pointed to by aBytes, must be > 0
-                SizeT& aBytesRead //!< [out] Number of bytes read from aBytes
+                size_t const aNumBytes, //!< [in] Number of bytes pointed to by aBytes, must be > 0
+                size_t& aBytesRead //!< [out] Number of bytes read from aBytes
                 );
 
             //! Can be used to reset the Symbolizer after a failed parsing operation
@@ -165,7 +165,7 @@ namespace Bfdp
             //! @return true if the parser should keep parsing.
             bool ReportSymbolFound
                 (
-                SInt const aCategory
+                int const aCategory
                 );
 
             //! Observer for symbols found by the Symbolizer
@@ -175,7 +175,7 @@ namespace Bfdp
             ISymbolBuffer& mSymbolBuffer;
 
             //! Category associated with the symbol in mSymbolBuffer
-            SInt mSavedCategory;
+            int mSavedCategory;
 
             //! Used to convert bytes to Unicode symbols
             Unicode::IConverter& mByteConverter;

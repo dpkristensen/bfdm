@@ -48,21 +48,21 @@ namespace BfsdlTests
         static void InternalErrorHandler
             (
             char const* const aModuleName,
-            Bfdp::UInt const aLine,
+            unsigned int const aLine,
             char const* const aErrorText
             );
 
         static void MisuseErrorHandler
             (
             char const* const aModuleName,
-            Bfdp::UInt const aLine,
+            unsigned int const aLine,
             char const* const aErrorText
             );
 
         static void RunTimeErrorHandler
             (
             char const* const aModuleName,
-            Bfdp::UInt const aLine,
+            unsigned int const aLine,
             char const* const aErrorText
             );
 

@@ -89,7 +89,7 @@ namespace BfsdlTests
         Unicode::CodePoint cp;
 
         // Test conversion table of valid values
-        for( SizeT i = 0; i < BFDP_COUNT_OF_ARRAY( test ); ++i )
+        for( size_t i = 0; i < BFDP_COUNT_OF_ARRAY( test ); ++i )
         {
             SCOPED_TRACE( ::testing::Message( "i = " ) << i );
 
@@ -107,7 +107,7 @@ namespace BfsdlTests
         // Test conversion of undefined values
         Byte const invalidBytes[] = { 0x80, 0xFF };
         cp = 89; // Valid code point
-        for( SizeT i = 0U; i < BFDP_COUNT_OF_ARRAY( invalidBytes ); ++i )
+        for( size_t i = 0U; i < BFDP_COUNT_OF_ARRAY( invalidBytes ); ++i )
         {
             SCOPED_TRACE( ::testing::Message( "i = " ) << i );
 
@@ -163,7 +163,7 @@ namespace BfsdlTests
         Unicode::CodePoint cp;
 
         // Test conversion table of valid values
-        for( SizeT i = 0; i < BFDP_COUNT_OF_ARRAY( test ); ++i )
+        for( size_t i = 0; i < BFDP_COUNT_OF_ARRAY( test ); ++i )
         {
             SCOPED_TRACE( ::testing::Message( "i = " ) << i );
 
@@ -181,7 +181,7 @@ namespace BfsdlTests
         // Test conversion of undefined values
         Byte const invalidBytes[] = { 0x7F, 0x8D, 0x8F, 0x90, 0x9D };
         cp = 89; // Valid code point
-        for( SizeT i = 0; i < BFDP_COUNT_OF_ARRAY( invalidBytes ); ++i )
+        for( size_t i = 0; i < BFDP_COUNT_OF_ARRAY( invalidBytes ); ++i )
         {
             SCOPED_TRACE( ::testing::Message( "i = " ) << i );
 
@@ -214,7 +214,7 @@ namespace BfsdlTests
     {
         struct TestData
         {
-            SizeT const numBytes;
+            size_t const numBytes;
             Byte const* bVal;
             Unicode::CodePoint uVal;
         };
@@ -237,7 +237,7 @@ namespace BfsdlTests
         Unicode::CodePoint cp;
 
         // Test conversion table of valid values
-        for( SizeT i = 0; i < BFDP_COUNT_OF_ARRAY( test ); ++i )
+        for( size_t i = 0; i < BFDP_COUNT_OF_ARRAY( test ); ++i )
         {
             SCOPED_TRACE( ::testing::Message( "i = " ) << i );
 
@@ -267,7 +267,7 @@ namespace BfsdlTests
             { 5, Char( "\xf8\x80\x80\x80\xc0" ) }  // Invalid followup byte (#4/last in sequence)
         };
         cp = 42; // Valid code point
-        for( SizeT i = 0; i < BFDP_COUNT_OF_ARRAY( invalidBytes ); ++i )
+        for( size_t i = 0; i < BFDP_COUNT_OF_ARRAY( invalidBytes ); ++i )
         {
             SCOPED_TRACE( ::testing::Message( "i = " ) << i );
 

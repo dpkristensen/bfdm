@@ -53,7 +53,7 @@ namespace Bfdp
             //! Create RangeSymbolCategory
             RangeSymbolCategory
                 (
-                SInt const aCategory, //!< Category to report when one of these symbols is encountered, must be >= 0
+                int const aCategory, //!< Category to report when one of these symbols is encountered, must be >= 0
                 Unicode::CodePoint const aStart, //!< The first code point (inclusive)
                 Unicode::CodePoint const aEnd, //!< The last code point (inclusive)
                 bool const aShouldConcatenate //!< Whether symbols should be reported in a concatenated form
@@ -62,7 +62,7 @@ namespace Bfdp
             //! Create RangeSymbolCategory
             RangeSymbolCategory
                 (
-                SInt const aCategory, //!< Category to report when one of these symbols is encountered, must be >= 0
+                int const aCategory, //!< Category to report when one of these symbols is encountered, must be >= 0
                 Unicode::CodePoint const aCodePoint, //!< The first and only code point
                 bool const aShouldConcatenate //!< Whether symbols should be reported in a concatenated form
                 );

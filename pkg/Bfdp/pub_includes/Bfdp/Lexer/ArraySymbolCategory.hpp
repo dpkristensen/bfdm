@@ -58,9 +58,9 @@ namespace Bfdp
             //! Create ArraySymbolCategory
             ArraySymbolCategory
                 (
-                SInt const aCategory, //!< Category to report when one of these symbols is encountered, must be >= 0
+                int const aCategory, //!< Category to report when one of these symbols is encountered, must be >= 0
                 Unicode::CodePoint const* const aPtr, //!< Pointer to an array of code points
-                SizeT const aCount, //!< Number of elements in the array pointed to by aPtr
+                size_t const aCount, //!< Number of elements in the array pointed to by aPtr
                 bool const aShouldConcatenate //!< Whether symbols should be reported in a concatenated form
                 );
 
@@ -74,7 +74,7 @@ namespace Bfdp
 
         private:
             Unicode::CodePoint const* mArrayPtr;
-            SizeT mCount;
+            size_t mCount;
         };
 
     } // namespace Lexer

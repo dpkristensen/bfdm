@@ -89,8 +89,8 @@ namespace BfsdlParser
             bool Parse
                 (
                 Bfdp::Byte const * aBytes, //!< [in] Pointer to bytes to read, must not be NULL
-                Bfdp::SizeT aNumBytes, //!< [in] Number of bytes pointed to by aBytes, must be > 0
-                Bfdp::SizeT& aBytesRead //!< [out] Number of bytes read from aBytes
+                size_t aNumBytes, //!< [in] Number of bytes pointed to by aBytes, must be > 0
+                size_t& aBytesRead //!< [out] Number of bytes read from aBytes
                 );
 
         private:
@@ -98,18 +98,18 @@ namespace BfsdlParser
             {
                 StateVariables();
 
-                Bfdp::SInt inputCategory;
+                int inputCategory;
                 std::string inputSymbol;
                 bool keepParsing;
             };
 
             //! Define the length of the longest token, which is a class name
-            static Bfdp::SizeT const MAX_TOKEN_LENGTH = 256;
+            static size_t const MAX_TOKEN_LENGTH = 256;
 
             //! @copydoc Lexer::ISymbolizer::OnMappedSymbol
             BFDP_OVERRIDE( bool OnMappedSymbol
                 (
-                Bfdp::SInt aCategory,
+                int aCategory,
                 std::string const& aSymbol
                 ) );
 

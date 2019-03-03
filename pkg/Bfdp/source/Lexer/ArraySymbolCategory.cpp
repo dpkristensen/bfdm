@@ -46,9 +46,9 @@ namespace Bfdp
 
         ArraySymbolCategory::ArraySymbolCategory
             (
-            SInt const aCategory,
+            int const aCategory,
             Unicode::CodePoint const* const aPtr,
-            SizeT const aCount,
+            size_t const aCount,
             bool const aShouldConcatenate
             )
             : SymbolCategoryBase( aCategory, aShouldConcatenate, BFDP_MODULE )

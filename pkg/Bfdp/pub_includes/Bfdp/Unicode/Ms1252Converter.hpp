@@ -53,23 +53,23 @@ namespace Bfdp
             Ms1252Converter();
 
             //! @copydoc IConverter::ConvertBytes
-            BFDP_OVERRIDE( SizeT ConvertBytes
+            BFDP_OVERRIDE( size_t ConvertBytes
                 (
                 Byte const* const aBytesIn,
-                SizeT const aByteCount,
+                size_t const aByteCount,
                 CodePoint& aSymbolOut
                 ) );
 
             //! @copydoc IConverter::ConvertSymbol
-            BFDP_OVERRIDE( SizeT ConvertSymbol
+            BFDP_OVERRIDE( size_t ConvertSymbol
                 (
                 CodePoint const& aSymbolIn,
                 Byte* const aBytesOut,
-                SizeT const aByteCount
+                size_t const aByteCount
                 ) );
 
             //! @copydoc IConverter::GetMaxBytes
-            BFDP_OVERRIDE( SizeT GetMaxBytes() const );
+            BFDP_OVERRIDE( size_t GetMaxBytes() const );
         };
 
     } // namespace Unicode

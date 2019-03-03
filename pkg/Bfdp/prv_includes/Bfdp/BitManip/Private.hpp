@@ -44,10 +44,10 @@ namespace Bfdp
     {
 
         //! Calculate the bit position given separate counters
-        static inline SizeT CalcBitPos
+        static inline size_t CalcBitPos
             (
-            SizeT const aBytePos,
-            SizeT const aBitPos
+            size_t const aBytePos,
+            size_t const aBitPos
             )
         {
             return BytesToBits( aBytePos ) + aBitPos;
@@ -56,9 +56,9 @@ namespace Bfdp
         //! Increment a set of position counters for a bitstream
         void IncrementPos
             (
-            SizeT& aBytePos,
-            SizeT& aBitPos,
-            SizeT const aIncrementCount = 1
+            size_t& aBytePos,
+            size_t& aBitPos,
+            size_t const aIncrementCount = 1
             );
 
     } // namespace BitManip

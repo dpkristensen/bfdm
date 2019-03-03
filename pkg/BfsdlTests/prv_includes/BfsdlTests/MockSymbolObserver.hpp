@@ -54,7 +54,7 @@ namespace BfsdlTests
     public:
         BFDP_OVERRIDE( bool OnMappedSymbol
             (
-            Bfdp::SInt const aCategory,
+            int const aCategory,
             std::string const& aSymbol
             ) );
 

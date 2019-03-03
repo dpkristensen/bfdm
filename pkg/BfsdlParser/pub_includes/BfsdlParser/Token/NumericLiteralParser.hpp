@@ -73,7 +73,7 @@ namespace BfsdlParser
             //! Parse mapped symbols
             void ParseMappedSymbol
                 (
-                Bfdp::SInt const aCategory,
+                int const aCategory,
                 std::string const& aSymbol
                 );
 

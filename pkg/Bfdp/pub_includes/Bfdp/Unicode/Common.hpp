@@ -42,13 +42,13 @@ namespace Bfdp
     namespace Unicode
     {
 
-        typedef UInt32 CodePoint;
+        typedef uint32_t CodePoint;
 
         static CodePoint const InvalidCodePoint = 0xFFFF;
         static CodePoint const NullCodePoint = 0U;
 
         //! Maximum number of bytes any converter may require for Unicode conversion of one symbol
-        static SizeT const MaxBytesForConversion = 4;
+        static size_t const MaxBytesForConversion = 4;
 
     } // namespace Unicode
 

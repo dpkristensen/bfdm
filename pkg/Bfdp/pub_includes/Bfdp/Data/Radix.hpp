@@ -47,7 +47,7 @@ namespace Bfdp
     {
 
         //! Typedef used to represent radices, in case it needs to change later...
-        typedef UInt RadixType;
+        typedef unsigned int RadixType;
 
         static RadixType const InvalidRadix = 0;
         static RadixType const MinRadix = 2;
@@ -58,19 +58,19 @@ namespace Bfdp
             (
             RadixType const aRadix,
             char const aChar,
-            UInt8& aValue
+            uint8_t& aValue
             );
 
         //! Convert numeric value to character with the specified radix
         bool ConvertBase
             (
             RadixType const aRadix,
-            UInt8 const aValue,
+            uint8_t const aValue,
             char& aSymbol
             );
 
         //! @return The number of bits needed to store a digit in the given radix, or 0 on error.
-        SizeT GetRadixBits
+        size_t GetRadixBits
             (
             RadixType const aRadix
             );

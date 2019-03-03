@@ -68,8 +68,8 @@ namespace BfsdlTests
 
         // Test non-ASCII characters are treated as an error
         char const * testData = "\x80";
-        SizeT bytesRead = 0;
-        SizeT dataLen = std::strlen( testData );
+        size_t bytesRead = 0;
+        size_t dataLen = std::strlen( testData );
 
         errWorkspace.ExpectRunTimeError();
         ASSERT_FALSE( tokenizer.Parse( reinterpret_cast< Byte const * >( testData ), dataLen, bytesRead ) );
@@ -92,8 +92,8 @@ namespace BfsdlTests
 
         // No tokens are observed
 
-        SizeT bytesRead = 0;
-        SizeT dataLen = std::strlen( testData );
+        size_t bytesRead = 0;
+        size_t dataLen = std::strlen( testData );
         ASSERT_TRUE( tokenizer.Parse( reinterpret_cast< Byte const * >( testData ), dataLen, bytesRead ) );
         ASSERT_EQ( dataLen, bytesRead );
         tokenizer.EndParsing();
@@ -111,8 +111,8 @@ namespace BfsdlTests
         // Test control characters in pairs to ensure they are not concatenated
         char const * testData = "]]::[[;;";
 
-        SizeT bytesRead = 0;
-        SizeT dataLen = std::strlen( testData );
+        size_t bytesRead = 0;
+        size_t dataLen = std::strlen( testData );
         ASSERT_TRUE( tokenizer.Parse( reinterpret_cast< Byte const * >( testData ), dataLen, bytesRead ) );
         ASSERT_EQ( dataLen, bytesRead );
         tokenizer.EndParsing();
@@ -131,7 +131,7 @@ namespace BfsdlTests
     TEST_F( TokenizerTest, LiteralWithSymbolizerError )
     {
         static char const* DATA = "#\xc2\xb9";
-        SizeT const DATA_LEN = std::strlen( DATA );
+        size_t const DATA_LEN = std::strlen( DATA );
 
         MockTokenObserver observer;
         SetMockErrorHandlers();
@@ -139,7 +139,7 @@ namespace BfsdlTests
 
         Token::Tokenizer tokenizer( observer );
         ASSERT_TRUE( tokenizer.IsInitOk() );
-        SizeT bytesRead = 0;
+        size_t bytesRead = 0;
 
         // Parsing will result in an error from the symbolizer, and leave the tokenizer in an unfinished state
         errWorkspace.ExpectRunTimeError();
@@ -173,17 +173,17 @@ namespace BfsdlTests
             { "#x:7b#",         "+7b" },
             { "#o:8#",          NULL },
         };
-        static SizeT const numTests = BFDP_COUNT_OF_ARRAY( testData );
+        static size_t const numTests = BFDP_COUNT_OF_ARRAY( testData );
 
         // Loop through test conditions
-        for( SizeT i = 0; i < numTests; ++i )
+        for( size_t i = 0; i < numTests; ++i )
         {
             SCOPED_TRACE( ::testing::Message( "input=" ) << testData[i].input << std::endl );
 
             Token::Tokenizer tokenizer( observer );
             ASSERT_TRUE( tokenizer.IsInitOk() );
-            SizeT bytesRead = 0;
-            SizeT dataLen = std::strlen( testData[i].input );
+            size_t bytesRead = 0;
+            size_t dataLen = std::strlen( testData[i].input );
 
             // Set expectations for this iteration
             errWorkspace.ExpectRunTimeError( testData[i].output == NULL );

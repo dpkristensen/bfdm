@@ -86,7 +86,7 @@ namespace BfsdlTests
     TEST_F( UnicodeIteratorTest, ValidAsciiIteratorPostIncrement )
     {
         static Unicode::CodePoint data[] = { 0x31, 0x32, 0x33, 0x00, 0x61, 0x62, 0x63, 0x7f };
-        static SizeT numValues = BFDP_COUNT_OF_ARRAY( data );
+        static size_t numValues = BFDP_COUNT_OF_ARRAY( data );
         AsciiTestIterator iter = AsciiTestIterator( std::string( "123\0abc\x7f", numValues ) );
 
         ASSERT_TRUE( iter );
@@ -114,14 +114,14 @@ namespace BfsdlTests
     TEST_F( UnicodeIteratorTest, ValidAsciiIteratorPreIncrement )
     {
         static Unicode::CodePoint data[] = { 0x7f, 0x20, 0x39 };
-        static SizeT numValues = BFDP_COUNT_OF_ARRAY( data );
+        static size_t numValues = BFDP_COUNT_OF_ARRAY( data );
         AsciiTestIterator iter = AsciiTestIterator( "\x7f 9" );
 
         while( iter )
         {
             SCOPED_TRACE( ::testing::Message( "input=" ) << &iter );
 
-            SizeT i = iter.GetIndex();
+            size_t i = iter.GetIndex();
             ASSERT_LT( i, numValues );
             ASSERT_EQ( data[i], *iter );
             ASSERT_FALSE( iter.HasError() );

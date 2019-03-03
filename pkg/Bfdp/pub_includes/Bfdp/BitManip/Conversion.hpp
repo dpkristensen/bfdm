@@ -49,18 +49,18 @@ namespace Bfdp
         //! Number of bits per byte
         //!
         //! @note Not using CHAR_BIT, since this is not intended to be architecture-specific
-        static SizeT const BitsPerByte = 8;
+        static size_t const BitsPerByte = 8;
 
         //! Max number of bits (theoretical) for bitwise operations
-        static SizeT const MaxBits = std::numeric_limits< SizeT >::max() - 7;
+        static size_t const MaxBits = std::numeric_limits< size_t >::max() - 7;
 
         //! Max number of bytes (theoretical) for bitwise operations
-        static SizeT const MaxBytes = MaxBits / BitsPerByte;
+        static size_t const MaxBytes = MaxBits / BitsPerByte;
 
         //! @return The number of bytes needed to store aBits of data
-        static inline SizeT BitsToBytes
+        static inline size_t BitsToBytes
             (
-            SizeT const aBits
+            size_t const aBits
             )
         {
             if( aBits > MaxBits )
@@ -75,9 +75,9 @@ namespace Bfdp
         }
 
         //! @return The number of bytes needed to store aBits of data
-        static inline SizeT BytesToBits
+        static inline size_t BytesToBits
             (
-            SizeT const aBytes
+            size_t const aBytes
             )
         {
             if( aBytes > MaxBytes )

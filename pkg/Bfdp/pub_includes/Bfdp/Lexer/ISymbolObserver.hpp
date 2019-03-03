@@ -54,7 +54,7 @@ namespace Bfdp
             //! @return true if parsing should continue, false otherwise.
             virtual bool OnMappedSymbol
                 (
-                SInt const aCategory,
+                int const aCategory,
                 std::string const& aSymbol
                 ) = 0;
 

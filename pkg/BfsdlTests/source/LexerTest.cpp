@@ -57,14 +57,14 @@ namespace BfsdlTests
             (
             Lexer::Symbolizer& aLexer,
             Byte const * aBuffer,
-            SizeT const aChunkSize[],
-            SizeT const aNumChunks
+            size_t const aChunkSize[],
+            size_t const aNumChunks
             )
         {
             Byte const * buf = aBuffer;
-            for( SizeT i = 0; i < aNumChunks; ++i )
+            for( size_t i = 0; i < aNumChunks; ++i )
             {
-                SizeT bytesRead = 0;
+                size_t bytesRead = 0;
                 SCOPED_TRACE( ::testing::Message( "i = " ) << i );
                 ASSERT_TRUE( aLexer.Parse( buf, aChunkSize[i], bytesRead ) );
                 ASSERT_EQ( aChunkSize[i], bytesRead );
@@ -88,7 +88,7 @@ namespace BfsdlTests
 
         static Byte const testBytes[] = "abc123xyz"; // implicit NULL at end
 
-        SizeT bytesRead = 0U;
+        size_t bytesRead = 0U;
         ASSERT_TRUE( lexer.Parse( testBytes, BFDP_COUNT_OF_ARRAY( testBytes ), bytesRead ) );
         ASSERT_EQ( 10U, bytesRead );
         lexer.EndParsing();
@@ -108,7 +108,7 @@ namespace BfsdlTests
 
         Lexer::Symbolizer lexer( observer, buffer, converter );
 
-        SizeT bytesRead = 0U;
+        size_t bytesRead = 0U;
         ASSERT_TRUE( lexer.Parse( Char( "X" ), 1, bytesRead ) );
         ASSERT_EQ( 1U, bytesRead );
         lexer.EndParsing();
@@ -125,7 +125,7 @@ namespace BfsdlTests
 
         Lexer::Symbolizer lexer( observer, buffer, converter );
 
-        SizeT bytesRead = 0U;
+        size_t bytesRead = 0U;
         ASSERT_TRUE( lexer.Parse( Char( "XXX" ), 3, bytesRead ) );
         ASSERT_EQ( 3U, bytesRead );
         lexer.EndParsing();
@@ -146,7 +146,7 @@ namespace BfsdlTests
         Lexer::StringSymbolCategory category5( 5, std::string( "A" ), true );
         ASSERT_TRUE( lexer.AddCategory( &category5 ) );
 
-        SizeT bytesRead = 0U;
+        size_t bytesRead = 0U;
         ASSERT_TRUE( lexer.Parse( Char( "AAAAA" ), 5, bytesRead ) );
         ASSERT_EQ( 5U, bytesRead );
         lexer.EndParsing();
@@ -165,7 +165,7 @@ namespace BfsdlTests
 
         std::string const LEFT_SINGLE_QUOTATION_MARK = "\xE2\x80\x98"; // In UTF-8
 
-        SizeT bytesRead = 0U;
+        size_t bytesRead = 0U;
         ASSERT_TRUE( lexer.Parse( Char( "\x41\x91\x42" ), 3, bytesRead ) );
         ASSERT_EQ( 3U, bytesRead );
         lexer.EndParsing();
@@ -186,7 +186,7 @@ namespace BfsdlTests
 
         std::string const NERD_FACE = "\xF0\x9F\xA4\x93"; // Unicode 0x1f913 in UTF-8
 
-        SizeT bytesRead = 0U;
+        size_t bytesRead = 0U;
         ASSERT_TRUE( lexer.Parse( Char( "\x43\xF0\x9F\xA4\x93\x44" ), 6, bytesRead ) );
         ASSERT_EQ( 6U, bytesRead );
         lexer.EndParsing();
@@ -206,7 +206,7 @@ namespace BfsdlTests
         Lexer::Symbolizer lexer( observer, buffer, converter );
 
         static Byte const * testBytes = Char( "abc123xyz" );
-        SizeT chunks[] = { 3, 3, 3 };
+        size_t chunks[] = { 3, 3, 3 };
 
         ASSERT_NO_FATAL_FAILURE
             (
@@ -233,7 +233,7 @@ namespace BfsdlTests
         ASSERT_TRUE( lexer.AddCategory( &category42 ) );
 
         static Byte const * testBytes = Char( "abc123xyz" );
-        SizeT chunks[] = { 3, 3, 3 };
+        size_t chunks[] = { 3, 3, 3 };
 
         ASSERT_NO_FATAL_FAILURE
         (
@@ -264,7 +264,7 @@ namespace BfsdlTests
         ASSERT_TRUE( lexer.AddCategory( &category3 ) );
 
         static Byte const * testBytes = Char( "abcqq123xyz" );
-        SizeT chunks[] = { 3, 2, 3, 3 };
+        size_t chunks[] = { 3, 2, 3, 3 };
 
         ASSERT_NO_FATAL_FAILURE
         (
@@ -294,7 +294,7 @@ namespace BfsdlTests
         ASSERT_TRUE( lexer.AddCategory( &category2 ) );
 
         static Byte const * testBytes = Char( "abc123xyz" );
-        SizeT chunks[] = { 3, 3, 3 };
+        size_t chunks[] = { 3, 3, 3 };
 
         ASSERT_NO_FATAL_FAILURE
         (
@@ -323,7 +323,7 @@ namespace BfsdlTests
         ASSERT_TRUE( lexer.AddCategory( &category2 ) );
 
         static Byte const * testBytes = Char( "abc123xyz" );
-        SizeT chunks[] = { 3, 3, 3 };
+        size_t chunks[] = { 3, 3, 3 };
 
         ASSERT_NO_FATAL_FAILURE
         (

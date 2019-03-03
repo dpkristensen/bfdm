@@ -104,9 +104,9 @@ namespace BfsdlTests
             { "126A", 16, true, "126a" },
             { "126G", 16, false, "" }
         };
-        static SizeT const testCount = BFDP_COUNT_OF_ARRAY( testData );
+        static size_t const testCount = BFDP_COUNT_OF_ARRAY( testData );
 
-        for( SizeT i = 0; i < testCount; ++i )
+        for( size_t i = 0; i < testCount; ++i )
         {
             SCOPED_TRACE
                 (

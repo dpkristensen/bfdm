@@ -46,23 +46,23 @@ namespace Bfdp
             (
             RadixType const aRadix,
             char const aChar,
-            UInt8& aValue
+            uint8_t& aValue
             )
         {
             BFDP_RETURNIF_V( !IsValidRadix( aRadix ), false );
 
-            UInt8 digit = 0U;
+            uint8_t digit = 0U;
             if( IsWithinRange( '0', aChar, '9' ) )
             {
-                digit = static_cast< UInt8 >( aChar - '0' );
+                digit = static_cast< uint8_t >( aChar - '0' );
             }
             else if( IsWithinRange( 'a', aChar, 'z' ) )
             {
-                digit = static_cast< UInt8 >( aChar - 'a' ) + 10U;
+                digit = static_cast< uint8_t >( aChar - 'a' ) + 10U;
             }
             else if( IsWithinRange( 'A', aChar, 'Z' ) )
             {
-                digit = static_cast< UInt8 >( aChar - 'A' ) + 10U;
+                digit = static_cast< uint8_t >( aChar - 'A' ) + 10U;
             }
             else
             {
@@ -79,7 +79,7 @@ namespace Bfdp
         bool ConvertBase
             (
             RadixType const aRadix,
-            UInt8 const aValue,
+            uint8_t const aValue,
             char& aSymbol
             )
         {
@@ -87,11 +87,11 @@ namespace Bfdp
             BFDP_RETURNIF_V( aValue >= aRadix, false );
 
             char out = 0;
-            if( IsWithinRange< UInt8 >( 0U, aValue, 9U ) )
+            if( IsWithinRange< uint8_t >( 0U, aValue, 9U ) )
             {
                 out = '0' + static_cast< char >( aValue );
             }
-            else if( IsWithinRange< UInt8 >( 10U, aValue, 35U ) )
+            else if( IsWithinRange< uint8_t >( 10U, aValue, 35U ) )
             {
                 out = 'a' + static_cast< char >( aValue - 10 );
             }
@@ -105,7 +105,7 @@ namespace Bfdp
             return true;
         }
 
-        SizeT GetRadixBits
+        size_t GetRadixBits
             (
             RadixType const aRadix
             )
@@ -116,7 +116,7 @@ namespace Bfdp
             }
 
             RadixType limit = 2;
-            SizeT bits = 1;
+            size_t bits = 1;
             while( aRadix > limit )
             {
                 limit <<= 1U;

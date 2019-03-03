@@ -56,7 +56,7 @@ namespace Bfdp
                 {   0,        0,   128,       1 }   // 0-127
             };
 
-            static SizeT const NumConv = BFDP_COUNT_OF_ARRAY( Conv );
+            static size_t const NumConv = BFDP_COUNT_OF_ARRAY( Conv );
 
         } // InternalAscii
 
@@ -66,10 +66,10 @@ namespace Bfdp
         {
         }
 
-        /* virtual */ SizeT AsciiConverter::ConvertBytes
+        /* virtual */ size_t AsciiConverter::ConvertBytes
             (
             Byte const* const aBytesIn,
-            SizeT const aByteCount,
+            size_t const aByteCount,
             CodePoint& aSymbolOut
             )
         {
@@ -84,11 +84,11 @@ namespace Bfdp
             return Transcode( false, Conv, NumConv, ascii, aSymbolOut );
         }
 
-        /* virtual */ SizeT AsciiConverter::ConvertSymbol
+        /* virtual */ size_t AsciiConverter::ConvertSymbol
             (
             CodePoint const& aSymbolIn,
             Byte* const aBytesOut,
-            SizeT const aByteCount
+            size_t const aByteCount
             )
         {
             if( ( NULL == aBytesOut          ) ||
@@ -99,7 +99,7 @@ namespace Bfdp
             }
 
             CodePoint ascii;
-            SizeT bytesUsed = Transcode( true, Conv, NumConv, aSymbolIn, ascii );
+            size_t bytesUsed = Transcode( true, Conv, NumConv, aSymbolIn, ascii );
 
             if( 0 != bytesUsed )
             {
@@ -109,7 +109,7 @@ namespace Bfdp
             return bytesUsed;
         }
 
-        /* virtual */ SizeT AsciiConverter::GetMaxBytes() const
+        /* virtual */ size_t AsciiConverter::GetMaxBytes() const
         {
             return 1;
         }

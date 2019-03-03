@@ -69,9 +69,9 @@ namespace Bfdp
                 BitBuffer& aBuffer
                 );
 
-            SizeT GetBitsTillEnd() const;
+            size_t GetBitsTillEnd() const;
 
-            SizeT GetPosBits() const;
+            size_t GetPosBits() const;
 
             //! Read aNumBits into aOutData
             //!
@@ -81,7 +81,7 @@ namespace Bfdp
             bool ReadBits
                 (
                 Byte* const aOutData,
-                SizeT const aNumBits
+                size_t const aNumBits
                 );
 
             //! Read all the bits of aValue
@@ -98,7 +98,7 @@ namespace Bfdp
             //! @return true on success, or false if out of bounds.
             bool SeekBits
                 (
-                SizeT const aBitPos
+                size_t const aBitPos
                 );
 
             //! Write aNumBits into aInData
@@ -109,7 +109,7 @@ namespace Bfdp
             bool WriteBits
                 (
                 Byte const* const aInData,
-                SizeT const aNumBits
+                size_t const aNumBits
                 );
 
             //! Write all the bits of aValue
@@ -125,17 +125,17 @@ namespace Bfdp
             bool CopyBits
                 (
                 Byte* const aOutData,
-                SizeT& aOutByteCtr,
-                SizeT& aOutBitCtr,
+                size_t& aOutByteCtr,
+                size_t& aOutBitCtr,
                 Byte const* const aInData,
-                SizeT& aInByteCtr,
-                SizeT& aInBitCtr,
-                SizeT const aNumBits
+                size_t& aInByteCtr,
+                size_t& aInBitCtr,
+                size_t const aNumBits
                 );
 
             BitBuffer& mBuffer;
-            SizeT mCurBit;
-            SizeT mCurByte;
+            size_t mCurBit;
+            size_t mCurByte;
         };
 
         template< class T >

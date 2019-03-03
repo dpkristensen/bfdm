@@ -60,7 +60,7 @@ namespace BfsdlTests
             Data::RadixType radix;
             char symbol;
             bool result;
-            UInt8 value;
+            uint8_t value;
         } TestData[] =
         {
             // Base-1 number system not computationally possible
@@ -104,9 +104,9 @@ namespace BfsdlTests
             { 37, 'z', false, 35 },
             { 37, 'Z', false, 35 },
         };
-        static SizeT const TestCount = BFDP_COUNT_OF_ARRAY( TestData );
+        static size_t const TestCount = BFDP_COUNT_OF_ARRAY( TestData );
 
-        for( SizeT i = 0; i < TestCount; ++i )
+        for( size_t i = 0; i < TestCount; ++i )
         {
             TestDataType& t = TestData[i];
             SCOPED_TRACE
@@ -114,10 +114,10 @@ namespace BfsdlTests
                 ::testing::Message( "[" ) << i << "]"
                 << " radix=" << t.radix
                 << " char=" << t.symbol
-                << " value=" << static_cast< UInt >( t.value )
+                << " value=" << static_cast< unsigned int >( t.value )
                 );
 
-            UInt8 outValue;
+            uint8_t outValue;
             ASSERT_EQ( t.result, Data::ConvertBase( t.radix, t.symbol, outValue ) );
             if( t.result )
             {
@@ -140,7 +140,7 @@ namespace BfsdlTests
         {
             Data::RadixType radix;
             bool valid;
-            SizeT bits;
+            size_t bits;
         } TestData[] =
         {
             {  0, false, 0 },
@@ -163,9 +163,9 @@ namespace BfsdlTests
             { 36, true,  6 },
             { 37, false, 0 },
         };
-        static SizeT const TestCount = BFDP_COUNT_OF_ARRAY( TestData );
+        static size_t const TestCount = BFDP_COUNT_OF_ARRAY( TestData );
 
-        for( SizeT i = 0; i < TestCount; ++i )
+        for( size_t i = 0; i < TestCount; ++i )
         {
             TestDataType& t = TestData[i];
             SCOPED_TRACE( ::testing::Message( "radix=" ) << t.radix );

@@ -70,7 +70,7 @@ namespace BfsdlParser
 
         void NumericLiteralParser::ParseMappedSymbol
             (
-            SInt const aCategory,
+            int const aCategory,
             std::string const& aSymbol
             )
         {

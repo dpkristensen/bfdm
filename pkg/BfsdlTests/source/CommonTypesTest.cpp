@@ -46,59 +46,59 @@ namespace BfsdlTests
 
     TEST_F( CommonTypesTest, IsWithinRange )
     {
-        ASSERT_FALSE( IsWithinRange< UInt8 >( 1U, 0U, 3U ) );
-        ASSERT_TRUE(  IsWithinRange< UInt8 >( 1U, 1U, 3U ) );
-        ASSERT_TRUE(  IsWithinRange< UInt8 >( 1U, 2U, 3U ) );
-        ASSERT_TRUE(  IsWithinRange< UInt8 >( 1U, 3U, 3U ) );
-        ASSERT_FALSE( IsWithinRange< UInt8 >( 1U, 4U, 3U ) );
+        ASSERT_FALSE( IsWithinRange< uint8_t >( 1U, 0U, 3U ) );
+        ASSERT_TRUE(  IsWithinRange< uint8_t >( 1U, 1U, 3U ) );
+        ASSERT_TRUE(  IsWithinRange< uint8_t >( 1U, 2U, 3U ) );
+        ASSERT_TRUE(  IsWithinRange< uint8_t >( 1U, 3U, 3U ) );
+        ASSERT_FALSE( IsWithinRange< uint8_t >( 1U, 4U, 3U ) );
 
-        ASSERT_FALSE( IsWithinRange< SInt8 >( -1, -2, 1 ) );
-        ASSERT_TRUE(  IsWithinRange< SInt8 >( -1, -1, 1 ) );
-        ASSERT_TRUE(  IsWithinRange< SInt8 >( -1,  0, 1 ) );
-        ASSERT_TRUE(  IsWithinRange< SInt8 >( -1,  1, 1 ) );
-        ASSERT_FALSE( IsWithinRange< SInt8 >( -1,  2, 1 ) );
+        ASSERT_FALSE( IsWithinRange< int8_t >( -1, -2, 1 ) );
+        ASSERT_TRUE(  IsWithinRange< int8_t >( -1, -1, 1 ) );
+        ASSERT_TRUE(  IsWithinRange< int8_t >( -1,  0, 1 ) );
+        ASSERT_TRUE(  IsWithinRange< int8_t >( -1,  1, 1 ) );
+        ASSERT_FALSE( IsWithinRange< int8_t >( -1,  2, 1 ) );
     }
 
     TEST_F( CommonTypesTest, MemoryTypes )
     {
         // Verify assumptions about memory types
-        ASSERT_EQ( sizeof( std::size_t ), sizeof( SizeT ) );
+        ASSERT_EQ( sizeof( std::size_t ), sizeof( size_t ) );
         ASSERT_EQ( 1U, sizeof( Byte ) );
     }
 
     TEST_F( CommonTypesTest, NumericTypes )
     {
         // Verify assumptions about sized numeric types
-        ASSERT_EQ( 1U, sizeof( UInt8  ) );
-        ASSERT_EQ( 2U, sizeof( UInt16 ) );
-        ASSERT_EQ( 4U, sizeof( UInt32 ) );
-        ASSERT_EQ( 8U, sizeof( UInt64 ) );
+        ASSERT_EQ( 1U, sizeof( uint8_t  ) );
+        ASSERT_EQ( 2U, sizeof( uint16_t ) );
+        ASSERT_EQ( 4U, sizeof( uint32_t ) );
+        ASSERT_EQ( 8U, sizeof( uint64_t ) );
 
-        ASSERT_EQ( 1U, sizeof( SInt8  ) );
-        ASSERT_EQ( 2U, sizeof( SInt16 ) );
-        ASSERT_EQ( 4U, sizeof( SInt32 ) );
-        ASSERT_EQ( 8U, sizeof( SInt64 ) );
+        ASSERT_EQ( 1U, sizeof( int8_t  ) );
+        ASSERT_EQ( 2U, sizeof( int16_t ) );
+        ASSERT_EQ( 4U, sizeof( int32_t ) );
+        ASSERT_EQ( 8U, sizeof( int64_t ) );
 
         // Compare min/max values as LL and ULL to catch size errors for types < 64-bits
-        ASSERT_EQ( -128LL,  SInt8Min );
-        ASSERT_EQ(  127LL,  SInt8Max );
-        ASSERT_EQ(    0ULL, UInt8Min );
-        ASSERT_EQ(  255ULL, UInt8Max );
+        ASSERT_EQ( -128LL,  INT8_MIN );
+        ASSERT_EQ(  127LL,  INT8_MAX );
+        ASSERT_EQ(    0ULL, UINT8_MIN );
+        ASSERT_EQ(  255ULL, UINT8_MAX );
 
-        ASSERT_EQ( -32768LL,  SInt16Min );
-        ASSERT_EQ(  32767LL,  SInt16Max );
-        ASSERT_EQ(      0ULL, UInt16Min );
-        ASSERT_EQ(  65535ULL, UInt16Max );
+        ASSERT_EQ( -32768LL,  INT16_MIN );
+        ASSERT_EQ(  32767LL,  INT16_MAX );
+        ASSERT_EQ(      0ULL, UINT16_MIN );
+        ASSERT_EQ(  65535ULL, UINT16_MAX );
 
-        ASSERT_EQ( -2147483648LL,  SInt32Min );
-        ASSERT_EQ(  2147483647LL,  SInt32Max );
-        ASSERT_EQ(           0ULL, UInt32Min );
-        ASSERT_EQ(  4294967295ULL, UInt32Max );
+        ASSERT_EQ( -2147483648LL,  INT32_MIN );
+        ASSERT_EQ(  2147483647LL,  INT32_MAX );
+        ASSERT_EQ(           0ULL, UINT32_MIN );
+        ASSERT_EQ(  4294967295ULL, UINT32_MAX );
 
-        ASSERT_EQ( -9223372036854775808LL,  SInt64Min );
-        ASSERT_EQ(  9223372036854775807LL,  SInt64Max );
-        ASSERT_EQ(                     0ULL, UInt64Min );
-        ASSERT_EQ(  18446744073709551615ULL, UInt64Max );
+        ASSERT_EQ( -9223372036854775808LL,  INT64_MIN );
+        ASSERT_EQ(  9223372036854775807LL,  INT64_MAX );
+        ASSERT_EQ(                     0ULL, UINT64_MIN );
+        ASSERT_EQ(  18446744073709551615ULL, UINT64_MAX );
     }
 
     TEST_F( CommonTypesTest, StrContains )

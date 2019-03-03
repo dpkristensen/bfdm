@@ -46,7 +46,7 @@ namespace Bfdp
         {
         }
 
-        /* virtual */ SInt SymbolCategoryBase::GetCategory() const
+        /* virtual */ int SymbolCategoryBase::GetCategory() const
         {
             return mCategory;
         }
@@ -58,7 +58,7 @@ namespace Bfdp
 
         SymbolCategoryBase::SymbolCategoryBase
             (
-            SInt const aCategory,
+            int const aCategory,
             bool const aShouldConcatenate,
             char const* const aModuleName
             )

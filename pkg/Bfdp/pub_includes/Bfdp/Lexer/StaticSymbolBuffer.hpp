@@ -58,7 +58,7 @@ namespace Bfdp
         //! @tparam MAX_SYMBOL_LENGTH Length of the buffer (in Chars) to allocate
         template
             <
-            SizeT MAX_SYMBOL_LENGTH
+            size_t MAX_SYMBOL_LENGTH
             >
         class StaticSymbolBuffer
             : private NonAssignable
@@ -100,7 +100,7 @@ namespace Bfdp
             }
 
             //! @copydoc ISymbolBuffer::GetSize()
-            BFDP_OVERRIDE( SizeT GetSize() const )
+            BFDP_OVERRIDE( size_t GetSize() const )
             {
                 return mIndex;
             }
@@ -108,7 +108,7 @@ namespace Bfdp
             //! @copydoc ISymbolBuffer::GetSymbolAt()
             BFDP_OVERRIDE( Unicode::CodePoint GetSymbolAt
                 (
-                SizeT const aIndex
+                size_t const aIndex
                 ) const )
             {
                 if( aIndex >= GetSize() )
@@ -129,7 +129,7 @@ namespace Bfdp
 
         private:
             Unicode::CodePoint mBuffer[ MAX_SYMBOL_LENGTH + 1 ];
-            SizeT mIndex;
+            size_t mIndex;
         };
 
     } // namespace Lexer

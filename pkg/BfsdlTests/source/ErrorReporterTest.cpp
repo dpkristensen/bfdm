@@ -52,7 +52,7 @@ namespace BfsdlTests
 
         struct ErrorData
         {
-            UInt line;
+            unsigned int line;
             char const* module;
             char const* text;
         };
@@ -72,7 +72,7 @@ namespace BfsdlTests
     static void InternalErrorHandler
         (
         char const* const aModuleName,
-        UInt const aLine,
+        unsigned int const aLine,
         char const* const aErrorText
         )
     {
@@ -87,7 +87,7 @@ namespace BfsdlTests
     static void MisuseErrorHandler
         (
         char const* const aModuleName,
-        UInt const aLine,
+        unsigned int const aLine,
         char const* const aErrorText
         )
     {
@@ -102,7 +102,7 @@ namespace BfsdlTests
     static void RunTimeErrorHandler
         (
         char const* const aModuleName,
-        UInt const aLine,
+        unsigned int const aLine,
         char const* const aErrorText
         )
     {
@@ -144,9 +144,9 @@ namespace BfsdlTests
 
     TEST_F( ErrorReporterTest, Macros )
     {
-        BFDP_INTERNAL_ERROR( text1 );  UInt internalLine = __LINE__;
-        BFDP_MISUSE_ERROR( text2 );   UInt misuseLine = __LINE__;
-        BFDP_RUNTIME_ERROR( text3 );  UInt runtimeLine = __LINE__;
+        BFDP_INTERNAL_ERROR( text1 );  unsigned int internalLine = __LINE__;
+        BFDP_MISUSE_ERROR( text2 );   unsigned int misuseLine = __LINE__;
+        BFDP_RUNTIME_ERROR( text3 );  unsigned int runtimeLine = __LINE__;
 
         ASSERT_EQ( 1U, gInternalEvents.size() );
         ASSERT_EQ( internalLine, gInternalEvents.front().line );

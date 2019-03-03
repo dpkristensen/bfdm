@@ -91,7 +91,7 @@ namespace Bfdp
         typedef void (*ErrorHandler)
             (
             char const* const aModuleName,
-            UInt const aLine,
+            unsigned int const aLine,
             char const* const aErrorText
             );
 
@@ -101,7 +101,7 @@ namespace Bfdp
         void ReportInternalError
             (
             char const* const aModuleName,
-            UInt const aLine,
+            unsigned int const aLine,
             char const* const aErrorText
             );
 
@@ -111,7 +111,7 @@ namespace Bfdp
         void ReportMisuseError
             (
             char const* const aModuleName,
-            UInt const aLine,
+            unsigned int const aLine,
             char const* const aErrorText
             );
 
@@ -121,7 +121,7 @@ namespace Bfdp
         void ReportRunTimeError
             (
             char const* const aModuleName,
-            UInt const aLine,
+            unsigned int const aLine,
             char const* const aErrorText
             );
 

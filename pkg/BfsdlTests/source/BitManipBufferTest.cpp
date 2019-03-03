@@ -55,8 +55,8 @@ namespace BfsdlTests
     TEST_F( BitManipBufferTest, CreateAlignedBuffer )
     {
         static Byte const data[] = { 0x01, 0xC2, 0x3f };
-        static SizeT const dataSizeBytes = BFDP_COUNT_OF_ARRAY( data );
-        static SizeT const dataSizeBits = BitManip::BytesToBits( BFDP_COUNT_OF_ARRAY( data ) );
+        static size_t const dataSizeBytes = BFDP_COUNT_OF_ARRAY( data );
+        static size_t const dataSizeBits = BitManip::BytesToBits( BFDP_COUNT_OF_ARRAY( data ) );
         BitManip::BitBuffer buf( data, dataSizeBits );
 
         ASSERT_EQ( dataSizeBits, buf.GetCapacityBits() );
@@ -105,8 +105,8 @@ namespace BfsdlTests
     TEST_F( BitManipBufferTest, CreateUnalignedBuffer )
     {
         static Byte const data[] = { 0x82, 0xa5, 0x3f };
-        static SizeT const dataSizeBytes = BFDP_COUNT_OF_ARRAY( data );
-        static SizeT const dataSizeBits = BitManip::BytesToBits( BFDP_COUNT_OF_ARRAY( data ) );
+        static size_t const dataSizeBytes = BFDP_COUNT_OF_ARRAY( data );
+        static size_t const dataSizeBits = BitManip::BytesToBits( BFDP_COUNT_OF_ARRAY( data ) );
         BitManip::BitBuffer buf( data, 20 );
 
         ASSERT_EQ( dataSizeBits, buf.GetCapacityBits() );
@@ -119,8 +119,8 @@ namespace BfsdlTests
 
     TEST_F( BitManipBufferTest, ResizeBufferNoPreserve )
     {
-        static SizeT const dataSizeBits = 12;
-        static SizeT const dataSizeBytes = BitManip::BitsToBytes( dataSizeBits );
+        static size_t const dataSizeBits = 12;
+        static size_t const dataSizeBytes = BitManip::BitsToBytes( dataSizeBits );
 
         BitManip::BitBuffer buf;
 
@@ -135,7 +135,7 @@ namespace BfsdlTests
         ASSERT_EQ( dataSizeBits, buf.GetDataBits() );
         ASSERT_EQ( dataSizeBytes, buf.GetDataBytes() );
         ASSERT_FALSE( buf.IsEmpty() );
-        for( SizeT i = 0; i < dataSizeBytes; ++i )
+        for( size_t i = 0; i < dataSizeBytes; ++i )
         {
             ASSERT_EQ( 0x7E, buf.GetDataPtr()[i] );
         }
@@ -144,8 +144,8 @@ namespace BfsdlTests
     TEST_F( BitManipBufferTest, ResizeBufferPreserve )
     {
         static Byte const initData[] = { 0xab, 0xcd, 0xef };
-        static SizeT const initSizeBytes = BFDP_COUNT_OF_ARRAY( initData );
-        static SizeT const initSizeBits = BitManip::BytesToBits( initSizeBytes );
+        static size_t const initSizeBytes = BFDP_COUNT_OF_ARRAY( initData );
+        static size_t const initSizeBits = BitManip::BytesToBits( initSizeBytes );
 
         BitManip::BitBuffer buf( initData, initSizeBits );
 
@@ -204,8 +204,8 @@ namespace BfsdlTests
     TEST_F( BitManipBufferTest, WriteToBuffer )
     {
         static Byte const data[] = { 0x65, 0x66, 0x67 };
-        static SizeT const dataSizeBytes = BFDP_COUNT_OF_ARRAY( data );
-        static SizeT const dataSizeBits = BitManip::BytesToBits( BFDP_COUNT_OF_ARRAY( data ) );
+        static size_t const dataSizeBytes = BFDP_COUNT_OF_ARRAY( data );
+        static size_t const dataSizeBits = BitManip::BytesToBits( BFDP_COUNT_OF_ARRAY( data ) );
         BitManip::BitBuffer buf( data, dataSizeBits );
 
         buf.GetDataPtr()[1] = 0x42;

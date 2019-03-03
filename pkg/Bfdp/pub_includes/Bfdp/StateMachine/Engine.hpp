@@ -89,7 +89,7 @@ namespace Bfdp
             //! @return true if action is added successfully
             bool AddAction
                 (
-                SizeT const aStateId,
+                size_t const aStateId,
                 ActionTrigger::Type const aTrigger,
                 IAction* const aAction
                 );
@@ -116,14 +116,14 @@ namespace Bfdp
 
             //! @return the currently active state, or the number of registered states if no
             //!     transitions have occurred yet.
-            SizeT GetCurState() const;
+            size_t GetCurState() const;
 
             //! Initialize States
             //!
             //! @return true if states are initialized, false otherwise
             bool InitStates
                 (
-                SizeT const aNumStates
+                size_t const aNumStates
                 );
 
             //! Transition to aNewState
@@ -140,14 +140,14 @@ namespace Bfdp
             //!     requests are fulfilled.
             void Transition
                 (
-                SizeT const aNewState
+                size_t const aNewState
                 );
 
         private:
-            SizeT mCurState;
-            SizeT mNextState;
+            size_t mCurState;
+            size_t mNextState;
             bool mNextStatePending;
-            SizeT mNumStates;
+            size_t mNumStates;
             State* mStates;
         };
 

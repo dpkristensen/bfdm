@@ -56,7 +56,7 @@ namespace Bfdp
             //! Create a StringSymbolCategory
             StringSymbolCategory
                 (
-                SInt const aCategory, //!< Category to report when one of these symbols is encountered, must be >= 0
+                int const aCategory, //!< Category to report when one of these symbols is encountered, must be >= 0
                 std::string const& aSymbols, //!< A collection of symbols to be loaded
                 bool const aShouldConcatenate //!< Whether symbols should be reported in a concatenated form
                 );

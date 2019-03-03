@@ -83,9 +83,9 @@ namespace BfsdlTests
             { Sign::Positive, "123", "456", true, "+123.456" },
             { Sign::Negative, "123", "456", true, "-123.456" }
         };
-        static SizeT const testCount = BFDP_COUNT_OF_ARRAY( testData );
+        static size_t const testCount = BFDP_COUNT_OF_ARRAY( testData );
 
-        for( SizeT i = 0; i < testCount; ++i )
+        for( size_t i = 0; i < testCount; ++i )
         {
             SCOPED_TRACE
                 (

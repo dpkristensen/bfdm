@@ -52,10 +52,10 @@ namespace Bfdp
             //!
             //! @note aSymbolOut is only modified when a non-zero value is returned
             //! @return Number of bytes converted, or 0 if no conversion took place.
-            virtual SizeT ConvertBytes
+            virtual size_t ConvertBytes
                 (
                 Byte const* const aBytesIn, //!< [in] Pointer to bytes to convert
-                SizeT const aByteCount,     //!< [in] Number of bytes available
+                size_t const aByteCount,     //!< [in] Number of bytes available
                 CodePoint& aSymbolOut       //!< [out] Symbol to save converted byte
                 ) = 0;
 
@@ -63,18 +63,18 @@ namespace Bfdp
             //!
             //! @note aBytesOut is only modified when a non-zero value is returned
             //! @return Number of bytes converted, or 0 if no conversion took place.
-            virtual SizeT ConvertSymbol
+            virtual size_t ConvertSymbol
                 (
                 CodePoint const& aSymbolIn, //!< [in] Symbol to convert
                 Byte* const aBytesOut,      //!< [out] Where to write bytes
-                SizeT const aByteCount      //!< [in] Number of Bytes available to write to; must be at least GetMaxBytes()
+                size_t const aByteCount      //!< [in] Number of Bytes available to write to; must be at least GetMaxBytes()
                 ) = 0;
 
             //! Get Max Bytes
             //!
             //! @note This will always be less than or equal to MaxBytesForConversion
             //! @return the maximum number of bytes required to convert all possible symbols
-            virtual SizeT GetMaxBytes() const = 0;
+            virtual size_t GetMaxBytes() const = 0;
 
         protected:
             virtual ~IConverter()

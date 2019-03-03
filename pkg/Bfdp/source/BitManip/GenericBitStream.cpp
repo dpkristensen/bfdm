@@ -56,12 +56,12 @@ namespace Bfdp
         {
         }
 
-        SizeT GenericBitStream::GetBitsTillEnd() const
+        size_t GenericBitStream::GetBitsTillEnd() const
         {
             return mBuffer.GetDataBits() - GetPosBits();
         }
 
-        SizeT GenericBitStream::GetPosBits() const
+        size_t GenericBitStream::GetPosBits() const
         {
             return BytesToBits( mCurByte ) + mCurBit;
         }
@@ -69,11 +69,11 @@ namespace Bfdp
         bool GenericBitStream::ReadBits
             (
             Byte* const aOutData,
-            SizeT const aNumBits
+            size_t const aNumBits
             )
         {
-            SizeT outByte = 0;
-            SizeT outBit = 0;
+            size_t outByte = 0;
+            size_t outBit = 0;
 
             return CopyBits
                 (
@@ -92,7 +92,7 @@ namespace Bfdp
 
         bool GenericBitStream::SeekBits
             (
-            SizeT const aBitPos
+            size_t const aBitPos
             )
         {
             if( aBitPos > mBuffer.GetDataBits() )
@@ -108,11 +108,11 @@ namespace Bfdp
         bool GenericBitStream::WriteBits
             (
             Byte const* const aInData,
-            SizeT const aNumBits
+            size_t const aNumBits
             )
         {
-            SizeT inByte = 0;
-            SizeT inBit = 0;
+            size_t inByte = 0;
+            size_t inBit = 0;
 
             return CopyBits
                 (
@@ -132,12 +132,12 @@ namespace Bfdp
         bool GenericBitStream::CopyBits
             (
             Byte* const aOutData,
-            SizeT& aOutByteCtr,
-            SizeT& aOutBitCtr,
+            size_t& aOutByteCtr,
+            size_t& aOutBitCtr,
             Byte const* const aInData,
-            SizeT& aInByteCtr,
-            SizeT& aInBitCtr,
-            SizeT const aNumBits
+            size_t& aInByteCtr,
+            size_t& aInBitCtr,
+            size_t const aNumBits
             )
         {
             // Detect overrun in such a way as to avoid overflows
@@ -146,11 +146,11 @@ namespace Bfdp
                 return false;
             }
 
-            SizeT bitsRemain = aNumBits;
+            size_t bitsRemain = aNumBits;
             while( bitsRemain )
             {
                 // Determine how many bits can be copied at once.
-                SizeT numBitsToCopy = BitsPerByte - std::max( aInBitCtr, mCurBit );
+                size_t numBitsToCopy = BitsPerByte - std::max( aInBitCtr, mCurBit );
                 numBitsToCopy = std::min( numBitsToCopy, bitsRemain );
 
                 // Extract and replace the relevant bits

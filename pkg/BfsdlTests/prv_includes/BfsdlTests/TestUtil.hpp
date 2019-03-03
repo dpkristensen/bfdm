@@ -48,7 +48,7 @@ namespace BfsdlTests
         (
         Bfdp::Byte const* const aExpected,
         Bfdp::Byte const* const aActual,
-        Bfdp::SizeT const aCount
+        size_t const aCount
         );
 
     void ClearErrorHandlers();

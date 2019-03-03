@@ -63,7 +63,7 @@ namespace Bfdp
 
         std::string DigitStream::GetStr()
         {
-            SizeT bitsPerDigit = Data::GetRadixBits( mRadix );
+            size_t bitsPerDigit = Data::GetRadixBits( mRadix );
             BFDP_RETURNIF_V( bitsPerDigit == 0, std::string() );
             BFDP_RETURNIF_VA
                 (
@@ -77,7 +77,7 @@ namespace Bfdp
             BitManip::GenericBitStream bs( mBuffer );
 
             Byte value = 0;
-            SizeT i = 0;
+            size_t i = 0;
             while( bs.ReadBits( &value, bitsPerDigit ) )
             {
                 char symbol;
@@ -116,7 +116,7 @@ namespace Bfdp
             Data::RadixType const aRadix
             )
         {
-            SizeT bitsPerDigit = Data::GetRadixBits( aRadix );
+            size_t bitsPerDigit = Data::GetRadixBits( aRadix );
             BFDP_RETURNIF_V( bitsPerDigit == 0, false );
 
             BitBuffer buffer;
@@ -129,7 +129,7 @@ namespace Bfdp
             std::string::const_iterator iter = aDigits.begin();
             for( ; iter != aDigits.end(); ++iter )
             {
-                UInt8 value;
+                uint8_t value;
                 ok = Data::ConvertBase( aRadix, *iter, value );
                 if( !ok )
                 {

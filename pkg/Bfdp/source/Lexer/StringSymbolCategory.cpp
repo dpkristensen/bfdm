@@ -47,7 +47,7 @@ namespace Bfdp
 
         StringSymbolCategory::StringSymbolCategory
             (
-            SInt const aCategory,
+            int const aCategory,
             std::string const& aSymbols,
             bool const aShouldConcatenate
             )

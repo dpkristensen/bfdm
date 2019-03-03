@@ -48,14 +48,14 @@ namespace Bfdp
             CodePoint otherValue;   // Value in other format
             CodePoint unicodeValue; // Value in unicode
             CodePoint blockLen;     // Number of symbols in conversion block
-            SizeT otherBytes;       // Number of bytes required to store result in other format
+            size_t otherBytes;       // Number of bytes required to store result in other format
         };
 
-        SizeT Transcode
+        size_t Transcode
             (
             bool const aFromUnicode,
             ConversionTable const* const aTable,
-            SizeT const aNumEntries,
+            size_t const aNumEntries,
             CodePoint const aCodePointIn,
             CodePoint& aCodePointOut
             );

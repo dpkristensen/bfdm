@@ -43,7 +43,7 @@ namespace BfsdlTests
 
     /* override */ bool MockSymbolObserver::OnMappedSymbol
         (
-        SInt const aCategory,
+        int const aCategory,
         std::string const& aSymbol
         )
     {

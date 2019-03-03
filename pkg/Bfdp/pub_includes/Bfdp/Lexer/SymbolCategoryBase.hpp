@@ -55,7 +55,7 @@ namespace Bfdp
             virtual ~SymbolCategoryBase();
 
             //! @copydoc ISymbolCategory::GetCategory()
-            BFDP_OVERRIDE( SInt GetCategory() const );
+            BFDP_OVERRIDE( int GetCategory() const );
 
             //! @copydoc ISymbolCategory::ShouldConcatenate()
             BFDP_OVERRIDE( bool ShouldConcatenate() const );
@@ -64,12 +64,12 @@ namespace Bfdp
             //! Create SymbolCategoryBase
             SymbolCategoryBase
                 (
-                SInt const aCategory, //!< Category to report when one of these symbols is encountered, must be >= 0
+                int const aCategory, //!< Category to report when one of these symbols is encountered, must be >= 0
                 bool const aShouldConcatenate, //!< Whether symbols should be reported in a concatenated form
                 char const* const aModuleName //!< Module name (for error reporting)
                 );
 
-            SInt mCategory;
+            int mCategory;
             bool mShouldConcatenate;
         };
 

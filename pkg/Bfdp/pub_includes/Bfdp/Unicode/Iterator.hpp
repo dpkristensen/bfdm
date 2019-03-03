@@ -92,7 +92,7 @@ namespace Bfdp
             //!
             //! @note This is NOT the array index of the byte in the buffer.
             //! @return The index of the current code point
-            SizeT GetIndex() const;
+            size_t GetIndex() const;
 
             //! @return true if the iterator had a conversion error, false otherwise.
             bool HasError() const;
@@ -108,7 +108,7 @@ namespace Bfdp
                 (
                 IConverter* const aConverter,
                 void const* const aBuffer,
-                SizeT const aSize
+                size_t const aSize
                 );
 
             enum FlagsType
@@ -131,12 +131,12 @@ namespace Bfdp
             void Convert() const;
 
             mutable CodePoint mCodePoint;
-            mutable SizeT mCodePointSize;
+            mutable size_t mCodePointSize;
             IConverter* mConverter;
-            mutable SizeT mIndex;
+            mutable size_t mIndex;
             mutable int mFlags;
             mutable Byte const* mPtr;
-            mutable SizeT mRemain;
+            mutable size_t mRemain;
         };
 
         //! Iterator for a std::string using the specified converter

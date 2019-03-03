@@ -49,7 +49,7 @@ namespace Bfdp
     inline std::string String
         (
         Byte const* const aBuffer,
-        SizeT const aCount
+        size_t const aCount
         )
     {
         return std::string( reinterpret_cast< char const* >( aBuffer ), aCount );
@@ -60,7 +60,7 @@ namespace Bfdp
         (
         std::string const& aString,
         Byte const* const aBuffer,
-        SizeT const aCount
+        size_t const aCount
         )
     {
         return std::string::npos != aString.find( reinterpret_cast< char const* >( aBuffer ), 0, aCount );

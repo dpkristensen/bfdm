@@ -46,7 +46,7 @@ namespace Bfdp
 
         RangeSymbolCategory::RangeSymbolCategory
             (
-            SInt const aCategory,
+            int const aCategory,
             Unicode::CodePoint const aStart,
             Unicode::CodePoint const aEnd,
             bool const aShouldConcatenate
@@ -65,7 +65,7 @@ namespace Bfdp
 
         RangeSymbolCategory::RangeSymbolCategory
             (
-            SInt const aCategory,
+            int const aCategory,
             Unicode::CodePoint const aCodePoint,
             bool const aShouldConcatenate
             )

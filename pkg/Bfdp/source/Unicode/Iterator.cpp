@@ -70,7 +70,7 @@ namespace Bfdp
             return mRemain != 0;
         }
 
-        SizeT IteratorBase::GetIndex() const
+        size_t IteratorBase::GetIndex() const
         {
             return mIndex;
         }
@@ -99,7 +99,7 @@ namespace Bfdp
             (
             IConverter* const aConverter,
             void const* const aBuffer,
-            SizeT const aSize
+            size_t const aSize
             )
         {
             mConverter = aConverter;

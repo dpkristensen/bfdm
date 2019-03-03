@@ -65,7 +65,7 @@ namespace Bfdp
 
         bool Engine::AddAction
             (
-            SizeT const aStateId,
+            size_t const aStateId,
             ActionTrigger::Type const aTrigger,
             IAction* const aAction
             )
@@ -96,7 +96,7 @@ namespace Bfdp
 
                 // Save the next state in case Exit requests a transition, to allow the previous
                 // transition to complete.
-                SizeT targetState = mNextState;
+                size_t targetState = mNextState;
 
                 // If there is a current state, perform Exit actions
                 if( mCurState < mNumStates )
@@ -127,14 +127,14 @@ namespace Bfdp
             }
         }
 
-        SizeT Engine::GetCurState() const
+        size_t Engine::GetCurState() const
         {
             return mCurState;
         }
 
         bool Engine::InitStates
             (
-            SizeT const aNumStates
+            size_t const aNumStates
             )
         {
             if( 0 == aNumStates )
@@ -158,7 +158,7 @@ namespace Bfdp
 
         void Engine::Transition
             (
-            SizeT const aNewState
+            size_t const aNewState
             )
         {
             if( aNewState >= mNumStates )

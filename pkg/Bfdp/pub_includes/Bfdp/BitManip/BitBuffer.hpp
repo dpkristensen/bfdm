@@ -53,7 +53,7 @@ namespace Bfdp
             //! Constructor
             BitBuffer
                 (
-                SizeT const aInitialCapacity = 0
+                size_t const aInitialCapacity = 0
                 );
 
             //! Construct a buffer from existing data
@@ -63,7 +63,7 @@ namespace Bfdp
             BitBuffer
                 (
                 Byte const* const aBytes,
-                SizeT const aNumBits
+                size_t const aNumBits
                 );
 
             //! Copy Constructor
@@ -81,13 +81,13 @@ namespace Bfdp
                 BitBuffer const& aOther
                 );
 
-            SizeT GetCapacityBits() const;
+            size_t GetCapacityBits() const;
 
-            SizeT GetCapacityBytes() const;
+            size_t GetCapacityBytes() const;
 
-            SizeT GetDataBits() const;
+            size_t GetDataBits() const;
 
-            SizeT GetDataBytes() const;
+            size_t GetDataBytes() const;
 
             Byte* GetDataPtr();
 
@@ -110,7 +110,7 @@ namespace Bfdp
             //! @return true if successful, false otherwise.
             bool ResizeNoPreserve
                 (
-                SizeT const aNumBits
+                size_t const aNumBits
                 );
 
             //! Resize the buffer to aNumBits (preserve data)
@@ -118,7 +118,7 @@ namespace Bfdp
             //! @return true if successful, false otherwise.
             bool ResizePreserve
                 (
-                SizeT const aNumBits
+                size_t const aNumBits
                 );
 
             //! Resize the buffer to aNumBits (preserve data)
@@ -128,7 +128,7 @@ namespace Bfdp
             //! @return true if successful, false otherwise.
             bool ResizePreserve
                 (
-                SizeT const aNumBits,
+                size_t const aNumBits,
                 Byte const aNewByteValue
                 );
 
@@ -136,9 +136,9 @@ namespace Bfdp
             //! Allocate a new buffer
             bool AllocateBits
                 (
-                SizeT const aNumBits, //!< [in] Number of bits needed
+                size_t const aNumBits, //!< [in] Number of bits needed
                 Byte*& aDataPtr, //!< [out] Points to buffer on success
-                SizeT& aNumBytes //!< [out] Holds number of bytes in buffer on success
+                size_t& aNumBytes //!< [out] Holds number of bytes in buffer on success
                 );
 
             //! Copy aOther into this object
@@ -150,16 +150,16 @@ namespace Bfdp
             //! Create a buffer to hold aNumBits
             //!
             //! @return Capacity of the buffer in bytes (0 on memory failure)
-            SizeT CreateBuffer
+            size_t CreateBuffer
                 (
-                SizeT const aNumBits
+                size_t const aNumBits
                 );
 
             void DeleteBuffer();
 
             Byte* mBuffer;
-            SizeT mCapacityBits;
-            SizeT mDataBits;
+            size_t mCapacityBits;
+            size_t mDataBits;
         };
 
     } // namespace BitManip

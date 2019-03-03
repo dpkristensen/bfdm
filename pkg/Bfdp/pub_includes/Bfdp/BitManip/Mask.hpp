@@ -55,8 +55,8 @@ namespace Bfdp
             >
         inline T CreateMask
             (
-            SizeT const aWidth,
-            SizeT const aOffset = 0
+            size_t const aWidth,
+            size_t const aOffset = 0
             )
         {
             if( aWidth == 0 )
@@ -81,8 +81,8 @@ namespace Bfdp
         inline T ExtractBits
             (
             T const aValue,
-            SizeT const aWidth,
-            SizeT const aOffset = 0
+            size_t const aWidth,
+            size_t const aOffset = 0
             )
         {
             return static_cast< T >( ( aValue >> aOffset ) & CreateMask< T >( aWidth ) );
@@ -100,8 +100,8 @@ namespace Bfdp
             (
             T const aDestValue,
             T const aSrcValue,
-            SizeT const aWidth,
-            SizeT const aOffset = 0
+            size_t const aWidth,
+            size_t const aOffset = 0
             )
         {
             T const srcMask = CreateMask< T >( aWidth );

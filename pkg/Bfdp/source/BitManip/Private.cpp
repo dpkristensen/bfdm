@@ -45,9 +45,9 @@ namespace Bfdp
 
         void IncrementPos
             (
-            SizeT& aBytePos,
-            SizeT& aBitPos,
-            SizeT const aIncrementCount
+            size_t& aBytePos,
+            size_t& aBitPos,
+            size_t const aIncrementCount
             )
         {
             aBitPos += aIncrementCount;

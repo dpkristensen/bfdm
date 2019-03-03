@@ -68,12 +68,12 @@ namespace BfsdlTests
 
     TEST_F( BitManipGenericBitStreamTest, ReadWrite )
     {
-        static SizeT const NumBits = 10;
+        static size_t const NumBits = 10;
 
         struct RwTestElement
         {
             Byte value;
-            SizeT size;
+            size_t size;
             bool result;
         };
 
@@ -90,10 +90,10 @@ namespace BfsdlTests
             { 0x1, 1U, true },
             { 0x1, 1U, false }
         };
-        SizeT const testCount = BFDP_COUNT_OF_ARRAY( inputData );
+        size_t const testCount = BFDP_COUNT_OF_ARRAY( inputData );
 
         // Write some data elements as const input
-        for( SizeT i = 0u; i < testCount; ++i )
+        for( size_t i = 0u; i < testCount; ++i )
         {
             RwTestElement const& e = inputData[i];
             SCOPED_TRACE( ::testing::Message( "i=" ) << i );
@@ -109,7 +109,7 @@ namespace BfsdlTests
         std::memset( outputData, 0u, testCount );
 
         // Read them back as non-const output
-        for( SizeT i = 0u; i < testCount; ++i )
+        for( size_t i = 0u; i < testCount; ++i )
         {
             RwTestElement const& e = inputData[i];
             SCOPED_TRACE( ::testing::Message( "i=" ) << i );

@@ -49,7 +49,7 @@ namespace BfsdlTests
     /* static */ void MockErrorHandler::InternalErrorHandler
         (
         char const* const aModuleName,
-        UInt const aLine,
+        unsigned int const aLine,
         char const* const aErrorText
         )
     {
@@ -69,7 +69,7 @@ namespace BfsdlTests
     /* static */ void MockErrorHandler::MisuseErrorHandler
         (
         char const* const aModuleName,
-        UInt const aLine,
+        unsigned int const aLine,
         char const* const aErrorText
         )
     {
@@ -89,7 +89,7 @@ namespace BfsdlTests
     /* static */ void MockErrorHandler::RunTimeErrorHandler
         (
         char const* const aModuleName,
-        UInt const aLine,
+        unsigned int const aLine,
         char const* const aErrorText
         )
     {

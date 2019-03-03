@@ -61,7 +61,7 @@ namespace Bfdp
                 ) const = 0;
 
             //! @return the category associated with this class (must be >= 0)
-            virtual SInt GetCategory() const = 0;
+            virtual int GetCategory() const = 0;
 
             //! @return true if the symbols in the category should be concatenation when reported,
             //!     false otherwise.

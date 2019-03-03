@@ -55,25 +55,25 @@ namespace Bfdp
             // 5-byte 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
             // 6-byte 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
 
-            static SizeT const ByteThreshold[] =
+            static size_t const ByteThreshold[] =
             {
-                BitManip::CreateMask< SizeT >( 7 ),
-                BitManip::CreateMask< SizeT >( 5 + 6 ),
-                BitManip::CreateMask< SizeT >( 4 + 6 + 6 ),
-                BitManip::CreateMask< SizeT >( 3 + 6 + 6 + 6 ),
-                BitManip::CreateMask< SizeT >( 2 + 6 + 6 + 6 + 6 ),
-                BitManip::CreateMask< SizeT >( 2 + 6 + 6 + 6 + 6 + 6 )
+                BitManip::CreateMask< size_t >( 7 ),
+                BitManip::CreateMask< size_t >( 5 + 6 ),
+                BitManip::CreateMask< size_t >( 4 + 6 + 6 ),
+                BitManip::CreateMask< size_t >( 3 + 6 + 6 + 6 ),
+                BitManip::CreateMask< size_t >( 2 + 6 + 6 + 6 + 6 ),
+                BitManip::CreateMask< size_t >( 2 + 6 + 6 + 6 + 6 + 6 )
             };
 
-            SizeT CountHeaderBits
+            size_t CountHeaderBits
                 (
                 Byte const aByte
                 )
             {
-                SizeT headerBitsSet = 0;
-                for( SizeT i = 8; i > 0; --i )
+                size_t headerBitsSet = 0;
+                for( size_t i = 8; i > 0; --i )
                 {
-                    UInt8 const mask = BitManip::CreateMask< UInt8 >( 1, ( i - 1 ) );
+                    uint8_t const mask = BitManip::CreateMask< uint8_t >( 1, ( i - 1 ) );
                     if( aByte & mask )
                     {
                         ++headerBitsSet;
@@ -95,10 +95,10 @@ namespace Bfdp
         {
         }
 
-        /* virtual */ SizeT Utf8Converter::ConvertBytes
+        /* virtual */ size_t Utf8Converter::ConvertBytes
             (
             Byte const* const aBytesIn,
-            SizeT const aByteCount,
+            size_t const aByteCount,
             CodePoint& aSymbolOut
             )
         {
@@ -110,8 +110,8 @@ namespace Bfdp
             }
 
             // Read the number of 1's in the header starting from bit 7
-            SizeT bytesToRead = 0;
-            SizeT headerBitsSet = CountHeaderBits( aBytesIn[0] );
+            size_t bytesToRead = 0;
+            size_t headerBitsSet = CountHeaderBits( aBytesIn[0] );
             if( headerBitsSet == 0 )
             {
                 bytesToRead = 1;
@@ -134,12 +134,12 @@ namespace Bfdp
             }
 
             // Read first byte
-            UInt8 mask = BitManip::CreateMask< UInt8 >( 7 - headerBitsSet );
+            uint8_t mask = BitManip::CreateMask< uint8_t >( 7 - headerBitsSet );
             CodePoint cp = static_cast< CodePoint >( aBytesIn[0] & mask );
 
             // Read subsequent bytes
-            mask = BitManip::CreateMask< UInt8 >( 6 );
-            for( SizeT i = 0; i < ( bytesToRead - 1 ); ++i )
+            mask = BitManip::CreateMask< uint8_t >( 6 );
+            for( size_t i = 0; i < ( bytesToRead - 1 ); ++i )
             {
                 if( CountHeaderBits( aBytesIn[i + 1] ) != 1 )
                 {
@@ -156,14 +156,14 @@ namespace Bfdp
             return bytesToRead;
         }
 
-        /* virtual */ SizeT Utf8Converter::ConvertSymbol
+        /* virtual */ size_t Utf8Converter::ConvertSymbol
             (
             CodePoint const& aSymbolIn,
             Byte* const aBytesOut,
-            SizeT const aByteCount
+            size_t const aByteCount
             )
         {
-            static UInt8 const byteNMask = BitManip::CreateMask< UInt8 >( 6 );
+            static uint8_t const byteNMask = BitManip::CreateMask< uint8_t >( 6 );
 
             if( ( NULL == aBytesOut          ) ||
                 ( aByteCount < GetMaxBytes() ) )
@@ -172,10 +172,10 @@ namespace Bfdp
                 return 0;
             }
 
-            SizeT numBytesToConvert = 0;
+            size_t numBytesToConvert = 0;
             while( numBytesToConvert < BFDP_COUNT_OF_ARRAY( ByteThreshold ) )
             {
-                SizeT const threshold = ByteThreshold[numBytesToConvert];
+                size_t const threshold = ByteThreshold[numBytesToConvert];
                 ++numBytesToConvert;
                 if( aSymbolIn < threshold )
                 {
@@ -190,19 +190,19 @@ namespace Bfdp
             }
 
             CodePoint cp = aSymbolIn;
-            for( SizeT i = numBytesToConvert; i != 0; --i )
+            for( size_t i = numBytesToConvert; i != 0; --i )
             {
                 Byte value;
-                SizeT bitsUsed;
+                size_t bitsUsed;
                 if( i == 1 )
                 {
-                    SizeT maskBits = ( numBytesToConvert == 1 ) ? 7 : ( 7 - numBytesToConvert );
-                    UInt8 byte1Mask = BitManip::CreateMask< UInt8 >( maskBits );
+                    size_t maskBits = ( numBytesToConvert == 1 ) ? 7 : ( 7 - numBytesToConvert );
+                    uint8_t byte1Mask = BitManip::CreateMask< uint8_t >( maskBits );
                     value = cp & byte1Mask;
                     bitsUsed = maskBits;
                     if( numBytesToConvert != 1 )
                     {
-                        value |= BitManip::CreateMask< UInt8 >( numBytesToConvert, maskBits + 1 );
+                        value |= BitManip::CreateMask< uint8_t >( numBytesToConvert, maskBits + 1 );
                     }
                 }
                 else
@@ -222,7 +222,7 @@ namespace Bfdp
             return numBytesToConvert;
         }
 
-        /* virtual */ SizeT Utf8Converter::GetMaxBytes() const
+        /* virtual */ size_t Utf8Converter::GetMaxBytes() const
         {
             return 6;
         }

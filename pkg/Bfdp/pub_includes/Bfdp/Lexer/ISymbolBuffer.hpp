@@ -61,12 +61,12 @@ namespace Bfdp
             virtual void Clear() = 0;
 
             //! @return the number of symbols in the buffer
-            virtual SizeT GetSize() const = 0;
+            virtual size_t GetSize() const = 0;
 
             //! @return the symbol at the given index
             virtual Unicode::CodePoint GetSymbolAt
                 (
-                SizeT const aIndex
+                size_t const aIndex
                 ) const = 0;
 
             //! @return true if the buffer is empty

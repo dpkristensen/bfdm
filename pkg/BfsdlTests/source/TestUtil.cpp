@@ -40,12 +40,12 @@ namespace BfsdlTests
 
     ::testing::AssertionResult ArraysMatch
         (
-        UInt8 const * const aExpected,
-        UInt8 const * const aActual,
-        SizeT const aCount
+        uint8_t const * const aExpected,
+        uint8_t const * const aActual,
+        size_t const aCount
         )
     {
-        for( SizeT i = 0; i < aCount; ++i )
+        for( size_t i = 0; i < aCount; ++i )
         {
             if( aExpected[i] != aActual[i] )
             {
@@ -68,7 +68,7 @@ namespace BfsdlTests
     static void InternalErrorHandler
         (
         char const * const aModuleName,
-        UInt const aLine,
+        unsigned int const aLine,
         char const * const aErrorText
         )
     {
@@ -78,7 +78,7 @@ namespace BfsdlTests
     static void MisuseErrorHandler
         (
         char const * const aModuleName,
-        UInt const aLine,
+        unsigned int const aLine,
         char const * const aErrorText
         )
     {
@@ -88,7 +88,7 @@ namespace BfsdlTests
     static void RunTimeErrorHandler
         (
         char const * const aModuleName,
-        UInt const aLine,
+        unsigned int const aLine,
         char const * const aErrorText
         )
     {
