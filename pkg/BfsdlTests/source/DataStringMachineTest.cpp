@@ -33,6 +33,8 @@
 #include "gtest/gtest.h"
 
 #include "Bfdp/Data/StringMachine.hpp"
+#include "Bfdp/Unicode/AsciiConverter.hpp"
+#include "Bfdp/Unicode/Ms1252Converter.hpp"
 #include "BfsdlTests/TestUtil.hpp"
 
 namespace BfsdlTests
@@ -48,7 +50,23 @@ namespace BfsdlTests
         }
     };
 
+    using namespace Bfdp;
     using Bfdp::Data::StringMachine;
+
+    TEST_F( DataStringMachineTest, AppendConverted )
+    {
+        StringMachine machine;
+        std::string strVal;
+
+        ASSERT_TRUE( machine.AppendUnicode( 88U ) );
+
+        Unicode::Ms1252Converter ms1252;
+        ASSERT_TRUE( machine.AppendString( ms1252, "Y\x8e" ) );
+        ASSERT_STREQ( "XY\xc5\xbd", machine.GetUtf8String().c_str() );
+
+        Unicode::AsciiConverter ascii;
+        ASSERT_FALSE( machine.AppendString( ascii, "\x8e" ) );
+    }
 
     TEST_F( DataStringMachineTest, AppendEmpty )
     {
@@ -113,6 +131,21 @@ namespace BfsdlTests
         ASSERT_TRUE( strVal.empty() );
         strVal = machine.GetUtf8HexString();
         ASSERT_TRUE( strVal.empty() );
+    }
+
+    TEST_F( DataStringMachineTest, GetConvertedString )
+    {
+        StringMachine machine;
+        std::string strVal;
+
+        machine.AppendUtf8( "XY\xc5\xbd" );
+
+        Unicode::Ms1252Converter ms1252;
+        ASSERT_TRUE( machine.GetString( ms1252, strVal ) );
+        ASSERT_STREQ( "XY\x8e", strVal.c_str() );
+
+        Unicode::AsciiConverter ascii;
+        ASSERT_FALSE( machine.GetString( ascii, strVal ) );
     }
 
 } // namespace BfsdlTests

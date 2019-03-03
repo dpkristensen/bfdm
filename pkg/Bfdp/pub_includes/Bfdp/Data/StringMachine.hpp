@@ -38,6 +38,7 @@
 
 // Internal Includes
 #include "Bfdp/Macros.hpp"
+#include "Bfdp/Unicode/IConverter.hpp"
 
 namespace Bfdp
 {
@@ -54,6 +55,25 @@ namespace Bfdp
         public:
             StringMachine();
 
+            //! Append a string decoded with the given converter
+            //!
+            //! @post IsDefined() will return true if successful
+            //! @return true if successful, false otherwise.
+            bool AppendString
+                (
+                Unicode::IConverter& aConverter, //!< [in] Converter to use
+                std::string const& aIn //!< [in] String to add
+                );
+
+            //! Append a Unicode symbol with the given code point
+            //!
+            //! @post IsDefined() will return true if successful
+            //! @return true if successful, false otherwise.
+            bool AppendUnicode
+                (
+                Unicode::CodePoint const aCodePoint
+                );
+
             //! Append a UTF8 encoded string to the buffer
             //!
             //! @post IsDefined() will return true
@@ -61,6 +81,13 @@ namespace Bfdp
                 (
                 std::string const& aValue
                 );
+
+            //! @return A string encoded by the given converter
+            bool GetString
+                (
+                Unicode::IConverter& aConverter, //!< [in] Converter to use
+                std::string& aOut //!< [out] Where to save the output
+                ) const;
 
             //! @return A UTF8-encoded string in a 2-byte hexadecimal form with an optional
             //!     per-byte prefix and separator.

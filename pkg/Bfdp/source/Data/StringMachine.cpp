@@ -38,6 +38,11 @@
 
 // Internal Includes
 #include "Bfdp/Common.hpp"
+#include "Bfdp/Data/ByteBuffer.hpp"
+#include "Bfdp/ErrorReporter/Functions.hpp"
+#include "Bfdp/Unicode/Utf8Converter.hpp"
+
+#define BFDP_MODULE "Data::StringMachine"
 
 namespace Bfdp
 {
@@ -57,6 +62,75 @@ namespace Bfdp
         {
         }
 
+        bool StringMachine::AppendString
+            (
+            Unicode::IConverter& aConverter,
+            std::string const& aIn
+            )
+        {
+            Unicode::Utf8Converter utf8Converter;
+            ByteBuffer utf8Buffer;
+            if( !utf8Buffer.Allocate( utf8Converter.GetMaxBytes() ) )
+            {
+                BFDP_RUNTIME_ERROR( "Out of memory while converting bytes" );
+                return false;
+            }
+
+            Byte const* inPtr = reinterpret_cast< Byte const* >( aIn.c_str() );
+            size_t inBytesLeft = aIn.length();
+
+            std::ostringstream oss;
+            Unicode::CodePoint cp;
+            while( inBytesLeft )
+            {
+                // Convert input format -> Unicode
+                size_t bytesConverted = aConverter.ConvertBytes( inPtr, inBytesLeft, cp );
+                inBytesLeft -= bytesConverted;
+                inPtr += bytesConverted;
+                if( 0 == bytesConverted )
+                {
+                    return false;
+                }
+
+                // Convert Unicode -> UTF8
+                bytesConverted = utf8Converter.ConvertSymbol( cp, utf8Buffer.GetPtr(), utf8Buffer.GetSize() );
+                if( 0 == bytesConverted )
+                {
+                    return false;
+                }
+                oss << utf8Buffer.GetString( bytesConverted );
+            }
+
+            AppendUtf8( oss.str() );
+
+            return true;
+        }
+
+        bool StringMachine::AppendUnicode
+            (
+            Unicode::CodePoint const aCodePoint
+            )
+        {
+            Unicode::Utf8Converter utf8Converter;
+            ByteBuffer utf8Buffer;
+            if( !utf8Buffer.Allocate( utf8Converter.GetMaxBytes() ) )
+            {
+                BFDP_RUNTIME_ERROR( "Out of memory while converting bytes" );
+                return false;
+            }
+
+            // Convert Unicode -> output format
+            size_t bytesConverted = utf8Converter.ConvertSymbol( aCodePoint, utf8Buffer.GetPtr(), utf8Buffer.GetSize() );
+            if( 0 == bytesConverted )
+            {
+                return false;
+            }
+
+            AppendUtf8( utf8Buffer.GetString( bytesConverted ) );
+
+            return true;
+        }
+
         void StringMachine::AppendUtf8
             (
             std::string const& aValue
@@ -64,6 +138,53 @@ namespace Bfdp
         {
             mBuffer << aValue;
             SetDefined();
+        }
+
+        bool StringMachine::GetString
+            (
+            Unicode::IConverter& aConverter,
+            std::string& aOut
+            ) const
+        {
+            Unicode::Utf8Converter utf8Converter;
+            ByteBuffer utf8Buffer;
+            ByteBuffer outBuffer;
+            if( ( !utf8Buffer.Allocate( utf8Converter.GetMaxBytes() ) ) ||
+                ( !outBuffer.Allocate( aConverter.GetMaxBytes() ) ) )
+            {
+                BFDP_RUNTIME_ERROR( "Out of memory while converting bytes" );
+                return false;
+            }
+
+            Pack();
+
+            Byte const* inPtr = reinterpret_cast< Byte const* >( mCache.c_str() );
+            size_t inBytesLeft = mCache.length();
+
+            std::ostringstream oss;
+            Unicode::CodePoint cp;
+            while( inBytesLeft )
+            {
+                // Convert UTF8 -> Unicode
+                size_t bytesConverted = utf8Converter.ConvertBytes( inPtr, inBytesLeft, cp );
+                inBytesLeft -= bytesConverted;
+                inPtr += bytesConverted;
+                if( 0 == bytesConverted )
+                {
+                    return false;
+                }
+
+                // Convert Unicode -> output format
+                bytesConverted = aConverter.ConvertSymbol( cp, outBuffer.GetPtr(), outBuffer.GetSize() );
+                if( 0 == bytesConverted )
+                {
+                    return false;
+                }
+                oss << outBuffer.GetString( bytesConverted );
+            }
+
+            aOut = oss.str();
+            return true;
         }
 
         std::string StringMachine::GetUtf8HexString
