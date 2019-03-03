@@ -406,7 +406,7 @@ Escape sequences may be used with `<string-literal-value>` to store characters i
                        <back-slash>'t'                          # Ex: \t = Unicode 8
                        <back-slash>'r'                          # Ex: \r = Unicode 13
                        <back-slash>'n'                          # Ex: \n = Unicode 10
-                       <back-slash>'a'(<radix-16-digits>...2)   # Ex: \a38 = ASCII 38
+                       <back-slash>'a'(<radix-16-digits>...2)   # Ex: \a38 = ASCII 56
                        <back-slash>'w'(<radix-16-digits>...2)   # Ex: \w7f = MS-1252 127
 
 Some escape sequences allow a variable number of digits to follow:
