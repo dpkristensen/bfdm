@@ -92,6 +92,7 @@ namespace BfsdlParser
             : mInitOk( false )
             , mNumericLiteralParser( aObserver )
             , mObserver( aObserver )
+            , mParseError( false )
             , mSymbolizer( *this, mSymbolBuffer, mAsciiConverter )
         {
             bool ok = true;
@@ -139,6 +140,15 @@ namespace BfsdlParser
                 return;
             }
 
+            // Do nothing else if an error was encountered
+            BFDP_RETURNIF( mParseError );
+
+            if( mStateMachine.GetCurState() != ParseState::MainSequence )
+            {
+                BFDP_RUNTIME_ERROR( "Unparsed content in stream" );
+                return;
+            }
+
             mSymbolizer.EndParsing();
         }
 
@@ -157,10 +167,17 @@ namespace BfsdlParser
             if( !mInitOk )
             {
                 BFDP_RUNTIME_ERROR( "Cannot parse; Tokenizer failed to initialize" );
+                mParseError = true;
                 return false;
             }
 
-            return mSymbolizer.Parse( aBytes, aNumBytes, aBytesRead );
+            if( !mSymbolizer.Parse( aBytes, aNumBytes, aBytesRead ) )
+            {
+                mParseError = true;
+                return false;
+            }
+
+            return true;
         }
 
         Tokenizer::StateVariables::StateVariables()
@@ -189,6 +206,7 @@ namespace BfsdlParser
             )
         {
             BFDP_RUNTIME_ERROR( "Unexpected symbol" );
+            mParseError = true;
             return false;
         }
 
@@ -209,6 +227,7 @@ namespace BfsdlParser
 
             default:
                 BFDP_RUNTIME_ERROR( "Unexpected symbol(s) at beginning of statement" );
+                mParseError = true;
                 mState.keepParsing = false;
                 break;
             }
@@ -225,6 +244,7 @@ namespace BfsdlParser
             switch( mNumericLiteralParser.GetParseResult() )
             {
                 case ParseResult::Error:
+                    mParseError = true;
                     mState.keepParsing = false;
                     break;
 
@@ -239,6 +259,7 @@ namespace BfsdlParser
 
                 default:
                     BFDP_INTERNAL_ERROR( "Unexpected parse state" );
+                    mParseError = true;
                     mState.keepParsing = false;
                     break;
             }

@@ -128,6 +128,28 @@ namespace BfsdlTests
         ASSERT_TRUE( observer.VerifyNone() );
     }
 
+    TEST_F( TokenizerTest, LiteralWithSymbolizerError )
+    {
+        static char const* DATA = "#\xc2\xb9";
+        SizeT const DATA_LEN = std::strlen( DATA );
+
+        MockTokenObserver observer;
+        SetMockErrorHandlers();
+        MockErrorHandler::Workspace errWorkspace;
+
+        Token::Tokenizer tokenizer( observer );
+        ASSERT_TRUE( tokenizer.IsInitOk() );
+        SizeT bytesRead = 0;
+
+        // Parsing will result in an error from the symbolizer, and leave the tokenizer in an unfinished state
+        errWorkspace.ExpectRunTimeError();
+        ASSERT_FALSE( tokenizer.Parse( reinterpret_cast< Byte const * >( DATA ), DATA_LEN, bytesRead ) );
+        errWorkspace.VerifyRunTimeError();
+
+        tokenizer.EndParsing();
+        ASSERT_TRUE( observer.VerifyNone() );
+    }
+
     TEST_F( TokenizerTest, NumericLiteral )
     {
         MockTokenObserver observer;
@@ -144,6 +166,7 @@ namespace BfsdlTests
         // NOTE: This does not need to be extremely verbose
         static TestData const testData[] =
         { //  Input             Output
+            { "#",              NULL },
             { "##",             NULL },
             { "#b:01111011#",   "+01111011" },
             { "#d:123#",        "+123" },

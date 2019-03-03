@@ -136,6 +136,9 @@ namespace BfsdlParser
             //! Reference to observer
             ITokenObserver& mObserver;
 
+            //! Whether a parsing error occurred
+            bool mParseError;
+
             // Values used by the state machine
             StateVariables mState;
 
