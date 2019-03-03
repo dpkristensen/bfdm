@@ -68,22 +68,21 @@ namespace BfsdlParser
             return mNumericLiteral;
         }
 
-        void NumericLiteralParser::ParseMappedSymbol
+        void NumericLiteralParser::ParseSymbols
             (
-            int const aCategory,
-            std::string const& aSymbol
+            SymbolSequence const& aSymbols
             )
         {
-            switch( aCategory )
+            switch( aSymbols.category )
             {
                 case Category::Control:
-                    ParseControl( aSymbol );
+                    ParseControl( aSymbols.str );
                     break;
 
                 case Category::DecimalDigits:
                 case Category::Letters:
                     // Letters and numbers are not processed immediately
-                    mUnparsedText += aSymbol;
+                    mUnparsedText += aSymbols.str;
                     break;
 
                 case Category::Hash:
@@ -93,7 +92,7 @@ namespace BfsdlParser
 
                 case Category::Operators:
                     UseOrSetDefaultRadix();
-                    ParseSign( aSymbol );
+                    ParseSign( aSymbols.str );
                     break;
 
                 case Category::Period:

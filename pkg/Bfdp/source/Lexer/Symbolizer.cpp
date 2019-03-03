@@ -319,8 +319,8 @@ namespace Bfdp
             delete [] buf;
 
             bool keepParsing = ( aCategory == Uncategorized )
-                ? mObserver.OnUnmappedSymbol( utf8String.str() )
-                : mObserver.OnMappedSymbol( aCategory, utf8String.str() );
+                ? mObserver.OnUnmappedSymbols( utf8String.str(), mSymbolBuffer.GetSize() )
+                : mObserver.OnMappedSymbols( aCategory, utf8String.str(), mSymbolBuffer.GetSize() );
 
             mSymbolBuffer.Clear();
 

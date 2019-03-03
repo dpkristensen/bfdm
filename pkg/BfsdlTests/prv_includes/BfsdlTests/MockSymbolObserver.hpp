@@ -52,15 +52,17 @@ namespace BfsdlTests
         , public Bfdp::Lexer::ISymbolObserver
     {
     public:
-        BFDP_OVERRIDE( bool OnMappedSymbol
+        BFDP_OVERRIDE( bool OnMappedSymbols
             (
             int const aCategory,
-            std::string const& aSymbol
+            std::string const& aSymbols,
+            size_t const aNumSymbols
             ) );
 
-        BFDP_OVERRIDE( bool OnUnmappedSymbol
+        BFDP_OVERRIDE( bool OnUnmappedSymbols
             (
-            std::string const& aSymbol
+            std::string const& aSymbols,
+            size_t const aNumSymbols
             ) );
     };
 

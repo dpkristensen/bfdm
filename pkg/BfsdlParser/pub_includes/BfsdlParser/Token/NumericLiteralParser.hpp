@@ -44,6 +44,7 @@
 #include "BfsdlParser/Objects/NumericLiteral.hpp"
 #include "BfsdlParser/Token/ITokenObserver.hpp"
 #include "BfsdlParser/Token/ParseResult.hpp"
+#include "BfsdlParser/Token/SymbolSequence.hpp"
 
 namespace BfsdlParser
 {
@@ -70,11 +71,10 @@ namespace BfsdlParser
             //! @return Immutable reference to parsed object
             Objects::NumericLiteral const& GetParsedObject() const;
 
-            //! Parse mapped symbols
-            void ParseMappedSymbol
+            //! Parse symbols
+            void ParseSymbols
                 (
-                int const aCategory,
-                std::string const& aSymbol
+                SymbolSequence const& aSymbols
                 );
 
             //! Reset the parser to prepare for a new parsing operation

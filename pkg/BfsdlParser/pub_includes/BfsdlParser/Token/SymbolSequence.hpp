@@ -1,7 +1,7 @@
 /**
-    BFDP Lexer Symbol Observer Interface
+    BFSDL Parser Token Symbol Sequence Declarations
 
-    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -30,52 +30,39 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef Bfdp_Lexer_ISymbolObserver
-#define Bfdp_Lexer_ISymbolObserver
+#ifndef BfsdlParser_Token_SymbolSequence
+#define BfsdlParser_Token_SymbolSequence
 
-// External includes
+// External Includes
 #include <string>
 
-// Internal includes
+// Internal Includes
 #include "Bfdp/Common.hpp"
 
-namespace Bfdp
+namespace BfsdlParser
 {
 
-    namespace Lexer
+    namespace Token
     {
 
-        //! Abstract interface for observer pattern with Symbolizer
-        class ISymbolObserver
+        struct SymbolSequence
         {
-        public:
-            //! Handler for Mapped Symbols
-            //!
-            //! @return true if parsing should continue, false otherwise.
-            virtual bool OnMappedSymbols
+            SymbolSequence();
+
+            SymbolSequence
                 (
                 int const aCategory,
-                std::string const& aSymbols,
-                size_t const aNumSymbols
-                ) = 0;
+                size_t const aCount,
+                std::string const& aString
+                );
 
-            //! Handler for Unmapped Symbols
-            //!
-            //! @return true if parsing should continue, false otherwise.
-            virtual bool OnUnmappedSymbols
-                (
-                std::string const& aSymbols,
-                size_t const aNumSymbols
-                ) = 0;
-
-        protected:
-            virtual ~ISymbolObserver()
-            {
-            }
+            int category;
+            size_t count;
+            std::string str;
         };
 
-    } // namespace Lexer
+    } // namespace Token
 
-} // namespace Bfdp
+} // namespace BfsdlParser
 
-#endif // Bfdp_Lexer_ISymbolObserver
+#endif // BfsdlParser_Token_SymbolSequence

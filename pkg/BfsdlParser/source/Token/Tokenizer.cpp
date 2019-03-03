@@ -181,28 +181,31 @@ namespace BfsdlParser
         }
 
         Tokenizer::StateVariables::StateVariables()
-            : inputCategory( UnknownCategory )
+            : symbols( UnknownCategory, 0, std::string() )
             , keepParsing( true )
         {
         }
 
-        /* virtual */ bool Tokenizer::OnMappedSymbol
+        /* virtual */ bool Tokenizer::OnMappedSymbols
             (
             int const aCategory,
-            std::string const& aSymbol
+            std::string const& aSymbols,
+            size_t const aNumSymbols
             )
         {
-            mState.inputCategory = aCategory;
-            mState.inputSymbol = aSymbol;
+            mState.symbols.category = aCategory;
+            mState.symbols.count = aNumSymbols;
+            mState.symbols.str = aSymbols;
 
             mStateMachine.EvaluateState();
 
             return mState.keepParsing;
         }
 
-        /* virtual */ bool Tokenizer::OnUnmappedSymbol
+        /* virtual */ bool Tokenizer::OnUnmappedSymbols
             (
-            std::string const& /* aSymbol */
+            std::string const&, /* aSymbols */
+            size_t const /* aNumSymbols */
             )
         {
             BFDP_RUNTIME_ERROR( "Unexpected symbol" );
@@ -212,10 +215,10 @@ namespace BfsdlParser
 
         void Tokenizer::StateMainSequenceEvaluate()
         {
-            switch( mState.inputCategory )
+            switch( mState.symbols.category )
             {
             case Category::Control:
-                mObserver.OnControlCharacter( mState.inputSymbol );
+                mObserver.OnControlCharacter( mState.symbols.str );
                 break;
 
             case Category::Hash:
@@ -240,7 +243,7 @@ namespace BfsdlParser
 
         void Tokenizer::StateNumericLiteralEvaluate()
         {
-            mNumericLiteralParser.ParseMappedSymbol( mState.inputCategory, mState.inputSymbol );
+            mNumericLiteralParser.ParseSymbols( mState.symbols );
             switch( mNumericLiteralParser.GetParseResult() )
             {
                 case ParseResult::Error:

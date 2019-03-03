@@ -1,7 +1,7 @@
 /**
-    BFDP Lexer Symbol Observer Interface
+    BFSDL Parser Token Symbol Sequence Definitions
 
-    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -30,52 +30,27 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef Bfdp_Lexer_ISymbolObserver
-#define Bfdp_Lexer_ISymbolObserver
+// Base Includes
+#include "BfsdlParser/Token/SymbolSequence.hpp"
 
-// External includes
-#include <string>
-
-// Internal includes
-#include "Bfdp/Common.hpp"
-
-namespace Bfdp
+namespace BfsdlParser
 {
 
-    namespace Lexer
+    namespace Token
     {
 
-        //! Abstract interface for observer pattern with Symbolizer
-        class ISymbolObserver
+        SymbolSequence::SymbolSequence
+            (
+            int const aCategory,
+            size_t const aCount,
+            std::string const& aString
+            )
+            : category( aCategory )
+            , count( aCount )
+            , str( aString )
         {
-        public:
-            //! Handler for Mapped Symbols
-            //!
-            //! @return true if parsing should continue, false otherwise.
-            virtual bool OnMappedSymbols
-                (
-                int const aCategory,
-                std::string const& aSymbols,
-                size_t const aNumSymbols
-                ) = 0;
+        }
 
-            //! Handler for Unmapped Symbols
-            //!
-            //! @return true if parsing should continue, false otherwise.
-            virtual bool OnUnmappedSymbols
-                (
-                std::string const& aSymbols,
-                size_t const aNumSymbols
-                ) = 0;
+    } // namespace Token
 
-        protected:
-            virtual ~ISymbolObserver()
-            {
-            }
-        };
-
-    } // namespace Lexer
-
-} // namespace Bfdp
-
-#endif // Bfdp_Lexer_ISymbolObserver
+} // namespace BfsdlParser

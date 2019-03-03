@@ -41,25 +41,27 @@ namespace BfsdlTests
 
     using namespace Bfdp;
 
-    /* override */ bool MockSymbolObserver::OnMappedSymbol
+    /* override */ bool MockSymbolObserver::OnMappedSymbols
         (
         int const aCategory,
-        std::string const& aSymbol
+        std::string const& aSymbols,
+            size_t const aNumSymbols
         )
     {
         std::ostringstream ss;
-        ss << "Mapped: " << aCategory << "/" << aSymbol;
+        ss << "Mapped: " << aCategory << "/" << aSymbols << "/" << aNumSymbols;
         RecordEvent( ss.str() );
         return true;
     }
 
-    /* override */ bool MockSymbolObserver::OnUnmappedSymbol
+    /* override */ bool MockSymbolObserver::OnUnmappedSymbols
         (
-        std::string const& aSymbol
+        std::string const& aSymbols,
+        size_t const aNumSymbols
         )
     {
         std::ostringstream ss;
-        ss << "Unmapped: " << aSymbol;
+        ss << "Unmapped: " << aSymbols << "/" << aNumSymbols;
         RecordEvent( ss.str() );
         return true;
     }

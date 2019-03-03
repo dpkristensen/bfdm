@@ -93,10 +93,10 @@ namespace BfsdlTests
         ASSERT_EQ( 10U, bytesRead );
         lexer.EndParsing();
 
-        ASSERT_TRUE( observer.VerifyNext( "Unmapped: abc" ) );
-        ASSERT_TRUE( observer.VerifyNext( "Unmapped: 123" ) );
-        ASSERT_TRUE( observer.VerifyNext( "Unmapped: xyz" ) );
-        ASSERT_TRUE( observer.VerifyNext( std::string( "Unmapped: \0", 11 ) ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: abc/3" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: 123/3" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: xyz/3" ) );
+        ASSERT_TRUE( observer.VerifyNext( std::string( "Unmapped: ") + '\0' + "/1" ) );
         ASSERT_TRUE( observer.VerifyNone() );
     }
 
@@ -113,7 +113,7 @@ namespace BfsdlTests
         ASSERT_EQ( 1U, bytesRead );
         lexer.EndParsing();
 
-        ASSERT_TRUE( observer.VerifyNext( "Unmapped: X" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: X/1" ) );
         ASSERT_TRUE( observer.VerifyNone() );
     }
 
@@ -130,7 +130,7 @@ namespace BfsdlTests
         ASSERT_EQ( 3U, bytesRead );
         lexer.EndParsing();
 
-        ASSERT_TRUE( observer.VerifyNext( "Unmapped: XXX" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: XXX/3" ) );
         ASSERT_TRUE( observer.VerifyNone() );
     }
 
@@ -151,7 +151,7 @@ namespace BfsdlTests
         ASSERT_EQ( 5U, bytesRead );
         lexer.EndParsing();
 
-        ASSERT_TRUE( observer.VerifyNext( "Mapped: 5/AAAAA" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 5/AAAAA/5" ) );
         ASSERT_TRUE( observer.VerifyNone() );
     }
 
@@ -170,9 +170,9 @@ namespace BfsdlTests
         ASSERT_EQ( 3U, bytesRead );
         lexer.EndParsing();
 
-        ASSERT_TRUE( observer.VerifyNext( "Unmapped: A" ) );
-        ASSERT_TRUE( observer.VerifyNext( std::string( "Unmapped: " ) + LEFT_SINGLE_QUOTATION_MARK ) );
-        ASSERT_TRUE( observer.VerifyNext( "Unmapped: B" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: A/1" ) );
+        ASSERT_TRUE( observer.VerifyNext( std::string( "Unmapped: " ) + LEFT_SINGLE_QUOTATION_MARK + "/1" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: B/1" ) );
         ASSERT_TRUE( observer.VerifyNone() );
     }
 
@@ -191,9 +191,9 @@ namespace BfsdlTests
         ASSERT_EQ( 6U, bytesRead );
         lexer.EndParsing();
 
-        ASSERT_TRUE( observer.VerifyNext( "Unmapped: C" ) );
-        ASSERT_TRUE( observer.VerifyNext( std::string( "Unmapped: " ) + NERD_FACE ) );
-        ASSERT_TRUE( observer.VerifyNext( "Unmapped: D" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: C/1" ) );
+        ASSERT_TRUE( observer.VerifyNext( std::string( "Unmapped: " ) + NERD_FACE + "/1" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: D/1" ) );
         ASSERT_TRUE( observer.VerifyNone() );
     }
 
@@ -214,9 +214,9 @@ namespace BfsdlTests
             );
         lexer.EndParsing();
 
-        ASSERT_TRUE( observer.VerifyNext( "Unmapped: abc" ) );
-        ASSERT_TRUE( observer.VerifyNext( "Unmapped: 123" ) );
-        ASSERT_TRUE( observer.VerifyNext( "Unmapped: xyz" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: abc/3" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: 123/3" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: xyz/3" ) );
         ASSERT_TRUE( observer.VerifyNone() );
     }
 
@@ -241,9 +241,9 @@ namespace BfsdlTests
         );
         lexer.EndParsing();
 
-        ASSERT_TRUE( observer.VerifyNext( "Unmapped: abc" ) );
-        ASSERT_TRUE( observer.VerifyNext( "Mapped: 42/123" ) );
-        ASSERT_TRUE( observer.VerifyNext( "Unmapped: xyz" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: abc/3" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 42/123/3" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: xyz/3" ) );
         ASSERT_TRUE( observer.VerifyNone() );
     }
 
@@ -272,10 +272,10 @@ namespace BfsdlTests
         );
         lexer.EndParsing();
 
-        ASSERT_TRUE( observer.VerifyNext( "Mapped: 1/abc" ) );
-        ASSERT_TRUE( observer.VerifyNext( "Unmapped: qq" ) );
-        ASSERT_TRUE( observer.VerifyNext( "Mapped: 2/123" ) );
-        ASSERT_TRUE( observer.VerifyNext( "Mapped: 3/xyz" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 1/abc/3" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: qq/2" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 2/123/3" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 3/xyz/3" ) );
         ASSERT_TRUE( observer.VerifyNone() );
     }
 
@@ -302,9 +302,9 @@ namespace BfsdlTests
         );
         lexer.EndParsing();
 
-        ASSERT_TRUE( observer.VerifyNext( "Mapped: 1/abc" ) );
-        ASSERT_TRUE( observer.VerifyNext( "Unmapped: 123" ) );
-        ASSERT_TRUE( observer.VerifyNext( "Mapped: 2/xyz" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 1/abc/3" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: 123/3" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 2/xyz/3" ) );
         ASSERT_TRUE( observer.VerifyNone() );
     }
 
@@ -331,11 +331,11 @@ namespace BfsdlTests
         );
         lexer.EndParsing();
 
-        ASSERT_TRUE( observer.VerifyNext( "Mapped: 1/a" ) );
-        ASSERT_TRUE( observer.VerifyNext( "Mapped: 1/b" ) );
-        ASSERT_TRUE( observer.VerifyNext( "Mapped: 1/c" ) );
-        ASSERT_TRUE( observer.VerifyNext( "Unmapped: 123" ) );
-        ASSERT_TRUE( observer.VerifyNext( "Mapped: 2/xyz" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 1/a/1" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 1/b/1" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 1/c/1" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Unmapped: 123/3" ) );
+        ASSERT_TRUE( observer.VerifyNext( "Mapped: 2/xyz/3" ) );
         ASSERT_TRUE( observer.VerifyNone() );
     }
 

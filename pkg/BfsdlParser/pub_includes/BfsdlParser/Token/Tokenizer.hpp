@@ -48,6 +48,7 @@
 #include "BfsdlParser/Objects/NumericLiteral.hpp"
 #include "BfsdlParser/Token/ITokenObserver.hpp"
 #include "BfsdlParser/Token/NumericLiteralParser.hpp"
+#include "BfsdlParser/Token/SymbolSequence.hpp"
 
 namespace BfsdlParser
 {
@@ -98,25 +99,26 @@ namespace BfsdlParser
             {
                 StateVariables();
 
-                int inputCategory;
-                std::string inputSymbol;
+                SymbolSequence symbols;
                 bool keepParsing;
             };
 
             //! Define the length of the longest token, which is a class name
             static size_t const MAX_TOKEN_LENGTH = 256;
 
-            //! @copydoc Lexer::ISymbolizer::OnMappedSymbol
-            BFDP_OVERRIDE( bool OnMappedSymbol
+            //! @copydoc Lexer::ISymbolizer::OnMappedSymbols
+            BFDP_OVERRIDE( bool OnMappedSymbols
                 (
                 int aCategory,
-                std::string const& aSymbol
+                std::string const& aSymbol,
+                size_t const aNumSymbols
                 ) );
 
-            //! @copydoc Lexer::ISymbolizer::OnUnmappedSymbol
-            BFDP_OVERRIDE( bool OnUnmappedSymbol
+            //! @copydoc Lexer::ISymbolizer::OnUnmappedSymbols
+            BFDP_OVERRIDE( bool OnUnmappedSymbols
                 (
-                std::string const& aSymbol
+                std::string const& aSymbol,
+                size_t const aNumSymbols
                 ) );
 
             // States
