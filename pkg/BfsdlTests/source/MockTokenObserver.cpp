@@ -46,7 +46,7 @@ namespace BfsdlTests
         std::string const& aControlCharacter
         )
     {
-        std::stringstream ss;
+        std::ostringstream ss;
         ss << "Control: " << aControlCharacter;
         RecordEvent( ss.str() );
         return true;
@@ -57,7 +57,7 @@ namespace BfsdlTests
         BfsdlParser::Objects::NumericLiteral const& aValue
         )
     {
-        std::stringstream ss;
+        std::ostringstream ss;
         ss << "NumericLiteral: " << aValue.GetStr( true );
         RecordEvent( ss.str() );
         return true;

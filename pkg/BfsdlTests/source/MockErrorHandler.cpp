@@ -53,7 +53,7 @@ namespace BfsdlTests
         char const* const aErrorText
         )
     {
-        std::stringstream errorMsg;
+        std::ostringstream errorMsg;
         errorMsg << "Internal Error in " << aModuleName << "@" << aLine << ": " << aErrorText;
 
         if( mWorkspace == NULL )
@@ -73,7 +73,7 @@ namespace BfsdlTests
         char const* const aErrorText
         )
     {
-        std::stringstream errorMsg;
+        std::ostringstream errorMsg;
         errorMsg << "Misuse Error in " << aModuleName << "@" << aLine << ": " << aErrorText;
 
         if( mWorkspace == NULL )
@@ -93,7 +93,7 @@ namespace BfsdlTests
         char const* const aErrorText
         )
     {
-        std::stringstream errorMsg;
+        std::ostringstream errorMsg;
         errorMsg << "Run Time Error in " << aModuleName << "@" << aLine << ": " << aErrorText;
 
         if( mWorkspace == NULL )

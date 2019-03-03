@@ -290,7 +290,7 @@ namespace Bfdp
             int const aCategory
             )
         {
-            std::stringstream utf8String;
+            std::ostringstream utf8String;
             Unicode::Utf8Converter utf8Conv;
             size_t const numBytes = utf8Conv.GetMaxBytes();
 

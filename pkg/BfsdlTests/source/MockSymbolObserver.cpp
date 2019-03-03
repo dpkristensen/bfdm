@@ -47,7 +47,7 @@ namespace BfsdlTests
         std::string const& aSymbol
         )
     {
-        std::stringstream ss;
+        std::ostringstream ss;
         ss << "Mapped: " << aCategory << "/" << aSymbol;
         RecordEvent( ss.str() );
         return true;
@@ -58,7 +58,7 @@ namespace BfsdlTests
         std::string const& aSymbol
         )
     {
-        std::stringstream ss;
+        std::ostringstream ss;
         ss << "Unmapped: " << aSymbol;
         RecordEvent( ss.str() );
         return true;

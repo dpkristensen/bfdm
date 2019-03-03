@@ -54,7 +54,7 @@ namespace Bfdp
             bool const aVerbose
             )
         {
-            std::stringstream out;
+            std::ostringstream out;
 
             out << ( aVerbose ? sign.GetExplicitStr() : sign.GetStr() );
 
@@ -80,7 +80,7 @@ namespace Bfdp
             bool const aVerbose
             )
         {
-            std::stringstream out;
+            std::ostringstream out;
 
             bool hasSignificand = significand.IsDefined();
             bool hasOrder = base.IsDefined() && exponent.IsDefined();
