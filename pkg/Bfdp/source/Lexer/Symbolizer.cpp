@@ -40,6 +40,7 @@
 
 // Internal includes
 #include "Bfdp/Common.hpp"
+#include "Bfdp/Data/ByteBuffer.hpp"
 #include "Bfdp/ErrorReporter/Functions.hpp"
 #include "Bfdp/Unicode/Utf8Converter.hpp"
 
@@ -294,8 +295,8 @@ namespace Bfdp
             Unicode::Utf8Converter utf8Conv;
             size_t const numBytes = utf8Conv.GetMaxBytes();
 
-            Byte* const buf = new(std::nothrow) Byte[numBytes];
-            if( NULL == buf )
+            Data::ByteBuffer buf;
+            if( !buf.Allocate( numBytes ) )
             {
                 BFDP_RUNTIME_ERROR( "Out of memory while converting sequence to UTF-8" );
                 return false;
@@ -306,7 +307,7 @@ namespace Bfdp
                 size_t bytesConverted = utf8Conv.ConvertSymbol
                     (
                     mSymbolBuffer.GetSymbolAt( i ),
-                    buf,
+                    buf.GetPtr(),
                     numBytes
                     );
                 if( 0 == bytesConverted )
@@ -314,9 +315,8 @@ namespace Bfdp
                     BFDP_RUNTIME_ERROR( "Invalid symbol while converting to UTF-8" );
                     return false;
                 }
-                utf8String << std::string( reinterpret_cast< char* >( buf ), bytesConverted );
+                utf8String << buf.GetString( bytesConverted );
             }
-            delete [] buf;
 
             bool keepParsing = ( aCategory == Uncategorized )
                 ? mObserver.OnUnmappedSymbols( utf8String.str(), mSymbolBuffer.GetSize() )

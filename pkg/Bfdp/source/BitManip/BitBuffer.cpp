@@ -52,8 +52,7 @@ namespace Bfdp
             (
             size_t const aInitialCapacity
             )
-            : mBuffer( NULL )
-            , mCapacityBits( 0 )
+            : mCapacityBits( 0 )
             , mDataBits( 0 )
         {
             BFDP_UNUSED_RETURN( CreateBuffer( aInitialCapacity ) );
@@ -64,8 +63,7 @@ namespace Bfdp
             Byte const* const aBytes,
             size_t const aNumBits
             )
-            : mBuffer( NULL )
-            , mCapacityBits( 0 )
+            : mCapacityBits( 0 )
             , mDataBits( 0 )
         {
             BFDP_RETURNIF( 0 == aBytes );
@@ -74,7 +72,7 @@ namespace Bfdp
             size_t numBytes = CreateBuffer( aNumBits );
             if( numBytes != 0 )
             {
-                std::memcpy( mBuffer, aBytes, numBytes );
+                mBuffer.CopyFrom( aBytes, numBytes );
                 mDataBits = aNumBits;
             }
         }
@@ -83,8 +81,7 @@ namespace Bfdp
             (
             BitBuffer const& aOther
             )
-            : mBuffer( NULL )
-            , mCapacityBits( 0 )
+            : mCapacityBits( 0 )
             , mDataBits( 0 )
         {
             Copy( aOther );
@@ -126,7 +123,7 @@ namespace Bfdp
 
         Byte* BitBuffer::GetDataPtr()
         {
-            return mBuffer;
+            return mBuffer.GetPtr();
         }
 
         bool BitBuffer::IsEmpty() const
@@ -139,11 +136,7 @@ namespace Bfdp
             Byte const aByte
             )
         {
-            size_t numBytes = GetCapacityBytes();
-            if( numBytes )
-            {
-                std::memset( mBuffer, aByte, numBytes );
-            }
+            mBuffer.MemSet( aByte );
         }
 
         bool BitBuffer::ResizeNoPreserve
@@ -175,9 +168,8 @@ namespace Bfdp
                 return true;
             }
 
-            Byte* newBuffer;
-            size_t numBytes;
-            if( !AllocateBits( aNumBits, newBuffer, numBytes ) )
+            Data::ByteBuffer newBuffer;
+            if( !AllocateBits( aNumBits, newBuffer ) )
             {
                 return false;
             }
@@ -185,15 +177,14 @@ namespace Bfdp
             //! Copy existing contents to new buffer
             if( !IsEmpty() )
             {
-                std::memcpy( newBuffer, mBuffer, BitsToBytes( mDataBits ) );
+                newBuffer.CopyFrom( mBuffer.GetConstPtr(), BitsToBytes( mDataBits ) );
             }
 
             //! Switch buffers
-            DeleteBuffer();
-            mBuffer = newBuffer;
+            mBuffer.Swap( newBuffer );
 
             // Update counters
-            mCapacityBits = BytesToBits( numBytes );
+            mCapacityBits = BytesToBits( mBuffer.GetSize() );
             mDataBits = aNumBits;
             return true;
         }
@@ -218,21 +209,20 @@ namespace Bfdp
             return true;
         }
 
-        //! Allocate a new buffer
         bool BitBuffer::AllocateBits
             (
-            size_t const aNumBits, //!< [in] Number of bits needed
-            Byte*& aDataPtr, //!< [out] Points to buffer on success
-            size_t& aNumBytes //!< [out] Holds number of bytes in buffer on success
+            size_t const aNumBits,
+            Data::ByteBuffer& aNewBuffer
             )
         {
             size_t numBytes = BitsToBytes( aNumBits );
 
-            Byte* newBuffer = new( std::nothrow ) Byte[numBytes];
-            BFDP_RETURNIF_VE( newBuffer == NULL, false, "Allocation failure" );
+            if( !aNewBuffer.Allocate( numBytes ) )
+            {
+                BFDP_RUNTIME_ERROR( "Allocation failure" );
+                return false;
+            }
 
-            aNumBytes = numBytes;
-            aDataPtr = newBuffer;
             return true;
         }
 
@@ -244,7 +234,7 @@ namespace Bfdp
             size_t numBytes = CreateBuffer( aOther.mCapacityBits );
             if( numBytes != 0 )
             {
-                std::memcpy( mBuffer, aOther.mBuffer, numBytes );
+                mBuffer.CopyFrom( aOther.mBuffer.GetConstPtr(), numBytes );
                 mCapacityBits = aOther.mCapacityBits;
                 mDataBits = aOther.mDataBits;
             }
@@ -257,19 +247,18 @@ namespace Bfdp
         {
             BFDP_RETURNIF_V( aNumBits == 0, 0 );
 
-            size_t numBytes;
-            if( !AllocateBits( aNumBits, mBuffer, numBytes ) )
+            if( !AllocateBits( aNumBits, mBuffer ) )
             {
                 return 0;
             }
 
-            mCapacityBits = BytesToBits( numBytes );
-            return numBytes;
+            mCapacityBits = BytesToBits( mBuffer.GetSize() );
+            return mBuffer.GetSize();
         }
 
         void BitBuffer::DeleteBuffer()
         {
-            delete [] mBuffer;
+            mBuffer.Delete();
             mCapacityBits = 0;
             mDataBits = 0;
         }

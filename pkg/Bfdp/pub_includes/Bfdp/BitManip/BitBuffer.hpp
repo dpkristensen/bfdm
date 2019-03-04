@@ -35,6 +35,7 @@
 
 //! Internal Includes
 #include "Bfdp/Common.hpp"
+#include "Bfdp/Data/ByteBuffer.hpp"
 #include "Bfdp/Macros.hpp"
 #include "Bfdp/String.hpp"
 
@@ -137,8 +138,7 @@ namespace Bfdp
             bool AllocateBits
                 (
                 size_t const aNumBits, //!< [in] Number of bits needed
-                Byte*& aDataPtr, //!< [out] Points to buffer on success
-                size_t& aNumBytes //!< [out] Holds number of bytes in buffer on success
+                Data::ByteBuffer& aNewBuffer //!< [inout] Buffer to use
                 );
 
             //! Copy aOther into this object
@@ -157,7 +157,7 @@ namespace Bfdp
 
             void DeleteBuffer();
 
-            Byte* mBuffer;
+            Data::ByteBuffer mBuffer;
             size_t mCapacityBits;
             size_t mDataBits;
         };
