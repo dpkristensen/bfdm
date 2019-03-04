@@ -68,6 +68,7 @@ namespace BfsdlTests
         ASSERT_FALSE( emptyIter );
         ASSERT_TRUE( !emptyIter );
         ASSERT_FALSE( emptyIter.HasError() );
+        ASSERT_EQ( 0U, emptyIter.GetCodePointSize() );
         ASSERT_EQ( 0U, emptyIter.GetIndex() );
         // Cannot place expectation on address of empty buffer
     }
@@ -79,30 +80,40 @@ namespace BfsdlTests
         ASSERT_FALSE( emptyIter );
         ASSERT_TRUE( !emptyIter );
         ASSERT_FALSE( emptyIter.HasError() );
+        ASSERT_EQ( 0U, emptyIter.GetCodePointSize() );
         ASSERT_EQ( 0U, emptyIter.GetIndex() );
         // Cannot place expectation on address of empty buffer
-}
+    }
 
     TEST_F( UnicodeIteratorTest, ValidAsciiIteratorPostIncrement )
     {
         static Unicode::CodePoint data[] = { 0x31, 0x32, 0x33, 0x00, 0x61, 0x62, 0x63, 0x7f };
         static size_t numValues = BFDP_COUNT_OF_ARRAY( data );
-        AsciiTestIterator iter = AsciiTestIterator( std::string( "123\0abc\x7f", numValues ) );
+        std::string input = std::string( "123\0abc\x7f", numValues );
+        AsciiTestIterator iter = AsciiTestIterator( input );
 
         ASSERT_TRUE( iter );
         ASSERT_FALSE( !iter );
         ASSERT_FALSE( iter.HasError() );
+        ASSERT_EQ( 0U, iter.GetCodePointSize() );
         ASSERT_EQ( 0U, iter.GetIndex() );
         ASSERT_NE( NULL_BYTE_CONST_PTR, &iter );
 
         Unicode::CodePoint cp = Unicode::InvalidCodePoint;
+        std::string cpStr;
+        size_t index;
         while( iter )
         {
-            SCOPED_TRACE( ::testing::Message( "input=" ) << iter.GetIndex() );
+            index = iter.GetIndex();
+            SCOPED_TRACE( ::testing::Message( "input=" ) << index );
 
-            ASSERT_LT( iter.GetIndex(), numValues );
+            ASSERT_LT( index, numValues );
             cp = *iter;
-            ASSERT_EQ( data[iter.GetIndex()], cp );
+            ASSERT_EQ( 1U, iter.GetCodePointSize() );
+            ASSERT_EQ( data[index], cp );
+            cpStr = iter.GetCodePointString();
+            ASSERT_EQ( 1U, cpStr.length() );
+            ASSERT_EQ( input[index], cpStr[0] );
             ASSERT_FALSE( iter.HasError() );
             ASSERT_EQ( cp, iter++ );
             ASSERT_FALSE( iter.HasError() );

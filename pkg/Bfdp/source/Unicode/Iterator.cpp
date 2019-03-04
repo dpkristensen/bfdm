@@ -70,6 +70,11 @@ namespace Bfdp
             return mRemain != 0;
         }
 
+        size_t IteratorBase::GetCodePointSize() const
+        {
+            return mCodePointSize;
+        }
+
         size_t IteratorBase::GetIndex() const
         {
             return mIndex;

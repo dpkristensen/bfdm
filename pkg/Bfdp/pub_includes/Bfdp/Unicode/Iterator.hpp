@@ -85,6 +85,9 @@ namespace Bfdp
             //! @return true if the iterator is valid, false otherwise.
             operator bool() const;
 
+            //! @return The size (in bytes) of the current code point
+            size_t GetCodePointSize() const;
+
             //! Get the current index
             //!
             //! This returns the index of the current code point, starting at 0 and
@@ -125,11 +128,11 @@ namespace Bfdp
             };
             BFDP_CTIME_ASSERT( F_COUNT <= ( BitManip::BitsPerByte * sizeof( int ) ), "Too many flags" );
 
-        private:
             void Advance() const;
 
             void Convert() const;
 
+        private:
             mutable CodePoint mCodePoint;
             mutable size_t mCodePointSize;
             IConverter* mConverter;
@@ -154,6 +157,17 @@ namespace Bfdp
                 , mString( aString )
             {
                 Init( &mConverter, mString.c_str(), mString.size() );
+            }
+
+            std::string GetCodePointString() const
+            {
+                Convert();
+
+                size_t cpSize = GetCodePointSize();
+                BFDP_RETURNIF_V( cpSize == 0U, std::string() );
+
+                Byte const* inPtr = operator&();
+                return std::string( reinterpret_cast< char const* >( inPtr ), cpSize );
             }
 
         private:
