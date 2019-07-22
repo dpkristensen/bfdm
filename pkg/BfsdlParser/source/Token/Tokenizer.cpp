@@ -58,10 +58,10 @@ namespace BfsdlParser
         namespace InternalTokenizer
         {
 
-            static int const UnknownCategory = -1;
-
+            static Lexer::RangeSymbolCategory CatBackslash( Category::Backslash, 92, false );
             static Lexer::StringSymbolCategory CatControl( Category::Control, "[];:", false );
             static Lexer::RangeSymbolCategory CatDecimalDigits( Category::DecimalDigits, 48, 57, true ); // 0-9
+            static Lexer::RangeSymbolCategory CatDoubleQuotes( Category::DoubleQuotes, 34, false ); // Double Quotes
             static Lexer::RangeSymbolCategory CatHash( Category::Hash, 35, false ); // Hash
             static Lexer::RangeSymbolCategory CatLetters1( Category::Letters, 65, 90, true ); // A-Z
             static Lexer::RangeSymbolCategory CatLetters2( Category::Letters, 97, 122, true ); // a-z
@@ -76,6 +76,7 @@ namespace BfsdlParser
                 {
                     MainSequence,
                     NumericLiteral,
+                    StringLiteral,
 
                     Count
                 };
@@ -93,11 +94,14 @@ namespace BfsdlParser
             , mNumericLiteralParser( aObserver )
             , mObserver( aObserver )
             , mParseError( false )
+            , mStringLiteralParser( aObserver )
             , mSymbolizer( *this, mSymbolBuffer, mAsciiConverter )
         {
             bool ok = true;
+            ok = ok && mSymbolizer.AddCategory( &CatBackslash );
             ok = ok && mSymbolizer.AddCategory( &CatControl );
             ok = ok && mSymbolizer.AddCategory( &CatDecimalDigits );
+            ok = ok && mSymbolizer.AddCategory( &CatDoubleQuotes );
             ok = ok && mSymbolizer.AddCategory( &CatHash );
             ok = ok && mSymbolizer.AddCategory( &CatLetters1 );
             ok = ok && mSymbolizer.AddCategory( &CatLetters2 );
@@ -118,6 +122,8 @@ namespace BfsdlParser
             BFDP_STATE_ACTION( ParseState::MainSequence, Evaluate, CallMethod( *this, &Tokenizer::StateMainSequenceEvaluate ) );
             BFDP_STATE_ACTION( ParseState::NumericLiteral, Entry, CallMethod( *this, &Tokenizer::StateNumericLiteralEntry ) );
             BFDP_STATE_ACTION( ParseState::NumericLiteral, Evaluate, CallMethod( *this, &Tokenizer::StateNumericLiteralEvaluate ) );
+            BFDP_STATE_ACTION( ParseState::StringLiteral, Entry, CallMethod( *this, &Tokenizer::StateStringLiteralEntry ) );
+            BFDP_STATE_ACTION( ParseState::StringLiteral, Evaluate, CallMethod( *this, &Tokenizer::StateStringLiteralEvaluate ) );
 
             BFDP_STATE_MAP_END();
 
@@ -181,7 +187,7 @@ namespace BfsdlParser
         }
 
         Tokenizer::StateVariables::StateVariables()
-            : symbols( UnknownCategory, 0, std::string() )
+            : symbols( Category::Unknown, 0, std::string() )
             , keepParsing( true )
         {
         }
@@ -221,6 +227,10 @@ namespace BfsdlParser
                 mObserver.OnControlCharacter( mState.symbols.str );
                 break;
 
+            case Category::DoubleQuotes:
+                mStateMachine.Transition( ParseState::StringLiteral );
+                break;
+
             case Category::Hash:
                 mStateMachine.Transition( ParseState::NumericLiteral );
                 break;
@@ -257,6 +267,38 @@ namespace BfsdlParser
 
                 case ParseResult::Complete:
                     mObserver.OnNumericLiteral( mNumericLiteralParser.GetParsedObject() );
+                    mStateMachine.Transition( ParseState::MainSequence );
+                    break;
+
+                default:
+                    BFDP_INTERNAL_ERROR( "Unexpected parse state" );
+                    mParseError = true;
+                    mState.keepParsing = false;
+                    break;
+            }
+        }
+
+        void Tokenizer::StateStringLiteralEntry()
+        {
+            mStringLiteralParser.Reset();
+        }
+
+        void Tokenizer::StateStringLiteralEvaluate()
+        {
+            mStringLiteralParser.ParseSymbols( mState.symbols );
+            switch( mStringLiteralParser.GetParseResult() )
+            {
+                case ParseResult::Error:
+                    mParseError = true;
+                    mState.keepParsing = false;
+                    break;
+
+                case ParseResult::NotComplete:
+                    // Nothing to do yet
+                    break;
+
+                case ParseResult::Complete:
+                    mObserver.OnStringLiteral( mStringLiteralParser.GetParsedObject() );
                     mStateMachine.Transition( ParseState::MainSequence );
                     break;
 

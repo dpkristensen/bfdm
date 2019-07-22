@@ -57,6 +57,11 @@ namespace BfsdlTests
             (
             BfsdlParser::Objects::NumericLiteral const& aValue
             ) );
+
+        BFDP_OVERRIDE( bool OnStringLiteral
+            (
+            Bfdp::Data::StringMachine const& aValue
+            ) );
     };
 
 } // namespace BfsdlTests

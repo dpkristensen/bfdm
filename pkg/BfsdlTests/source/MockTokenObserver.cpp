@@ -63,4 +63,15 @@ namespace BfsdlTests
         return true;
     }
 
+    /* override */ bool MockTokenObserver::OnStringLiteral
+        (
+        Bfdp::Data::StringMachine const& aValue
+        )
+    {
+        std::stringstream ss;
+        ss << "StringLiteral: " << aValue.GetUtf8HexString( " " );
+        RecordEvent( ss.str() );
+        return true;
+    }
+
 } // namespace BfsdlTests

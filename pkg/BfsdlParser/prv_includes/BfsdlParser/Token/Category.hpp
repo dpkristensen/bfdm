@@ -43,14 +43,18 @@ namespace BfsdlParser
         {
             enum Type
             {
+                Backslash,
                 Control,
                 DecimalDigits,
+                DoubleQuotes,
                 Hash,
                 Letters,
                 Operators,
                 Period,
                 Tilde,
-                Whitespace
+                Whitespace,
+
+                Unknown = -1 // For initialization use, DO NOT MAP
             };
         };
 

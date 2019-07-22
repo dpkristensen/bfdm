@@ -208,4 +208,119 @@ namespace BfsdlTests
         }
     }
 
+    TEST_F( TokenizerTest, StringLiteral )
+    {
+        MockTokenObserver observer;
+        SetMockErrorHandlers();
+        MockErrorHandler::Workspace errWorkspace;
+
+        struct TestData
+        {
+            char const* input;
+            char const* output;
+        };
+
+        // Test condition table
+        // NOTE: This does not need to be extremely verbose.  Output is always in utf8
+        static TestData const testData[] =
+        { //  Input             Output
+            { "\"",             NULL },
+            { "\"\"",           "" },
+            { "\"abc123\"",     "61 62 63 31 32 33" },
+            // Hex escape sequences
+            { "\"\\x62c3\"",    "62 63 33" },
+            { "\"\\0x62c3\"",   NULL },
+            { "\"\\1x62c3\"",   "06 32 63 33" },
+            { "\"\\4x62c3\"",   "e6 8b 83" },
+            { "\"\\8x12345678\"", "fc 92 8d 85 99 b8" },
+            { "\"\\9x123456780\"", NULL },
+            { "\"\\x80\"",      "c2 80" },
+            { "\"\\x00\"",      "00" },
+            { "\"\\x0g\"",      NULL },
+            { "\"\\x0z\"",      NULL },
+            { "\"\\x\"",        NULL },
+            { "\"\\x1\"",       NULL },
+            // Ascii escape sequences
+            { "\"\\a41\"",      "41" },
+            { "\"\\a7f\"",      "7f" },
+            { "\"\\a80\"",      NULL },
+            { "\"\\0a7f\"",     NULL },
+            { "\"\\2a7f\"",     NULL },
+            { "\"\\a0g\"",      NULL },
+            { "\"\\a0z\"",      NULL },
+            { "\"\\a\"",        NULL },
+            { "\"\\a7\"",       NULL },
+            // MS-1252 escape sequences
+            { "\"\\w41\"",      "41" },
+            { "\"\\w7e\"",      "7e" },
+            { "\"\\w7f\"",      NULL },
+            { "\"\\w80\"",      "e2 82 ac" },
+            { "\"\\w8c\"",      "c5 92" },
+            { "\"\\w8d\"",      NULL },
+            { "\"\\w8e\"",      "c5 bd" },
+            { "\"\\0w7f\"",     NULL },
+            { "\"\\2w7f\"",     NULL },
+            { "\"\\w0g\"",      NULL },
+            { "\"\\w0z\"",      NULL },
+            { "\"\\w\"",        NULL },
+            { "\"\\w7\"",       NULL },
+            // Unicode escape sequences
+            { "\"\\u0000\"",        "00" },
+            { "\"\\u00b9\"",        "c2 b9" },
+            { "\"\\4u000b9\"",      "0b 39" },
+            { "\"\\5u000b9\"",      "c2 b9" },
+            { "\"\\5u1f913\"",      "f0 9f a4 93" },
+            { "\"\\8u7fffffff\"",   "fd bf bf bf bf bf" },
+            { "\"\\8u80000000\"",   NULL },
+            { "\"\\9u0000000b9\"",  NULL },
+            { "\"\\0u1234\"",       NULL },
+            { "\"\\u000g\"",        NULL },
+            { "\"\\u000z\"",        NULL },
+            { "\"\\u\"",            NULL },
+            { "\"\\u7\"",           NULL },
+            { "\"\\u123\"",         NULL },
+            // Other escape sequences
+            { "\"\\\"\"",       "22" },
+            { "\"\\t\"",        "08" },
+            { "\"\\r\"",        "0d" },
+            { "\"\\n\"",        "0a" },
+            { "\"\\\\\"",       "5c" },
+            // Multiple escape sequences together
+            { "\"\\\"\\t\\r\\n\\\\t\"", "22 08 0d 0a 5c 74" },
+        };
+        static size_t const numTests = BFDP_COUNT_OF_ARRAY( testData );
+
+        // Loop through test conditions
+        for( size_t i = 0; i < numTests; ++i )
+        {
+            SCOPED_TRACE( ::testing::Message( "input=" ) << testData[i].input << std::endl );
+
+            Token::Tokenizer tokenizer( observer );
+            ASSERT_TRUE( tokenizer.IsInitOk() );
+            size_t bytesRead = 0;
+            size_t dataLen = std::strlen( testData[i].input );
+
+            // Set expectations for this iteration
+            errWorkspace.ExpectRunTimeError( testData[i].output == NULL );
+
+            // Parse data for this iteration
+            ASSERT_TRUE( tokenizer.Parse( reinterpret_cast< Byte const * >( testData[i].input ), dataLen, bytesRead ) );
+            tokenizer.EndParsing();
+
+            // Verify postconditions
+            errWorkspace.VerifyRunTimeError();
+            if( testData[i].output )
+            {
+                std::string value = std::string( "StringLiteral: " ) + testData[i].output;
+                ASSERT_TRUE( observer.VerifyNext( value ) );
+            }
+            ASSERT_TRUE( observer.VerifyNone() );
+
+            if( testData[i].output )
+            {
+                ASSERT_EQ( dataLen, bytesRead );
+            }
+        }
+    }
+
 } // namespace BfsdlTests

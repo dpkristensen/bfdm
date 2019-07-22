@@ -37,6 +37,7 @@
 #include <string>
 
 // Internal includes
+#include "Bfdp/Data/StringMachine.hpp"
 #include "BfsdlParser/Objects/NumericLiteral.hpp"
 
 namespace BfsdlParser
@@ -65,6 +66,14 @@ namespace BfsdlParser
             virtual bool OnNumericLiteral
                 (
                 Objects::NumericLiteral const& aValue
+                ) = 0;
+
+            //! Signal emitted for string literal expressions
+            //!
+            //! @return true if parsing should continue, false otherwise.
+            virtual bool OnStringLiteral
+                (
+                Bfdp::Data::StringMachine const& aValue
                 ) = 0;
 
         protected:

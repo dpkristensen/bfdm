@@ -48,6 +48,7 @@
 #include "BfsdlParser/Objects/NumericLiteral.hpp"
 #include "BfsdlParser/Token/ITokenObserver.hpp"
 #include "BfsdlParser/Token/NumericLiteralParser.hpp"
+#include "BfsdlParser/Token/StringLiteralParser.hpp"
 #include "BfsdlParser/Token/SymbolSequence.hpp"
 
 namespace BfsdlParser
@@ -125,6 +126,8 @@ namespace BfsdlParser
             void StateMainSequenceEvaluate();
             void StateNumericLiteralEntry();
             void StateNumericLiteralEvaluate();
+            void StateStringLiteralEntry();
+            void StateStringLiteralEvaluate();
 
             //! Converter for ASCII (initial format)
             Bfdp::Unicode::AsciiConverter mAsciiConverter;
@@ -143,6 +146,9 @@ namespace BfsdlParser
 
             // Values used by the state machine
             StateVariables mState;
+
+            //! Parser for handling String Literals
+            StringLiteralParser mStringLiteralParser;
 
             //! Symbol buffer; this is fixed to the maximum length of any token
             Bfdp::Lexer::StaticSymbolBuffer< MAX_TOKEN_LENGTH > mSymbolBuffer;
