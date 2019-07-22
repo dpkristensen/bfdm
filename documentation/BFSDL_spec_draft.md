@@ -412,20 +412,20 @@ Escape sequences may be used with `<string-literal-value>` to store characters i
 Some escape sequences allow a variable number of digits to follow:
 
     escape-digits := <radix-10-digits>...
-    escape-sequence += <back-slash>[<escape-digits>]'x'(<radix-16-digits>...2)
+    escape-sequence += <back-slash>[<escape-digits>]'x'(<radix-16-digits>...<escape-digits>)
         # Default for <escape-digits> = 2
         # Smallest supported range of <escape-digits> is 1-8
         # Examples:
         #   \x34 = String code 52
         #   \4x1234 = String code 4660
-    escape-sequence += <back-slash>[<escape-digits>]'b'(<radix-2-digits>....8)
+    escape-sequence += <back-slash>[<escape-digits>]'b'(<radix-2-digits>...<escape-digits>)
         # Default for <escape-digits> = 8
-        # Smallest supported range of <escape-digits> is 1-64
+        # Smallest supported range of <escape-digits> is 1-32
         # Examples:
         #   \b00110001 = String code 49
         #   \4b0001 = String code 1
         #   \16b0001001100110111 = String code 4919
-    escape-sequence += <back-slash>[<escape-digits>]'u'(<radix-16-digits>...4)
+    escape-sequence += <back-slash>[<escape-digits>]'u'(<radix-16-digits>...<escape-digits>)
         # Default for <escape-digits> = 4
         # Smallest supported range of <escape-digits> is 1-8
         # Examples:
