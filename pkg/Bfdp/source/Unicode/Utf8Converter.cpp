@@ -62,7 +62,7 @@ namespace Bfdp
                 BitManip::CreateMask< size_t >( 4 + 6 + 6 ),
                 BitManip::CreateMask< size_t >( 3 + 6 + 6 + 6 ),
                 BitManip::CreateMask< size_t >( 2 + 6 + 6 + 6 + 6 ),
-                BitManip::CreateMask< size_t >( 2 + 6 + 6 + 6 + 6 + 6 )
+                BitManip::CreateMask< size_t >( 1 + 6 + 6 + 6 + 6 + 6 )
             };
 
             size_t CountHeaderBits
@@ -172,12 +172,17 @@ namespace Bfdp
                 return 0;
             }
 
+            if( TheoreticalMaxUnicodePoint < aSymbolIn )
+            {
+                return 0;
+            }
+
             size_t numBytesToConvert = 0;
             while( numBytesToConvert < BFDP_COUNT_OF_ARRAY( ByteThreshold ) )
             {
                 size_t const threshold = ByteThreshold[numBytesToConvert];
                 ++numBytesToConvert;
-                if( aSymbolIn < threshold )
+                if( aSymbolIn <= threshold )
                 {
                     break;
                 }

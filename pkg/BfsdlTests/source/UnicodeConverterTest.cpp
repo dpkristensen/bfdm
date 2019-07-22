@@ -224,11 +224,16 @@ namespace BfsdlTests
             { 1, Char( "\0" ),                          0x00000000 },
             { 1, Char( "0" ),                           0x00000030 },
             { 1, Char( "~" ),                           0x0000007e },
+            { 1, Char( "\x7f" ),                        0x0000007f },
             { 2, Char( "\xc2\x80" ),                    0x00000080 },
             { 2, Char( "\xde\xaa" ),                    0x000007aa },
+            { 2, Char( "\xdf\xbf" ),                    0x000007ff },
             { 3, Char( "\xeb\x9d\xbb" ),                0x0000b77b },
+            { 3, Char( "\xef\xbf\xbf" ),                0x0000ffff },
             { 4, Char( "\xf5\xae\xbd\xbd" ),            0x0016ef7d },
+            { 4, Char( "\xf7\xbf\xbf\xbf" ),            0x001fffff },
             { 5, Char( "\xfa\xb7\x9e\xbe\xbf" ),        0x02ddefbf },
+            { 5, Char( "\xfb\xbf\xbf\xbf\xbf" ),        0x03ffffff },
             { 6, Char( "\xfd\x9b\xaf\x9f\x9f\xaf" ),    0x5bbdf7ef },
             { 6, Char( "\xfd\xbf\xbf\xbf\xbf\xbf" ),    0x7fffffff }
         };
@@ -278,6 +283,16 @@ namespace BfsdlTests
             ASSERT_EQ( 0U, utf8.ConvertBytes( buf, invalidBytes[i].numBytes, cp ) );
             ASSERT_EQ( 42, cp ); // Unchanged
         }
+
+        // Special case: 6-byte 0 (happens when incorrectly converting 0x8000000 to UTF8)
+        // NOTE: This cannot be detected as invalid, since bit 32 has already been lost
+        std::memcpy( buf, Char( "\xfc\x80\x80\x80\x80\x80" ), 6 );
+        ASSERT_EQ( 6U, utf8.ConvertBytes( buf, 6, cp ) );
+        ASSERT_EQ( 0U, cp );
+
+        // Special case: 32 bit data is invalid
+        ASSERT_EQ( 0U, utf8.ConvertSymbol( 0x80000000, buf, 6 ) );
+        ASSERT_EQ( 0U, utf8.ConvertSymbol( 0xffffffff, buf, 6 ) );
 
         SetMockErrorHandlers();
         MockErrorHandler::Workspace wksp;

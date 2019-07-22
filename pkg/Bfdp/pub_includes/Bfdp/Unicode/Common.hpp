@@ -50,6 +50,8 @@ namespace Bfdp
         //! Maximum number of bytes any converter may require for Unicode conversion of one symbol
         static size_t const MaxBytesForConversion = 4;
 
+        static CodePoint const TheoreticalMaxUnicodePoint = 0x7FFFFFFF;
+
     } // namespace Unicode
 
 } // namespace Bfdp
