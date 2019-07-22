@@ -91,6 +91,15 @@ namespace Bfdp
 
         using namespace InternalMs1252;
 
+        /* static */ bool Ms1252Converter::GetUnicode
+            (
+            CodePoint const& aSymbolIn,
+            CodePoint& aSymbolOut
+            )
+        {
+            return 0 != Transcode( false, Conv, NumConv, aSymbolIn, aSymbolOut );
+        }
+
         Ms1252Converter::Ms1252Converter()
         {
         }

@@ -62,6 +62,15 @@ namespace Bfdp
 
         using namespace InternalAscii;
 
+        /* static */ bool AsciiConverter::GetUnicode
+            (
+            CodePoint const& aSymbolIn,
+            CodePoint& aSymbolOut
+            )
+        {
+            return 0 != Transcode( false, Conv, NumConv, aSymbolIn, aSymbolOut );
+        }
+
         AsciiConverter::AsciiConverter()
         {
         }

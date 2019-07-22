@@ -50,6 +50,13 @@ namespace Bfdp
             : public IConverter
         {
         public:
+            //! @copydoc GetUnicodeFunc
+            static bool GetUnicode
+                (
+                CodePoint const& aSymbolIn,
+                CodePoint& aSymbolOut
+                );
+
             Ms1252Converter();
 
             //! @copydoc IConverter::ConvertBytes

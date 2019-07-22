@@ -93,11 +93,17 @@ namespace BfsdlTests
         {
             SCOPED_TRACE( ::testing::Message( "i = " ) << i );
 
+            // Test decoding
             buf = test[i].bVal;
             cp = Unicode::InvalidCodePoint;
             ASSERT_EQ( 1U, ascii.ConvertBytes( &buf, 1, cp ) );
             ASSERT_EQ( test[i].uVal, cp );
 
+            // Test direct conversion
+            ASSERT_TRUE( Unicode::AsciiConverter::GetUnicode( test[i].bVal, cp ) );
+            ASSERT_EQ( test[i].uVal, cp );
+
+            // Test encoding
             buf = 128; // Not a valid code
             cp = test[i].uVal;
             ASSERT_EQ( 1U, ascii.ConvertSymbol( cp, &buf, 1 ) );
@@ -111,7 +117,12 @@ namespace BfsdlTests
         {
             SCOPED_TRACE( ::testing::Message( "i = " ) << i );
 
+            // Test decoding
             ASSERT_EQ( 0U, ascii.ConvertBytes( &invalidBytes[i], 1, cp ) );
+            ASSERT_EQ( 89, cp ); // Unchanged
+
+            // Test direct conversion
+            ASSERT_FALSE( Unicode::AsciiConverter::GetUnicode( invalidBytes[i], cp ) );
             ASSERT_EQ( 89, cp ); // Unchanged
         }
 
@@ -167,11 +178,17 @@ namespace BfsdlTests
         {
             SCOPED_TRACE( ::testing::Message( "i = " ) << i );
 
+            // Test decoding
             buf = test[i].bVal;
             cp = Unicode::InvalidCodePoint;
             ASSERT_EQ( 1U, ms1252.ConvertBytes( &buf, 1, cp ) );
             ASSERT_EQ( test[i].uVal, cp );
 
+            // Test direct conversion
+            ASSERT_TRUE( Unicode::Ms1252Converter::GetUnicode( test[i].bVal, cp ) );
+            ASSERT_EQ( test[i].uVal, cp );
+
+            // Test encoding
             buf = 127; // Not a valid code
             cp = test[i].uVal;
             ASSERT_EQ( 1U, ms1252.ConvertSymbol( cp, &buf, 1 ) );
@@ -185,7 +202,12 @@ namespace BfsdlTests
         {
             SCOPED_TRACE( ::testing::Message( "i = " ) << i );
 
+            // Test decoding
             ASSERT_EQ( 0U, ms1252.ConvertBytes( &invalidBytes[i], 1, cp ) );
+            ASSERT_EQ( 89, cp ); // Unchanged
+
+            // Test direct conversion
+            ASSERT_FALSE( Unicode::Ms1252Converter::GetUnicode( invalidBytes[i], cp ) );
             ASSERT_EQ( 89, cp ); // Unchanged
         }
 
@@ -250,10 +272,12 @@ namespace BfsdlTests
             std::memset( buf, 0, sizeof( buf ) );
             std::memcpy( buf, test[i].bVal, test[i].numBytes );
 
+            // Test decoding
             cp = Unicode::InvalidCodePoint;
             ASSERT_EQ( test[i].numBytes, utf8.ConvertBytes( buf, test[i].numBytes, cp ) );
             ASSERT_EQ( test[i].uVal, cp );
 
+            // Test encoding
             memset( buf, 0xff, sizeof( buf ) ); // not a valid code
             cp = test[i].uVal;
             ASSERT_EQ( test[i].numBytes, utf8.ConvertSymbol( cp, buf, 6 ) );

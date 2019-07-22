@@ -44,6 +44,16 @@ namespace Bfdp
     namespace Unicode
     {
 
+        //! Convert a symbol of this type to Unicode
+        //!
+        //! @return true if conversion is successful, false if the symbol has no direct
+        //!     correlation.
+        typedef bool (*GetUnicodeFunc)
+            (
+            CodePoint const& aSymbolIn, //!< [in] Symbol to convert
+            CodePoint& aSymbolOut       //!< [out] Where to store result
+            );
+
         //! Abstract interface for converting bytes
         class IConverter
         {
@@ -55,19 +65,20 @@ namespace Bfdp
             virtual size_t ConvertBytes
                 (
                 Byte const* const aBytesIn, //!< [in] Pointer to bytes to convert
-                size_t const aByteCount,     //!< [in] Number of bytes available
+                size_t const aByteCount,    //!< [in] Number of bytes available
                 CodePoint& aSymbolOut       //!< [out] Symbol to save converted byte
                 ) = 0;
 
             //! Convert a Unicode symbol into Bytes
             //!
             //! @note aBytesOut is only modified when a non-zero value is returned
+            //! @pre aByteCount must be at least GetMaxBytes()
             //! @return Number of bytes converted, or 0 if no conversion took place.
             virtual size_t ConvertSymbol
                 (
                 CodePoint const& aSymbolIn, //!< [in] Symbol to convert
                 Byte* const aBytesOut,      //!< [out] Where to write bytes
-                size_t const aByteCount      //!< [in] Number of Bytes available to write to; must be at least GetMaxBytes()
+                size_t const aByteCount     //!< [in] Number of Bytes available to write to
                 ) = 0;
 
             //! Get Max Bytes
