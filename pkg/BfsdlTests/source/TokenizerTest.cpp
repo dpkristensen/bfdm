@@ -323,4 +323,51 @@ namespace BfsdlTests
         }
     }
 
+    TEST_F( TokenizerTest, WordTest )
+    {
+        MockTokenObserver observer;
+        SetMockErrorHandlers();
+
+        struct TestData
+        {
+            char const* input;
+            char const* output[4];
+        };
+
+        // Test condition table
+        static TestData const testData[] =
+        { //  Input             Output (NULL termilnated list)
+            { "foo",            { "foo", NULL } },
+            { "fOo",            { "fOo", NULL } },
+            { "foo bar",        { "foo", "bar", NULL } },
+            { " bar baz ",      { "bar", "baz", NULL } },
+            { "a_b cd1 ef_2_",  { "a_b", "cd1", "ef_2_", NULL } },
+        };
+        static size_t const numTests = BFDP_COUNT_OF_ARRAY( testData );
+
+        // Loop through test conditions
+        for( size_t i = 0; i < numTests; ++i )
+        {
+            SCOPED_TRACE( ::testing::Message( "input=" ) << testData[i].input << std::endl );
+
+            Token::Tokenizer tokenizer( observer );
+            ASSERT_TRUE( tokenizer.IsInitOk() );
+            size_t bytesRead = 0;
+            size_t dataLen = std::strlen( testData[i].input );
+
+            // Parse data for this iteration
+            ASSERT_TRUE( tokenizer.Parse( reinterpret_cast< Byte const * >( testData[i].input ), dataLen, bytesRead ) );
+            tokenizer.EndParsing();
+
+            // Verify postconditions
+            for( char const* const* outPtr = testData[i].output; *outPtr != NULL; ++outPtr )
+            {
+                ASSERT_TRUE( observer.VerifyNext( *outPtr ) );
+            }
+            ASSERT_TRUE( observer.VerifyNone() );
+
+            ASSERT_EQ( dataLen, bytesRead );
+        }
+    }
+
 } // namespace BfsdlTests

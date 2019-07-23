@@ -76,6 +76,14 @@ namespace BfsdlParser
                 Bfdp::Data::StringMachine const& aValue
                 ) = 0;
 
+            //! Signal emitted for words/identifiers
+            //!
+            //! @return true if parsing should continue, false otherwise.
+            virtual bool OnWord
+                (
+                std::string const& aValue
+                ) = 0;
+
         protected:
             virtual ~ITokenObserver()
             {

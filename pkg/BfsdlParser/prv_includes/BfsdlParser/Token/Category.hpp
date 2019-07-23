@@ -52,6 +52,7 @@ namespace BfsdlParser
                 Operators,
                 Period,
                 Tilde,
+                Underscore,
                 Whitespace,
 
                 Unknown = -1 // For initialization use, DO NOT MAP

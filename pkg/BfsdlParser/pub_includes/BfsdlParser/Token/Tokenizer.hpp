@@ -37,6 +37,9 @@
 #include "Bfdp/NonAssignable.hpp"
 #include "Bfdp/NonCopyable.hpp"
 
+// External includes
+#include <sstream>
+
 // Internal Includes
 #include "Bfdp/Lexer/ISymbolObserver.hpp"
 #include "Bfdp/Lexer/StaticSymbolBuffer.hpp"
@@ -102,10 +105,14 @@ namespace BfsdlParser
 
                 SymbolSequence symbols;
                 bool keepParsing;
+                bool reEvaluate;
+                std::stringstream word;
             };
 
             //! Define the length of the longest token, which is a class name
             static size_t const MAX_TOKEN_LENGTH = 256;
+
+            void EmitWord();
 
             //! @copydoc Lexer::ISymbolizer::OnMappedSymbols
             BFDP_OVERRIDE( bool OnMappedSymbols
@@ -128,6 +135,8 @@ namespace BfsdlParser
             void StateNumericLiteralEvaluate();
             void StateStringLiteralEntry();
             void StateStringLiteralEvaluate();
+            void StateWordEntry();
+            void StateWordEvaluate();
 
             //! Converter for ASCII (initial format)
             Bfdp::Unicode::AsciiConverter mAsciiConverter;

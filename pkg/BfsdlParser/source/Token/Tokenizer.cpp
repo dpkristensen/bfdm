@@ -68,6 +68,7 @@ namespace BfsdlParser
             static Lexer::StringSymbolCategory CatOperators( Category::Operators, "+-", false );
             static Lexer::RangeSymbolCategory CatPeriod( Category::Period, 46, false ); // Period
             static Lexer::StringSymbolCategory CatTilde( Category::Tilde, "~", false ); // Tilde
+            static Lexer::StringSymbolCategory CatUnderscore( Category::Underscore, "_", true ); // Underscore
             static Lexer::StringSymbolCategory CatWhitespace( Category::Whitespace, " \t\n\r", true );
 
             struct ParseState
@@ -77,6 +78,7 @@ namespace BfsdlParser
                     MainSequence,
                     NumericLiteral,
                     StringLiteral,
+                    Word,
 
                     Count
                 };
@@ -107,6 +109,7 @@ namespace BfsdlParser
             ok = ok && mSymbolizer.AddCategory( &CatLetters2 );
             ok = ok && mSymbolizer.AddCategory( &CatOperators );
             ok = ok && mSymbolizer.AddCategory( &CatPeriod );
+            ok = ok && mSymbolizer.AddCategory( &CatUnderscore );
             ok = ok && mSymbolizer.AddCategory( &CatWhitespace );
 
             if( !ok )
@@ -124,6 +127,8 @@ namespace BfsdlParser
             BFDP_STATE_ACTION( ParseState::NumericLiteral, Evaluate, CallMethod( *this, &Tokenizer::StateNumericLiteralEvaluate ) );
             BFDP_STATE_ACTION( ParseState::StringLiteral, Entry, CallMethod( *this, &Tokenizer::StateStringLiteralEntry ) );
             BFDP_STATE_ACTION( ParseState::StringLiteral, Evaluate, CallMethod( *this, &Tokenizer::StateStringLiteralEvaluate ) );
+            BFDP_STATE_ACTION( ParseState::Word, Entry, CallMethod( *this, &Tokenizer::StateWordEntry ) );
+            BFDP_STATE_ACTION( ParseState::Word, Evaluate, CallMethod( *this, &Tokenizer::StateWordEvaluate ) );
 
             BFDP_STATE_MAP_END();
 
@@ -149,13 +154,26 @@ namespace BfsdlParser
             // Do nothing else if an error was encountered
             BFDP_RETURNIF( mParseError );
 
-            if( mStateMachine.GetCurState() != ParseState::MainSequence )
+            switch( mStateMachine.GetCurState() )
             {
-                BFDP_RUNTIME_ERROR( "Unparsed content in stream" );
-                return;
-            }
+                case ParseState::Word:
+                case ParseState::MainSequence:
+                    // No error here
+                    break;
+
+                default:
+                    BFDP_RUNTIME_ERROR( "Unparsed content in stream" );
+                    return;
+                    // break omitted - unconditional return
+            };
 
             mSymbolizer.EndParsing();
+
+            if( mStateMachine.GetCurState() == ParseState::Word )
+            {
+                // Emit any pending word
+                EmitWord();
+            }
         }
 
         bool Tokenizer::IsInitOk() const
@@ -189,7 +207,17 @@ namespace BfsdlParser
         Tokenizer::StateVariables::StateVariables()
             : symbols( Category::Unknown, 0, std::string() )
             , keepParsing( true )
+            , reEvaluate( false )
         {
+        }
+
+        void Tokenizer::EmitWord()
+        {
+            std::string word = mState.word.str();
+            if( !word.empty() )
+            {
+                mState.keepParsing = mObserver.OnWord( word );
+            }
         }
 
         /* virtual */ bool Tokenizer::OnMappedSymbols
@@ -203,7 +231,11 @@ namespace BfsdlParser
             mState.symbols.count = aNumSymbols;
             mState.symbols.str = aSymbols;
 
-            mStateMachine.EvaluateState();
+            do
+            {
+                mState.reEvaluate = false;
+                mStateMachine.EvaluateState();
+            } while( mState.reEvaluate );
 
             return mState.keepParsing;
         }
@@ -236,6 +268,12 @@ namespace BfsdlParser
                 break;
 
             case Category::Whitespace:
+                break;
+
+            case Category::Letters:
+            case Category::DecimalDigits:
+            case Category::Underscore:
+                mStateMachine.Transition( ParseState::Word );
                 break;
 
             default:
@@ -307,6 +345,34 @@ namespace BfsdlParser
                     mParseError = true;
                     mState.keepParsing = false;
                     break;
+            }
+        }
+
+        void Tokenizer::StateWordEntry()
+        {
+            mState.word.clear();
+            mState.word.str( std::string() );
+            mState.word << mState.symbols.str;
+        }
+
+        void Tokenizer::StateWordEvaluate()
+        {
+            switch( mState.symbols.category )
+            {
+            case Category::Letters:
+            case Category::DecimalDigits:
+            case Category::Underscore:
+                mState.word << mState.symbols.str;
+                break;
+
+            default:
+                // End of the word
+                EmitWord();
+
+                // Re-parse the current symbols on re-entry to the main state
+                mState.reEvaluate = true;
+                mStateMachine.Transition( ParseState::MainSequence );
+                break;
             }
         }
 

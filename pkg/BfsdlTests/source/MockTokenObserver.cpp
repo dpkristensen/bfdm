@@ -74,4 +74,13 @@ namespace BfsdlTests
         return true;
     }
 
+    /* override */ bool MockTokenObserver::OnWord
+        (
+        std::string const& aValue
+        )
+    {
+        RecordEvent( aValue );
+        return true;
+    }
+
 } // namespace BfsdlTests

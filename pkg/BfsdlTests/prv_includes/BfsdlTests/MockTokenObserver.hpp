@@ -62,6 +62,11 @@ namespace BfsdlTests
             (
             Bfdp::Data::StringMachine const& aValue
             ) );
+
+        BFDP_OVERRIDE( bool OnWord
+            (
+            std::string const& aValue
+            ) );
     };
 
 } // namespace BfsdlTests
