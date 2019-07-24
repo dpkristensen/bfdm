@@ -42,6 +42,15 @@ namespace Bfdp
     namespace Algorithm
     {
 
+        bool HashedString::StrictWeakCompare::operator()
+            (
+            HashedString const& aLhs,
+            HashedString const& aRhs
+            ) const
+        {
+            return aLhs.IsStrictWeakLessThan( aRhs );
+        }
+
         HashedString::HashedString
             (
             std::string const& aValue
@@ -59,6 +68,15 @@ namespace Bfdp
         std::string const& HashedString::GetStr() const
         {
             return mString;
+        }
+
+        bool HashedString::IsStrictWeakLessThan
+            (
+            HashedString const& aOther
+            ) const
+        {
+            return ( mHash < aOther.mHash ) ||
+                ( 0 > std::strcmp( mString.c_str(), aOther.mString.c_str() ) );
         }
 
         bool HashedString::operator ==

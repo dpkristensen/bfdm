@@ -80,4 +80,29 @@ namespace BfsdlTests
         ASSERT_STREQ( hs2.GetStr().c_str(), "Baz" );
     }
 
+    TEST_F( AlgorithmHashedStringTest, VerifyStrictWeakOrder )
+    {
+        HashedString hsFoo1 = HashedString( "Foo" );
+        HashedString hsFoo2 = HashedString( "Foo" );
+        HashedString hsBaz = HashedString( "Baz" );
+
+        // Preconditions for this to be a valid test for the implemented algorithm
+        ASSERT_EQ( hsFoo1.GetHash(), hsFoo2.GetHash() );
+        ASSERT_NE( hsFoo1.GetHash(), hsBaz.GetHash() );
+
+        // Since the relationship is canonically undefined, determine what to expect first.
+        bool isFooLessThanBaz = hsFoo1.IsStrictWeakLessThan( hsBaz );
+
+        // Compare for same hash
+        ASSERT_EQ( isFooLessThanBaz, hsFoo2.IsStrictWeakLessThan( hsBaz ) );
+        ASSERT_NE( isFooLessThanBaz, hsBaz.IsStrictWeakLessThan( hsFoo2 ) );
+
+        // Symmetry
+        ASSERT_NE( isFooLessThanBaz, hsBaz.IsStrictWeakLessThan( hsFoo1 ) );
+
+        // Reflexivity / Equality
+        ASSERT_FALSE( hsFoo1.IsStrictWeakLessThan( hsFoo2 ) );
+        ASSERT_FALSE( hsFoo2.IsStrictWeakLessThan( hsFoo1 ) );
+    }
+
 } // namespace BfsdlTests

@@ -52,6 +52,16 @@ namespace Bfdp
         class HashedString BFDP_FINAL
         {
         public:
+            //! Functor meeting Compare requirements for strict weak ordering
+            struct StrictWeakCompare
+            {
+                bool operator()
+                    (
+                    HashedString const& aLhs,
+                    HashedString const& aRhs
+                    ) const;
+            };
+
             HashedString
                 (
                 std::string const& aValue
@@ -61,13 +71,19 @@ namespace Bfdp
 
             std::string const& GetStr() const;
 
+            //! Comparison operator for less than operator with a strict weak ordering
+            bool IsStrictWeakLessThan
+                (
+                HashedString const& aOther
+                ) const;
+
             //! Comparison operator for equality
             bool operator ==
                 (
                 HashedString const& aOther
                 ) const;
 
-            //! Comparison operator for equality
+            //! Comparison operator for inequality
             bool operator !=
                 (
                 HashedString const& aOther
