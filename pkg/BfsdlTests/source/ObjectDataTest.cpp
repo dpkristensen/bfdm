@@ -33,13 +33,16 @@
 #include "gtest/gtest.h"
 
 #include "BfsdlParser/Objects/Field.hpp"
+#include "BfsdlParser/Objects/Tree.hpp"
 #include "BfsdlTests/TestUtil.hpp"
 
 namespace BfsdlTests
 {
 
+    using BfsdlParser::Objects::Field;
     using BfsdlParser::Objects::IObject;
     using BfsdlParser::Objects::ObjectType;
+    using BfsdlParser::Objects::Tree;
 
     class ObjectDataTest
         : public ::testing::Test
@@ -53,18 +56,47 @@ namespace BfsdlTests
 
     TEST_F( ObjectDataTest, Field )
     {
-        using BfsdlParser::Objects::Field;
-
         Field::UFieldPtr fp = Field::Create( "test" );
 
         ASSERT_TRUE( fp != NULL );
         ASSERT_EQ( ObjectType::Field, fp->GetType() );
         ASSERT_STREQ( "test", fp->GetName().c_str() );
+        ASSERT_STREQ( "test", fp->GetId().GetStr().c_str() );
 
         IObject::UPtr op = std::move( fp );
         Field* f = Field::Get( op );
         ASSERT_TRUE( f != NULL );
         ASSERT_STREQ( "test", f->GetName().c_str() );
+    }
+
+    TEST_F( ObjectDataTest, Tree )
+    {
+        Tree tree;
+        ASSERT_EQ( ObjectType::Tree, tree.GetType() );
+        ASSERT_STREQ( "", tree.GetName().c_str() );
+
+        IObject* op = tree.Add( Field::Create( "One" ) );
+        ASSERT_TRUE( op != NULL );
+        ASSERT_STREQ( "One", op->GetName().c_str() );
+
+        op = tree.Add( Field::Create( "Two" ) );
+        ASSERT_TRUE( op != NULL );
+        ASSERT_STREQ( "Two", op->GetName().c_str() );
+
+        op = tree.Find( "doesNotExist" );
+        ASSERT_TRUE( op == NULL );
+
+        op = tree.Find( "Two" );
+        ASSERT_TRUE( op != NULL );
+        ASSERT_STREQ( "Two", op->GetName().c_str() );
+
+        op = tree.Find( "One" );
+        ASSERT_TRUE( op != NULL );
+        ASSERT_STREQ( "One", op->GetName().c_str() );
+
+        op = tree.Find( "Two" );
+        ASSERT_TRUE( op != NULL );
+        ASSERT_STREQ( "Two", op->GetName().c_str() );
     }
 
 } // namespace BfsdlTests

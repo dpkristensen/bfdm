@@ -1,5 +1,5 @@
 /**
-    BFSDL Parser Object Base Definition
+    BFSDL Parser Object Tree Container
 
     Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
@@ -30,8 +30,11 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// Base includes
-#include "BfsdlParser/Objects/ObjectBase.hpp"
+// Base Includes
+#include "BfsdlParser/Objects/Tree.hpp"
+
+// Internal Includes
+#include "Bfdp/Macros.hpp"
 
 namespace BfsdlParser
 {
@@ -39,32 +42,43 @@ namespace BfsdlParser
     namespace Objects
     {
 
-        ObjectBase::~ObjectBase()
+        Tree::~Tree()
         {
         }
 
-        Bfdp::Algorithm::HashedString const& ObjectBase::GetId() const
-        {
-            return mName;
-        }
-
-        std::string const& ObjectBase::GetName() const
-        {
-            return mName.GetStr();
-        }
-
-        ObjectType::Id ObjectBase::GetType() const
-        {
-            return mType;
-        }
-
-        ObjectBase::ObjectBase
+        IObject* Tree::Add
             (
-            std::string const& aName,
-            ObjectType::Id const aType
+            IObject::UPtr aNode
             )
-            : mName( aName )
-            , mType( aType )
+        {
+            BFDP_RETURNIF_V( aNode == NULL, NULL );
+            BFDP_RETURNIF_V( Find( aNode->GetName() ) != NULL, NULL );
+
+            NodeMap::iterator iter = mMap.insert
+                (
+                std::make_pair( aNode->GetId(), std::move( aNode ) )
+                );
+            BFDP_RETURNIF_V( iter == mMap.end(), NULL );
+
+            return iter->second.get();
+        }
+
+        IObject* Tree::Find
+            (
+            std::string const& aName
+            )
+        {
+            using Bfdp::Algorithm::HashedString;
+
+            HashedString hs = HashedString( aName );
+            NodeMap::iterator iter = mMap.find( hs );
+            BFDP_RETURNIF_V( iter == mMap.end(), NULL );
+
+            return iter->second.get();
+        }
+
+        Tree::Tree()
+            : ObjectBase( std::string(), ObjectType::Tree )
         {
         }
 

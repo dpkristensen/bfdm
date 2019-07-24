@@ -1,5 +1,5 @@
 /**
-    BFSDL Parser Object Base Definition
+    BFSDL Parser Object Tree Container
 
     Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
@@ -30,8 +30,20 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef BfsdlParser_Objects_Tree
+#define BfsdlParser_Objects_Tree
+
 // Base includes
 #include "BfsdlParser/Objects/ObjectBase.hpp"
+
+// External includes
+#include <map>
+#include <string>
+
+// Internal includes
+#include "Bfdp/Algorithm/Calc.hpp"
+#include "Bfdp/Algorithm/HashedString.hpp"
+#include "Bfdp/Macros.hpp"
 
 namespace BfsdlParser
 {
@@ -39,35 +51,45 @@ namespace BfsdlParser
     namespace Objects
     {
 
-        ObjectBase::~ObjectBase()
+        //! Object Tree Container
+        //!
+        //! Encapsulates a collection of objects
+        class Tree
+            : public ObjectBase
         {
-        }
+        public:
+            Tree();
 
-        Bfdp::Algorithm::HashedString const& ObjectBase::GetId() const
-        {
-            return mName;
-        }
+            virtual ~Tree();
 
-        std::string const& ObjectBase::GetName() const
-        {
-            return mName.GetStr();
-        }
+            //! @note On success, lifecycle management of the node is transferred to the tree;
+            //!     the original pointer will be NULL.
+            //! @return Raw pointer to the object if added to the tree, NULL otherwise.
+            IObject* Add
+                (
+                IObject::UPtr aNode
+                );
 
-        ObjectType::Id ObjectBase::GetType() const
-        {
-            return mType;
-        }
+            //! @note This does NOT do a recursive lookup.
+            //! @return Pointer to the object if found in the tree, NULL otherwise.
+            IObject* Find
+                (
+                std::string const& aName
+                );
 
-        ObjectBase::ObjectBase
-            (
-            std::string const& aName,
-            ObjectType::Id const aType
-            )
-            : mName( aName )
-            , mType( aType )
-        {
-        }
+        private:
+            typedef std::multimap
+                <
+                Bfdp::Algorithm::HashedString,
+                IObject::UPtr,
+                Bfdp::Algorithm::HashedString::StrictWeakCompare
+                > NodeMap;
+
+            NodeMap mMap;
+        };
 
     } // namespace Objects
 
 } // namespace BfsdlParser
+
+#endif // BfsdlParser_Objects_Tree

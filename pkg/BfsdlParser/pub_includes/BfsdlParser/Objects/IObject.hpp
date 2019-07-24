@@ -41,6 +41,9 @@
 #include <memory>
 #include <string>
 
+// Internal Includes
+#include "Bfdp/Algorithm/HashedString.hpp"
+
 namespace BfsdlParser
 {
 
@@ -52,6 +55,7 @@ namespace BfsdlParser
             enum Id
             {
                 Field,  //!< Field
+                Tree,   //!< Root node that contains other objects
 
                 Count
             };
@@ -70,6 +74,8 @@ namespace BfsdlParser
             virtual ~IObject()
             {
             }
+
+            virtual Bfdp::Algorithm::HashedString const& GetId() const = 0;
 
             virtual std::string const& GetName() const = 0;
 

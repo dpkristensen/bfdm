@@ -55,6 +55,8 @@ namespace BfsdlParser
         public:
             virtual ~ObjectBase();
 
+            BFDP_OVERRIDE( Bfdp::Algorithm::HashedString const& GetId() const );
+
             BFDP_OVERRIDE( std::string const& GetName() const );
 
             BFDP_OVERRIDE( ObjectType::Id GetType() const );
