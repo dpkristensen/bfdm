@@ -60,6 +60,16 @@ namespace Bfdp
         {
         }
 
+        HashedString::HashedString
+            (
+            std::string const& aValue,
+            HashType const aHash
+            )
+            : mString( aValue )
+            , mHash( aHash )
+        {
+        }
+
         HashType const HashedString::GetHash() const
         {
             return mHash;
@@ -75,8 +85,9 @@ namespace Bfdp
             HashedString const& aOther
             ) const
         {
-            return ( mHash < aOther.mHash ) ||
-                ( 0 > std::strcmp( mString.c_str(), aOther.mString.c_str() ) );
+            return ( mHash == aOther.mHash )
+                ? ( 0 > std::strcmp( mString.c_str(), aOther.mString.c_str() ) )
+                : ( mHash < aOther.mHash );
         }
 
         bool HashedString::operator ==

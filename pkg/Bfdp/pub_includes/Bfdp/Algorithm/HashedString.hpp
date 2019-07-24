@@ -67,6 +67,15 @@ namespace Bfdp
                 std::string const& aValue
                 );
 
+            //! Constructor for testing only, do not use
+            //!
+            //! @private
+            HashedString
+                (
+                std::string const& aValue,
+                HashType const aHash
+                );
+
             HashType const GetHash() const;
 
             std::string const& GetStr() const;

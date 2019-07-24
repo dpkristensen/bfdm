@@ -41,6 +41,7 @@ namespace BfsdlTests
 {
 
     using Bfdp::Algorithm::HashedString;
+    using Bfdp::Algorithm::HashType;
 
     class AlgorithmHashedStringTest
         : public ::testing::Test
@@ -80,29 +81,51 @@ namespace BfsdlTests
         ASSERT_STREQ( hs2.GetStr().c_str(), "Baz" );
     }
 
-    TEST_F( AlgorithmHashedStringTest, VerifyStrictWeakOrder )
+    TEST_F( AlgorithmHashedStringTest, VerifyCompare )
     {
-        HashedString hsFoo1 = HashedString( "Foo" );
-        HashedString hsFoo2 = HashedString( "Foo" );
-        HashedString hsBaz = HashedString( "Baz" );
+        static struct TestData
+        {
+            char const* inStr1;
+            HashType inHash1;
+            char const* inStr2;
+            HashType inHash2;
+            bool outEq;
+            bool outLtStrictWeak;
+            bool outGtStrictWeak;
+        } const test[] =
+        {
+            // INPUT 1   INPUT 2   |    OUTPUT
+            // str  hash str  hash |  ==      <      >
+            //                     |        (strict weak)
 
-        // Preconditions for this to be a valid test for the implemented algorithm
-        ASSERT_EQ( hsFoo1.GetHash(), hsFoo2.GetHash() );
-        ASSERT_NE( hsFoo1.GetHash(), hsBaz.GetHash() );
+            // Compare hashes only
+            { "Foo", 1, "Foo", 0,   false,  false,   true },
+            { "Foo", 1, "Foo", 1,    true,  false,  false },
+            { "Foo", 1, "Foo", 2,   false,   true,  false },
 
-        // Since the relationship is canonically undefined, determine what to expect first.
-        bool isFooLessThanBaz = hsFoo1.IsStrictWeakLessThan( hsBaz );
+            // Compare both
+            { "Foo", 1, "Bar", 0,   false,  false,   true },
+            { "Foo", 1, "Bar", 1,   false,  false,   true },
+            { "Foo", 1, "Bar", 2,   false,   true,  false },
 
-        // Compare for same hash
-        ASSERT_EQ( isFooLessThanBaz, hsFoo2.IsStrictWeakLessThan( hsBaz ) );
-        ASSERT_NE( isFooLessThanBaz, hsBaz.IsStrictWeakLessThan( hsFoo2 ) );
+            // Compare strings only
+            { "Foo", 1, "Bar", 1,   false,  false,   true },
+            { "Bar", 1, "Bar", 1,    true,  false,  false },
+            { "Bar", 1, "Foo", 1,   false,   true,  false },
+        };
+        static size_t const numTests = BFDP_COUNT_OF_ARRAY( test );
 
-        // Symmetry
-        ASSERT_NE( isFooLessThanBaz, hsBaz.IsStrictWeakLessThan( hsFoo1 ) );
+        for( size_t i = 0; i < numTests; ++i )
+        {
+            SCOPED_TRACE( ::testing::Message( "i=" ) << i );
 
-        // Reflexivity / Equality
-        ASSERT_FALSE( hsFoo1.IsStrictWeakLessThan( hsFoo2 ) );
-        ASSERT_FALSE( hsFoo2.IsStrictWeakLessThan( hsFoo1 ) );
+            HashedString v1 = HashedString( test[i].inStr1, test[i].inHash1 );
+            HashedString v2 = HashedString( test[i].inStr2, test[i].inHash2 );
+            ASSERT_EQ( test[i].outEq, v1 == v2 );
+            ASSERT_EQ( !test[i].outEq, v1 != v2 );
+            ASSERT_EQ( test[i].outLtStrictWeak, v1.IsStrictWeakLessThan( v2 ) );
+            ASSERT_EQ( test[i].outGtStrictWeak, v2.IsStrictWeakLessThan( v1 ) );
+        }
     }
 
 } // namespace BfsdlTests
