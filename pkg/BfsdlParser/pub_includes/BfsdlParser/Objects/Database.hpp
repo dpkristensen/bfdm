@@ -1,5 +1,5 @@
 /**
-    BFSDL Parser Object Tree Container
+    BFSDL Parser Object Database
 
     Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
@@ -30,11 +30,14 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// Base Includes
-#include "BfsdlParser/Objects/Tree.hpp"
+#ifndef BfsdlParser_Objects_Database
+#define BfsdlParser_Objects_Database
 
 // Internal Includes
+#include "Bfdp/Common.hpp"
 #include "Bfdp/Macros.hpp"
+#include "BfsdlParser/Objects/IObject.hpp"
+#include "BfsdlParser/Objects/Tree.hpp"
 
 namespace BfsdlParser
 {
@@ -42,58 +45,49 @@ namespace BfsdlParser
     namespace Objects
     {
 
-        Tree::~Tree()
+        //! Object Database
+        //!
+        //! Keeps track of objects parsed from a BFSDL stream.
+        class Database BFDP_FINAL
         {
-        }
+        public:
+            //! Opaque handle type to protect the database
+            typedef void* Handle;
 
-        IObject* Tree::Add
-            (
-            IObject::UPtr aNode
-            )
-        {
-            BFDP_RETURNIF_V( aNode == NULL, NULL );
-            BFDP_RETURNIF_V( Find( aNode->GetName() ) != NULL, NULL );
+            static Handle BFDP_CONSTEXPR InvalidHandle = NULL;
 
-            NodeMap::iterator iter = mMap.insert
+            Database();
+
+            ~Database();
+
+            //! Add object
+            //!
+            //! Add aObject to the database as a child of aParent (or the root node if invalid).
+            //!
+            //! If aOutHandle is not NULL, then the output is set on success as follows:
+            //! * If aObject is of type Tree, then aOutHandle is the new handle of the tree.
+            //! * NULL otherwise
+            bool Add
                 (
-                std::make_pair( aNode->GetId(), std::move( aNode ) )
+                IObject::UPtr& aObject,
+                Handle const aParent,
+                Handle* const aOutHandle = NULL
                 );
-            BFDP_RETURNIF_V( iter == mMap.end(), NULL );
 
-            return iter->second.get();
-        }
+            Handle GetRoot();
 
-        IObject* Tree::Find
-            (
-            std::string const& aName
-            )
-        {
-            using Bfdp::Algorithm::HashedString;
+            void Iterate
+                (
+                ObjectCb const aFunc,
+                void* const aArg
+                );
 
-            HashedString hs = HashedString( aName );
-            NodeMap::iterator iter = mMap.find( hs );
-            BFDP_RETURNIF_V( iter == mMap.end(), NULL );
-
-            return iter->second.get();
-        }
-
-        void Tree::Iterate
-            (
-            ObjectCb const aFunc,
-            void* const aArg
-            )
-        {
-            for( NodeMap::iterator iter = mMap.begin(); iter != mMap.end(); ++iter )
-            {
-                aFunc( iter->second.get(), aArg );
-            }
-        }
-
-        Tree::Tree()
-            : ObjectBase( std::string(), ObjectType::Tree )
-        {
-        }
+        private:
+            Tree mRoot;
+        };
 
     } // namespace Objects
 
 } // namespace BfsdlParser
+
+#endif // BfsdlParser_Object_Database

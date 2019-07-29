@@ -1,5 +1,5 @@
 /**
-    BFSDL Parser Object Tree Container
+    BFDP Object Database Tests
 
     Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
@@ -31,69 +31,75 @@
 */
 
 // Base Includes
-#include "BfsdlParser/Objects/Tree.hpp"
+#include "gtest/gtest.h"
+
+// External Includes
+#include <list>
+#include <string>
 
 // Internal Includes
-#include "Bfdp/Macros.hpp"
+#include "BfsdlParser/Objects/Database.hpp"
+#include "BfsdlParser/Objects/Field.hpp"
+#include "BfsdlTests/TestUtil.hpp"
 
-namespace BfsdlParser
+namespace BfsdlTests
 {
 
-    namespace Objects
+    using BfsdlParser::Objects::Database;
+    using BfsdlParser::Objects::Field;
+    using BfsdlParser::Objects::IObject;
+
+    class ObjectDatabaseTest
+        : public ::testing::Test
     {
-
-        Tree::~Tree()
+    public:
+        void SetUp()
         {
+            SetDefaultErrorHandlers();
         }
+    };
 
-        IObject* Tree::Add
+    namespace BfsdlTestsInternal
+    {
+        typedef std::list< std::string > TestItemList;
+
+        void TestCb
             (
-            IObject::UPtr aNode
-            )
-        {
-            BFDP_RETURNIF_V( aNode == NULL, NULL );
-            BFDP_RETURNIF_V( Find( aNode->GetName() ) != NULL, NULL );
-
-            NodeMap::iterator iter = mMap.insert
-                (
-                std::make_pair( aNode->GetId(), std::move( aNode ) )
-                );
-            BFDP_RETURNIF_V( iter == mMap.end(), NULL );
-
-            return iter->second.get();
-        }
-
-        IObject* Tree::Find
-            (
-            std::string const& aName
-            )
-        {
-            using Bfdp::Algorithm::HashedString;
-
-            HashedString hs = HashedString( aName );
-            NodeMap::iterator iter = mMap.find( hs );
-            BFDP_RETURNIF_V( iter == mMap.end(), NULL );
-
-            return iter->second.get();
-        }
-
-        void Tree::Iterate
-            (
-            ObjectCb const aFunc,
+            IObject* const aObject,
             void* const aArg
             )
         {
-            for( NodeMap::iterator iter = mMap.begin(); iter != mMap.end(); ++iter )
-            {
-                aFunc( iter->second.get(), aArg );
-            }
+            TestItemList* list = reinterpret_cast< TestItemList* >( aArg );
+            list->push_back( aObject->GetName() );
         }
+    }
+    using namespace BfsdlTestsInternal;
 
-        Tree::Tree()
-            : ObjectBase( std::string(), ObjectType::Tree )
+    TEST_F( ObjectDatabaseTest, Add )
+    {
+        char const* ExpectedData[] =
         {
-        }
+            "f1",
+            "f2"
+        };
 
-    } // namespace Objects
+        Database db;
+        Database::Handle hOut = Database::InvalidHandle;
 
-} // namespace BfsdlParser
+        IObject::UPtr fp = Field::Create( "f1" );
+        ASSERT_TRUE( db.Add( fp, db.GetRoot(), &hOut ) );
+        ASSERT_EQ( Database::InvalidHandle, hOut );
+        ASSERT_TRUE( fp == NULL );
+
+        fp = Field::Create( "f2" );
+        ASSERT_TRUE( db.Add( fp, db.GetRoot() ) );
+        ASSERT_TRUE( fp == NULL );
+
+        TestItemList out;
+        db.Iterate( TestCb, &out );
+        out.sort();
+
+        ASSERT_TRUE( StrListsMatch( ExpectedData, out ) );
+    }
+
+} // namespace BfsdlTests

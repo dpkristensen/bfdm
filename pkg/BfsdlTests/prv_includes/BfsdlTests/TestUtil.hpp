@@ -35,6 +35,8 @@
 
 // External includes
 #include <gtest/gtest.h>
+#include <list>
+#include <string>
 
 // Internal includes
 #include "Bfdp/Common.hpp"
@@ -43,6 +45,8 @@
 
 namespace BfsdlTests
 {
+
+    typedef std::list< std::string > TestStringList;
 
     ::testing::AssertionResult ArraysMatch
         (
@@ -61,6 +65,23 @@ namespace BfsdlTests
         return ( aPtr == NULL )
             ? aNullValue
             : aPtr;
+    }
+
+    ::testing::AssertionResult StrListsMatch
+        (
+        char const* const* aExpected,
+        TestStringList& aActual,
+        size_t const aCount
+        );
+
+    template< size_t NUM_ELEMENTS >
+    ::testing::AssertionResult StrListsMatch
+        (
+        char const* (&aExpected)[NUM_ELEMENTS],
+        TestStringList& aActual
+        )
+    {
+        return StrListsMatch( aExpected, aActual, NUM_ELEMENTS );
     }
 
     static inline char const* StrOrNull( char const* aString )

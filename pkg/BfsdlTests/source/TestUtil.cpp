@@ -33,6 +33,9 @@
 // Base includes
 #include "BfsdlTests/TestUtil.hpp"
 
+// External Includes
+#include <cstring>
+
 namespace BfsdlTests
 {
 
@@ -100,6 +103,39 @@ namespace BfsdlTests
         ErrorReporter::SetInternalErrorHandler( InternalErrorHandler );
         ErrorReporter::SetMisuseErrorHandler( MisuseErrorHandler );
         ErrorReporter::SetRunTimeErrorHandler( RunTimeErrorHandler );
+    }
+
+    ::testing::AssertionResult StrListsMatch
+        (
+        char const* const* aExpected,
+        TestStringList& aActual,
+        size_t const aCount
+        )
+    {
+        TestStringList::iterator actualIter = aActual.begin();
+        for( size_t i = 0; i < aCount; ++i )
+        {
+            if( actualIter == aActual.end() )
+            {
+                return ::testing::AssertionFailure() << "Missing [" << i << "]: " << aExpected[i];
+            }
+
+            if( 0 != std::strcmp( actualIter->c_str(), aExpected[i] ) )
+            {
+                return ::testing::AssertionFailure() << "Mismatch at [" << i << "]:" << std::endl
+                    << "  Actual:   " << aExpected[i] << std::endl
+                    << "  Expected: " << actualIter->c_str();
+            }
+
+            ++actualIter;
+        }
+
+        if( actualIter != aActual.end() )
+        {
+            return ::testing::AssertionFailure() << "Unexpected: " << actualIter->c_str();
+        }
+
+        return ::testing::AssertionSuccess();
     }
 
 } // namespace BfsdlTests

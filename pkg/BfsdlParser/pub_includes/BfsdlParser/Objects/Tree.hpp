@@ -44,6 +44,7 @@
 #include "Bfdp/Algorithm/Calc.hpp"
 #include "Bfdp/Algorithm/HashedString.hpp"
 #include "Bfdp/Macros.hpp"
+#include "BfsdlParser/Objects/IObject.hpp"
 
 namespace BfsdlParser
 {
@@ -75,6 +76,12 @@ namespace BfsdlParser
             IObject* Find
                 (
                 std::string const& aName
+                );
+
+            void Iterate
+                (
+                ObjectCb const aFunc,
+                void* const aArg
                 );
 
         private:

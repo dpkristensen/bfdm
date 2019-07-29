@@ -43,23 +43,13 @@
 
 // Internal Includes
 #include "Bfdp/Algorithm/HashedString.hpp"
+#include "BfsdlParser/Objects/Common.hpp"
 
 namespace BfsdlParser
 {
 
     namespace Objects
     {
-
-        struct ObjectType
-        {
-            enum Id
-            {
-                Field,  //!< Field
-                Tree,   //!< Root node that contains other objects
-
-                Count
-            };
-        };
 
         //! Abstract interface for an Object Container
         //!

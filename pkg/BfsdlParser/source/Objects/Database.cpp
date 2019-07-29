@@ -1,5 +1,5 @@
 /**
-    BFSDL Parser Object Tree Container
+    BFSDL Parser Database Definition
 
     Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
@@ -30,11 +30,8 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// Base Includes
-#include "BfsdlParser/Objects/Tree.hpp"
-
-// Internal Includes
-#include "Bfdp/Macros.hpp"
+// Base includes
+#include "BfsdlParser/Objects/Database.hpp"
 
 namespace BfsdlParser
 {
@@ -42,56 +39,51 @@ namespace BfsdlParser
     namespace Objects
     {
 
-        Tree::~Tree()
+        Database::Database()
         {
         }
 
-        IObject* Tree::Add
+        Database::~Database()
+        {
+        }
+
+        bool Database::Add
             (
-            IObject::UPtr aNode
+            IObject::UPtr& aObject,
+            Handle const aParent,
+            Handle* const aOutHandle
             )
         {
-            BFDP_RETURNIF_V( aNode == NULL, NULL );
-            BFDP_RETURNIF_V( Find( aNode->GetName() ) != NULL, NULL );
+            Tree* tree = ( aParent == InvalidHandle )
+                ? &mRoot
+                : reinterpret_cast< Tree* >( aParent );
 
-            NodeMap::iterator iter = mMap.insert
-                (
-                std::make_pair( aNode->GetId(), std::move( aNode ) )
-                );
-            BFDP_RETURNIF_V( iter == mMap.end(), NULL );
+            IObject* newNode = tree->Add( std::move( aObject ) );
 
-            return iter->second.get();
+            BFDP_RETURNIF_V( newNode == NULL, false );
+
+            if( aOutHandle != NULL )
+            {
+                *aOutHandle = ( newNode->GetType() == ObjectType::Tree )
+                    ? newNode
+                    : NULL;
+            }
+
+            return true;
         }
 
-        IObject* Tree::Find
-            (
-            std::string const& aName
-            )
+        Database::Handle Database::GetRoot()
         {
-            using Bfdp::Algorithm::HashedString;
-
-            HashedString hs = HashedString( aName );
-            NodeMap::iterator iter = mMap.find( hs );
-            BFDP_RETURNIF_V( iter == mMap.end(), NULL );
-
-            return iter->second.get();
+            return &mRoot;
         }
 
-        void Tree::Iterate
+        void Database::Iterate
             (
             ObjectCb const aFunc,
             void* const aArg
             )
         {
-            for( NodeMap::iterator iter = mMap.begin(); iter != mMap.end(); ++iter )
-            {
-                aFunc( iter->second.get(), aArg );
-            }
-        }
-
-        Tree::Tree()
-            : ObjectBase( std::string(), ObjectType::Tree )
-        {
+            mRoot.Iterate( aFunc, aArg );
         }
 
     } // namespace Objects

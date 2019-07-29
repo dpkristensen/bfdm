@@ -60,6 +60,13 @@
 
 #if( ( __cplusplus >= 201103L ) || \
      ( defined( _MSC_VER ) && ( _MSC_VER >= 1600 ) ) )
+    #define BFDP_CONSTEXPR constexpr
+#else
+    #define BFDP_CONSTEXPR const
+#endif
+
+#if( ( __cplusplus >= 201103L ) || \
+     ( defined( _MSC_VER ) && ( _MSC_VER >= 1600 ) ) )
     #define BFDP_FINAL  final
 #else
     #define BFDP_FINAL

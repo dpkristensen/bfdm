@@ -1,5 +1,5 @@
 /**
-    BFSDL Parser Object Tree Container
+    BFSDL Parser Common Object Declarations
 
     Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
@@ -30,11 +30,19 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef BfsdlParser_Objects_Common
+#define BfsdlParser_Objects_Common
+
 // Base Includes
-#include "BfsdlParser/Objects/Tree.hpp"
+#include "Bfdp/NonAssignable.hpp"
+#include "Bfdp/NonCopyable.hpp"
+
+// External Includes
+#include <memory>
+#include <string>
 
 // Internal Includes
-#include "Bfdp/Macros.hpp"
+#include "Bfdp/Algorithm/HashedString.hpp"
 
 namespace BfsdlParser
 {
@@ -42,58 +50,27 @@ namespace BfsdlParser
     namespace Objects
     {
 
-        Tree::~Tree()
+        class IObject;
+
+        struct ObjectType
         {
-        }
-
-        IObject* Tree::Add
-            (
-            IObject::UPtr aNode
-            )
-        {
-            BFDP_RETURNIF_V( aNode == NULL, NULL );
-            BFDP_RETURNIF_V( Find( aNode->GetName() ) != NULL, NULL );
-
-            NodeMap::iterator iter = mMap.insert
-                (
-                std::make_pair( aNode->GetId(), std::move( aNode ) )
-                );
-            BFDP_RETURNIF_V( iter == mMap.end(), NULL );
-
-            return iter->second.get();
-        }
-
-        IObject* Tree::Find
-            (
-            std::string const& aName
-            )
-        {
-            using Bfdp::Algorithm::HashedString;
-
-            HashedString hs = HashedString( aName );
-            NodeMap::iterator iter = mMap.find( hs );
-            BFDP_RETURNIF_V( iter == mMap.end(), NULL );
-
-            return iter->second.get();
-        }
-
-        void Tree::Iterate
-            (
-            ObjectCb const aFunc,
-            void* const aArg
-            )
-        {
-            for( NodeMap::iterator iter = mMap.begin(); iter != mMap.end(); ++iter )
+            enum Id
             {
-                aFunc( iter->second.get(), aArg );
-            }
-        }
+                Field,  //!< Field
+                Tree,   //!< Root node that contains other objects
 
-        Tree::Tree()
-            : ObjectBase( std::string(), ObjectType::Tree )
-        {
-        }
+                Count
+            };
+        };
+
+        typedef void (*ObjectCb)
+            (
+            IObject* const aObject,
+            void* const aArg
+            );
 
     } // namespace Objects
 
 } // namespace BfsdlParser
+
+#endif // BfsdlParser_Objects_Common
