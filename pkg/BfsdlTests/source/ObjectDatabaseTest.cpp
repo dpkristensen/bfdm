@@ -49,6 +49,7 @@ namespace BfsdlTests
     using BfsdlParser::Objects::Field;
     using BfsdlParser::Objects::FieldPtr;
     using BfsdlParser::Objects::NumericField;
+    using BfsdlParser::Objects::NumericFieldProperties;
     using BfsdlParser::Objects::NumericFieldPtr;
     using BfsdlParser::Objects::IObject;
     using BfsdlParser::Objects::IObjectPtr;
@@ -93,18 +94,18 @@ namespace BfsdlTests
     {
         char const* ExpectedData[] =
         {
-            "f1:???",
-            "f2:???"
+            "f1:u8",
+            "f2:s8.8"
         };
 
         Database db;
         Database::Handle hOut = Database::InvalidHandle;
 
-        IObjectPtr fp = std::make_shared< NumericField >( "f1" );
+        IObjectPtr fp = std::make_shared< NumericField >( "f1", NumericFieldProperties( false, 8, 0 ) );
         ASSERT_TRUE( db.Add( fp, db.GetRoot(), &hOut ) );
         ASSERT_EQ( Database::InvalidHandle, hOut );
 
-        fp = std::make_shared< NumericField >( "f2" );
+        fp = std::make_shared< NumericField >( "f2", NumericFieldProperties( true, 8, 8 ) );
         ASSERT_TRUE( db.Add( fp, db.GetRoot() ) );
 
         TestItemList out;

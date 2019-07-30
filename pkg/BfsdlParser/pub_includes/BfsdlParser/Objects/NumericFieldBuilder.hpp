@@ -1,5 +1,5 @@
 /**
-    BFSDL Parser Numeric Field Declaration
+    BFSDL Parser Numeric Field Builder Declaration
 
     Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
@@ -30,14 +30,16 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef BfsdlParser_Objects_NumericField
-#define BfsdlParser_Objects_NumericField
+#ifndef BfsdlParser_Objects_NumericFieldBuilder
+#define BfsdlParser_Objects_NumericFieldBuilder
 
 // Base Includes
-#include "BfsdlParser/Objects/Field.hpp"
+#include "Bfdp/NonAssignable.hpp"
+#include "Bfdp/NonCopyable.hpp"
 
 // Internal Includes
-#include "BfsdlParser/Objects/Common.hpp"
+#include "Bfdp/Macros.hpp"
+#include "BfsdlParser/Objects/NumericField.hpp"
 
 namespace BfsdlParser
 {
@@ -45,33 +47,64 @@ namespace BfsdlParser
     namespace Objects
     {
 
-        class NumericField;
-
-        typedef std::shared_ptr< NumericField > NumericFieldPtr;
-
-        //! Numeric Field
+        //! Numeric Field Builder
         //!
-        //! Specialization of Field for numeric data types.
-        class NumericField
-            : public Field
+        //! Allows building properties for a NumericField incrementally
+        class NumericFieldBuilder BFDP_FINAL
         {
         public:
-            static NumericFieldPtr StaticCast
+            NumericFieldBuilder();
+
+            NumericFieldPtr GetField
                 (
-                IObjectPtr& aObject
+                std::string const& aName
+                ) const;
+
+            //! Parse the identifier
+            //!
+            //! This will be the text before a space or dot, consisting of numbers and/or letters.
+            //!
+            //! @return true if the identifier appears to be the beginning of a fixed-point
+            //!     numeric type.
+            bool ParseIdentifier
+                (
+                std::string const& aText
                 );
 
-            NumericField
+            //! Parse the suffix
+            //!
+            //! This will be the text after a period, consisting of numbers and/or letters.
+            //!
+            //! @return true if the text is the fractional part of a fixed-point numeric type.
+            bool ParseSuffix
                 (
-                std::string const& aName,
-                NumericFieldProperties const& aProps
+                std::string const& aText
                 );
 
-            virtual ~NumericField();
+            void Reset();
 
-            BFDP_OVERRIDE( std::string const& GetTypeStr() const );
+            void SetBitBase
+                (
+                BitBase::Type const aBitBase
+                );
 
         private:
+            bool CalcBits
+                (
+                char const* aText,
+                size_t& aOut
+                );
+
+            bool ParseSign
+                (
+                char const aChar
+                );
+
+            BitBase::Type mBitBase;
+
+            bool mComplete;
+            bool mIdentParsed;
+
             NumericFieldProperties mProps;
         };
 
@@ -79,4 +112,4 @@ namespace BfsdlParser
 
 } // namespace BfsdlParser
 
-#endif // BfsdlParser_Objects_NumericField
+#endif // BfsdlParser_Objects_NumericFieldBuilder

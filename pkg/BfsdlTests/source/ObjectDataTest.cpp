@@ -46,6 +46,7 @@ namespace BfsdlTests
     using BfsdlParser::Objects::IObject;
     using BfsdlParser::Objects::IObjectPtr;
     using BfsdlParser::Objects::NumericField;
+    using BfsdlParser::Objects::NumericFieldProperties;
     using BfsdlParser::Objects::NumericFieldPtr;
     using BfsdlParser::Objects::ObjectType;
     using BfsdlParser::Objects::StringField;
@@ -64,7 +65,10 @@ namespace BfsdlTests
 
     TEST_F( ObjectDataTest, NumericField )
     {
-        IObjectPtr op = std::make_shared< NumericField >( "test" );
+        static NumericFieldProperties const sNumericProps1 = { true, 24, 8 };
+        static NumericFieldProperties const sNumericProps2 = { false, 16, 0 };
+
+        IObjectPtr op = std::make_shared< NumericField >( "test", sNumericProps1 );
 
         ASSERT_TRUE( op != NULL );
         ASSERT_EQ( ObjectType::Field, op->GetType() );
@@ -74,14 +78,18 @@ namespace BfsdlTests
         FieldPtr fp = Field::StaticCast( op );
         ASSERT_TRUE( fp != NULL );
         ASSERT_STREQ( "test", fp->GetName().c_str() );
-        ASSERT_STREQ( "???", fp->GetTypeStr().c_str() );
+        ASSERT_STREQ( "s24.8", fp->GetTypeStr().c_str() );
         ASSERT_EQ( FieldType::Numeric, fp->GetFieldType() );
 
         NumericFieldPtr nfp = NumericField::StaticCast( op );
         ASSERT_TRUE( nfp != NULL );
         ASSERT_STREQ( "test", nfp->GetName().c_str() );
-        ASSERT_STREQ( "???", nfp->GetTypeStr().c_str() );
+        ASSERT_STREQ( "s24.8", nfp->GetTypeStr().c_str() );
         ASSERT_EQ( FieldType::Numeric, nfp->GetFieldType() );
+
+        NumericFieldPtr fp2 = std::make_shared< NumericField >( "abc", sNumericProps2 );
+        ASSERT_STREQ( "abc", fp2->GetName().c_str() );
+        ASSERT_STREQ( "u16", fp2->GetTypeStr().c_str() );
     }
 
     TEST_F( ObjectDataTest, StringField )
@@ -108,15 +116,17 @@ namespace BfsdlTests
 
     TEST_F( ObjectDataTest, Tree )
     {
+        static NumericFieldProperties const sNumericProps = { false, 16, 0 };
+
         Tree tree;
         ASSERT_EQ( ObjectType::Tree, tree.GetType() );
         ASSERT_STREQ( "", tree.GetName().c_str() );
 
-        IObjectPtr op = tree.Add( std::make_shared< NumericField >( "One" ) );
+        IObjectPtr op = tree.Add( std::make_shared< NumericField >( "One", sNumericProps ) );
         ASSERT_TRUE( op != NULL );
         ASSERT_STREQ( "One", op->GetName().c_str() );
 
-        op = tree.Add( std::make_shared< NumericField >( "Two" ) );
+        op = tree.Add( std::make_shared< NumericField >( "Two", sNumericProps ) );
         ASSERT_TRUE( op != NULL );
         ASSERT_STREQ( "Two", op->GetName().c_str() );
 

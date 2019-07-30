@@ -1,5 +1,5 @@
 /**
-    BFSDL Parser Numeric Field Declaration
+    BFSDL Parser Common Object Definitions
 
     Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
@@ -30,13 +30,7 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef BfsdlParser_Objects_NumericField
-#define BfsdlParser_Objects_NumericField
-
 // Base Includes
-#include "BfsdlParser/Objects/Field.hpp"
-
-// Internal Includes
 #include "BfsdlParser/Objects/Common.hpp"
 
 namespace BfsdlParser
@@ -45,38 +39,18 @@ namespace BfsdlParser
     namespace Objects
     {
 
-        class NumericField;
-
-        typedef std::shared_ptr< NumericField > NumericFieldPtr;
-
-        //! Numeric Field
-        //!
-        //! Specialization of Field for numeric data types.
-        class NumericField
-            : public Field
+        NumericFieldProperties::NumericFieldProperties
+            (
+            bool aSigned,
+            size_t aIntegralBits,
+            size_t aFractionalBits
+            )
+            : mSigned( aSigned )
+            , mIntegralBits( aIntegralBits )
+            , mFractionalBits( aFractionalBits )
         {
-        public:
-            static NumericFieldPtr StaticCast
-                (
-                IObjectPtr& aObject
-                );
-
-            NumericField
-                (
-                std::string const& aName,
-                NumericFieldProperties const& aProps
-                );
-
-            virtual ~NumericField();
-
-            BFDP_OVERRIDE( std::string const& GetTypeStr() const );
-
-        private:
-            NumericFieldProperties mProps;
-        };
+        }
 
     } // namespace Objects
 
 } // namespace BfsdlParser
-
-#endif // BfsdlParser_Objects_NumericField

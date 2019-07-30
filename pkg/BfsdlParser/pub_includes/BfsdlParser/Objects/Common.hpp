@@ -33,11 +33,27 @@
 #ifndef BfsdlParser_Objects_Common
 #define BfsdlParser_Objects_Common
 
+// Internal Includes
+#include "Bfdp/Macros.hpp"
+
 namespace BfsdlParser
 {
 
     namespace Objects
     {
+
+        static size_t BFDP_CONSTEXPR MAX_NUMERIC_FIELD_BITS = 64U;
+
+        struct BitBase
+        {
+            enum Type
+            {
+                Byte = 8,
+                Bit = 1,
+
+                Default = Byte
+            };
+        };
 
         struct ObjectType
         {
@@ -60,6 +76,20 @@ namespace BfsdlParser
                 Count,
                 Unknown = Count
             };
+        };
+
+        struct NumericFieldProperties
+        {
+            NumericFieldProperties
+                (
+                bool aSigned,
+                size_t aIntegralBits,
+                size_t aFractionalBits
+                );
+
+            bool mSigned;
+            size_t mIntegralBits;
+            size_t mFractionalBits;
         };
 
     } // namespace Objects

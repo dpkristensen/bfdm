@@ -59,14 +59,33 @@ namespace BfsdlParser
 
         NumericField::NumericField
             (
-            std::string const& aName
+            std::string const& aName,
+            NumericFieldProperties const& aProps
             )
             : Field( aName, FieldType::Numeric )
+            , mProps( aProps )
         {
         }
 
         NumericField::~NumericField()
         {
+        }
+
+        std::string const& NumericField::GetTypeStr() const
+        {
+            if( mTypeStr.empty() )
+            {
+                std::stringstream ss;
+                ss << ( mProps.mSigned ? "s" : "u" );
+                ss << mProps.mIntegralBits;
+                if( mProps.mFractionalBits != 0 )
+                {
+                    ss << "." << mProps.mFractionalBits;
+                }
+                mTypeStr = ss.str();
+            }
+
+            return mTypeStr;
         }
 
     } // namespace Objects
