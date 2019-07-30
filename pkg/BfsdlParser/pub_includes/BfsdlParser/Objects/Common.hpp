@@ -33,24 +33,11 @@
 #ifndef BfsdlParser_Objects_Common
 #define BfsdlParser_Objects_Common
 
-// Base Includes
-#include "Bfdp/NonAssignable.hpp"
-#include "Bfdp/NonCopyable.hpp"
-
-// External Includes
-#include <memory>
-#include <string>
-
-// Internal Includes
-#include "Bfdp/Algorithm/HashedString.hpp"
-
 namespace BfsdlParser
 {
 
     namespace Objects
     {
-
-        class IObject;
 
         struct ObjectType
         {
@@ -62,12 +49,6 @@ namespace BfsdlParser
                 Count
             };
         };
-
-        typedef void (*ObjectCb)
-            (
-            IObject* const aObject,
-            void* const aArg
-            );
 
     } // namespace Objects
 

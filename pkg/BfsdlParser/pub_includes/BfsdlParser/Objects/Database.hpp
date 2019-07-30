@@ -69,7 +69,7 @@ namespace BfsdlParser
             //! * NULL otherwise
             bool Add
                 (
-                IObject::UPtr& aObject,
+                IObjectPtr& aObject,
                 Handle const aParent,
                 Handle* const aOutHandle = NULL
                 );

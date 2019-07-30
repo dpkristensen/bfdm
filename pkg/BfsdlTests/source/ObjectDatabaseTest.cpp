@@ -47,7 +47,9 @@ namespace BfsdlTests
 
     using BfsdlParser::Objects::Database;
     using BfsdlParser::Objects::Field;
+    using BfsdlParser::Objects::FieldPtr;
     using BfsdlParser::Objects::IObject;
+    using BfsdlParser::Objects::IObjectPtr;
 
     class ObjectDatabaseTest
         : public ::testing::Test
@@ -65,7 +67,7 @@ namespace BfsdlTests
 
         void TestCb
             (
-            IObject* const aObject,
+            IObjectPtr& aObject,
             void* const aArg
             )
         {
@@ -86,14 +88,12 @@ namespace BfsdlTests
         Database db;
         Database::Handle hOut = Database::InvalidHandle;
 
-        IObject::UPtr fp = Field::Create( "f1" );
+        IObjectPtr fp = std::make_shared< Field >( "f1" );
         ASSERT_TRUE( db.Add( fp, db.GetRoot(), &hOut ) );
         ASSERT_EQ( Database::InvalidHandle, hOut );
-        ASSERT_TRUE( fp == NULL );
 
-        fp = Field::Create( "f2" );
+        fp = std::make_shared< Field >( "f2" );
         ASSERT_TRUE( db.Add( fp, db.GetRoot() ) );
-        ASSERT_TRUE( fp == NULL );
 
         TestItemList out;
         db.Iterate( TestCb, &out );

@@ -51,6 +51,10 @@ namespace BfsdlParser
     namespace Objects
     {
 
+        class IObject;
+
+        typedef std::shared_ptr< IObject > IObjectPtr;
+
         //! Abstract interface for an Object Container
         //!
         //! Defines the interface for interactions with a Container that stores other objects.
@@ -59,8 +63,6 @@ namespace BfsdlParser
             , public Bfdp::NonCopyable
         {
         public:
-            typedef std::unique_ptr< IObject > UPtr;
-
             virtual ~IObject()
             {
             }
@@ -71,6 +73,12 @@ namespace BfsdlParser
 
             virtual ObjectType::Id GetType() const = 0;
         };
+
+        typedef void (*ObjectCb)
+            (
+            IObjectPtr& aObject,
+            void* const aArg
+            );
 
     } // namespace Objects
 

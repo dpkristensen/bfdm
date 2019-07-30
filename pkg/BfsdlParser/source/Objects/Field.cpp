@@ -39,21 +39,13 @@ namespace BfsdlParser
     namespace Objects
     {
 
-        /* static */ Field::UFieldPtr Field::Create
+        /* static */ FieldPtr Field::StaticCast
             (
-            std::string const& aName
-            )
-        {
-            return UFieldPtr( new Field( aName ) );
-        }
-
-        /* static */ Field* Field::Get
-            (
-            Field::UPtr& aObject
+            IObjectPtr& aObject
             )
         {
             return ( ObjectType::Field == aObject->GetType() )
-                ? static_cast< Field* >( aObject.get() )
+                ? std::static_pointer_cast< Field >( aObject )
                 : NULL;
         }
 

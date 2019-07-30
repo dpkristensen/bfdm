@@ -48,6 +48,10 @@ namespace BfsdlParser
     namespace Objects
     {
 
+        class Field;
+
+        typedef std::shared_ptr< Field > FieldPtr;
+
         //! Field
         //!
         //! Encapsulates information a field describing how to read an element of data from the
@@ -56,26 +60,18 @@ namespace BfsdlParser
             : public ObjectBase
         {
         public:
-            typedef std::unique_ptr< Field > UFieldPtr;
-
-            static UFieldPtr Create
+            Field
                 (
                 std::string const& aName
                 );
 
             //! @return Pointer to Field object if aObject is a Field, otherwise NULL.
-            static Field* Get
+            static FieldPtr StaticCast
                 (
-                UPtr& aObject
+                IObjectPtr& aObject
                 );
 
             virtual ~Field();
-
-        private:
-            Field
-                (
-                std::string const& aName
-                );
 
             // TODO: Add field properties here
         };

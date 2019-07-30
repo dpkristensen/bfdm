@@ -49,7 +49,7 @@ namespace BfsdlParser
 
         bool Database::Add
             (
-            IObject::UPtr& aObject,
+            IObjectPtr& aObject,
             Handle const aParent,
             Handle* const aOutHandle
             )
@@ -58,14 +58,14 @@ namespace BfsdlParser
                 ? &mRoot
                 : reinterpret_cast< Tree* >( aParent );
 
-            IObject* newNode = tree->Add( std::move( aObject ) );
+            IObjectPtr newNode = tree->Add( aObject );
 
             BFDP_RETURNIF_V( newNode == NULL, false );
 
             if( aOutHandle != NULL )
             {
                 *aOutHandle = ( newNode->GetType() == ObjectType::Tree )
-                    ? newNode
+                    ? newNode.get()
                     : NULL;
             }
 

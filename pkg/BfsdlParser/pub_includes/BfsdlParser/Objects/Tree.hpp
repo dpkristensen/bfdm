@@ -63,17 +63,15 @@ namespace BfsdlParser
 
             virtual ~Tree();
 
-            //! @note On success, lifecycle management of the node is transferred to the tree;
-            //!     the original pointer will be NULL.
-            //! @return Raw pointer to the object if added to the tree, NULL otherwise.
-            IObject* Add
+            //! @return Pointer to the object if added to the tree, NULL otherwise.
+            IObjectPtr Add
                 (
-                IObject::UPtr aNode
+                IObjectPtr aNode
                 );
 
             //! @note This does NOT do a recursive lookup.
             //! @return Pointer to the object if found in the tree, NULL otherwise.
-            IObject* Find
+            IObjectPtr Find
                 (
                 std::string const& aName
                 );
@@ -88,7 +86,7 @@ namespace BfsdlParser
             typedef std::multimap
                 <
                 Bfdp::Algorithm::HashedString,
-                IObject::UPtr,
+                IObjectPtr,
                 Bfdp::Algorithm::HashedString::StrictWeakCompare
                 > NodeMap;
 

@@ -46,9 +46,9 @@ namespace BfsdlParser
         {
         }
 
-        IObject* Tree::Add
+        IObjectPtr Tree::Add
             (
-            IObject::UPtr aNode
+            IObjectPtr aNode
             )
         {
             BFDP_RETURNIF_V( aNode == NULL, NULL );
@@ -56,14 +56,14 @@ namespace BfsdlParser
 
             NodeMap::iterator iter = mMap.insert
                 (
-                std::make_pair( aNode->GetId(), std::move( aNode ) )
+                std::make_pair( aNode->GetId(), aNode )
                 );
             BFDP_RETURNIF_V( iter == mMap.end(), NULL );
 
-            return iter->second.get();
+            return iter->second;
         }
 
-        IObject* Tree::Find
+        IObjectPtr Tree::Find
             (
             std::string const& aName
             )
@@ -74,7 +74,7 @@ namespace BfsdlParser
             NodeMap::iterator iter = mMap.find( hs );
             BFDP_RETURNIF_V( iter == mMap.end(), NULL );
 
-            return iter->second.get();
+            return iter->second;
         }
 
         void Tree::Iterate
@@ -85,7 +85,7 @@ namespace BfsdlParser
         {
             for( NodeMap::iterator iter = mMap.begin(); iter != mMap.end(); ++iter )
             {
-                aFunc( iter->second.get(), aArg );
+                aFunc( iter->second, aArg );
             }
         }
 
