@@ -38,9 +38,11 @@
 
 // External Includes
 #include <memory>
+#include <string>
 
 // Internal Includes
 #include "Bfdp/Macros.hpp"
+#include "BfsdlParser/Objects/Common.hpp"
 
 namespace BfsdlParser
 {
@@ -60,11 +62,6 @@ namespace BfsdlParser
             : public ObjectBase
         {
         public:
-            Field
-                (
-                std::string const& aName
-                );
-
             //! @return Pointer to Field object if aObject is a Field, otherwise NULL.
             static FieldPtr StaticCast
                 (
@@ -73,7 +70,21 @@ namespace BfsdlParser
 
             virtual ~Field();
 
-            // TODO: Add field properties here
+            virtual FieldType::Id GetFieldType() const;
+
+            //! @return A description of the type (non-canonical)
+            virtual std::string const& GetTypeStr() const;
+
+        protected:
+            Field
+                (
+                std::string const& aName,
+                FieldType::Id const aType
+                );
+
+            FieldType::Id mFieldType;
+
+            mutable std::string mTypeStr;
         };
 
     } // namespace Objects

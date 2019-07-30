@@ -1,5 +1,5 @@
 /**
-    BFSDL Parser Field Definition
+    BFSDL Parser String Field Declaration
 
     Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
@@ -30,8 +30,14 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// Base includes
+#ifndef BfsdlParser_Objects_StringField
+#define BfsdlParser_Objects_StringField
+
+// Base Includes
 #include "BfsdlParser/Objects/Field.hpp"
+
+// Internal Includes
+#include "Bfdp/Unicode/Common.hpp"
 
 namespace BfsdlParser
 {
@@ -39,44 +45,33 @@ namespace BfsdlParser
     namespace Objects
     {
 
-        /* static */ FieldPtr Field::StaticCast
-            (
-            IObjectPtr& aObject
-            )
-        {
-            return ( ObjectType::Field == aObject->GetType() )
-                ? std::static_pointer_cast< Field >( aObject )
-                : NULL;
-        }
+        class StringField;
 
-        Field::~Field()
-        {
-        }
+        typedef std::shared_ptr< StringField > StringFieldPtr;
 
-        /* virtual */ FieldType::Id Field::GetFieldType() const
+        //! String Field
+        //!
+        //! Specialization of Field for String data types.
+        class StringField
+            : public Field
         {
-            return mFieldType;
-        }
+        public:
+            static StringFieldPtr StaticCast
+                (
+                IObjectPtr& aObject
+                );
 
-        /* virtual */ std::string const& Field::GetTypeStr() const
-        {
-            if( mTypeStr.empty() )
-            {
-                mTypeStr = "???";
-            }
-            return mTypeStr;
-        }
+            StringField
+                (
+                std::string const& aName
+                );
 
-        Field::Field
-            (
-            std::string const& aName,
-            FieldType::Id const aType
-            )
-            : ObjectBase( aName, ObjectType::Field )
-            , mFieldType( aType )
-        {
-        }
+            virtual ~StringField();
+
+        };
 
     } // namespace Objects
 
 } // namespace BfsdlParser
+
+#endif // BfsdlParser_Objects_StringField

@@ -32,7 +32,8 @@
 
 #include "gtest/gtest.h"
 
-#include "BfsdlParser/Objects/Field.hpp"
+#include "BfsdlParser/Objects/NumericField.hpp"
+#include "BfsdlParser/Objects/StringField.hpp"
 #include "BfsdlParser/Objects/Tree.hpp"
 #include "BfsdlTests/TestUtil.hpp"
 
@@ -41,9 +42,14 @@ namespace BfsdlTests
 
     using BfsdlParser::Objects::Field;
     using BfsdlParser::Objects::FieldPtr;
+    using BfsdlParser::Objects::FieldType;
     using BfsdlParser::Objects::IObject;
     using BfsdlParser::Objects::IObjectPtr;
+    using BfsdlParser::Objects::NumericField;
+    using BfsdlParser::Objects::NumericFieldPtr;
     using BfsdlParser::Objects::ObjectType;
+    using BfsdlParser::Objects::StringField;
+    using BfsdlParser::Objects::StringFieldPtr;
     using BfsdlParser::Objects::Tree;
 
     class ObjectDataTest
@@ -56,19 +62,48 @@ namespace BfsdlTests
         }
     };
 
-    TEST_F( ObjectDataTest, Field )
+    TEST_F( ObjectDataTest, NumericField )
     {
-        FieldPtr fp = std::make_shared< Field >( "test" );
+        IObjectPtr op = std::make_shared< NumericField >( "test" );
 
+        ASSERT_TRUE( op != NULL );
+        ASSERT_EQ( ObjectType::Field, op->GetType() );
+        ASSERT_STREQ( "test", op->GetName().c_str() );
+        ASSERT_STREQ( "test", op->GetId().GetStr().c_str() );
+
+        FieldPtr fp = Field::StaticCast( op );
         ASSERT_TRUE( fp != NULL );
-        ASSERT_EQ( ObjectType::Field, fp->GetType() );
         ASSERT_STREQ( "test", fp->GetName().c_str() );
-        ASSERT_STREQ( "test", fp->GetId().GetStr().c_str() );
+        ASSERT_STREQ( "???", fp->GetTypeStr().c_str() );
+        ASSERT_EQ( FieldType::Numeric, fp->GetFieldType() );
 
-        IObjectPtr op = fp;
-        FieldPtr f = Field::StaticCast( op );
-        ASSERT_TRUE( f != NULL );
-        ASSERT_STREQ( "test", f->GetName().c_str() );
+        NumericFieldPtr nfp = NumericField::StaticCast( op );
+        ASSERT_TRUE( nfp != NULL );
+        ASSERT_STREQ( "test", nfp->GetName().c_str() );
+        ASSERT_STREQ( "???", nfp->GetTypeStr().c_str() );
+        ASSERT_EQ( FieldType::Numeric, nfp->GetFieldType() );
+    }
+
+    TEST_F( ObjectDataTest, StringField )
+    {
+        IObjectPtr op = std::make_shared< StringField >( "test" );
+
+        ASSERT_TRUE( op != NULL );
+        ASSERT_EQ( ObjectType::Field, op->GetType() );
+        ASSERT_STREQ( "test", op->GetName().c_str() );
+        ASSERT_STREQ( "test", op->GetId().GetStr().c_str() );
+
+        FieldPtr fp = Field::StaticCast( op );
+        ASSERT_TRUE( fp != NULL );
+        ASSERT_STREQ( "test", fp->GetName().c_str() );
+        ASSERT_STREQ( "???", fp->GetTypeStr().c_str() );
+        ASSERT_EQ( FieldType::String, fp->GetFieldType() );
+
+        StringFieldPtr sfp = StringField::StaticCast( op );
+        ASSERT_TRUE( sfp != NULL );
+        ASSERT_STREQ( "test", sfp->GetName().c_str() );
+        ASSERT_STREQ( "???", sfp->GetTypeStr().c_str() );
+        ASSERT_EQ( FieldType::String, sfp->GetFieldType() );
     }
 
     TEST_F( ObjectDataTest, Tree )
@@ -77,11 +112,11 @@ namespace BfsdlTests
         ASSERT_EQ( ObjectType::Tree, tree.GetType() );
         ASSERT_STREQ( "", tree.GetName().c_str() );
 
-        IObjectPtr op = tree.Add( std::make_shared< Field >( "One" ) );
+        IObjectPtr op = tree.Add( std::make_shared< NumericField >( "One" ) );
         ASSERT_TRUE( op != NULL );
         ASSERT_STREQ( "One", op->GetName().c_str() );
 
-        op = tree.Add( std::make_shared< Field >( "Two" ) );
+        op = tree.Add( std::make_shared< NumericField >( "Two" ) );
         ASSERT_TRUE( op != NULL );
         ASSERT_STREQ( "Two", op->GetName().c_str() );
 

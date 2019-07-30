@@ -1,5 +1,5 @@
 /**
-    BFSDL Parser Field Definition
+    BFSDL Parser Numeric Field Definition
 
     Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
@@ -30,8 +30,11 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// Base includes
-#include "BfsdlParser/Objects/Field.hpp"
+// Base Includes
+#include "BfsdlParser/Objects/NumericField.hpp"
+
+// External Includes
+#include <sstream>
 
 namespace BfsdlParser
 {
@@ -39,41 +42,30 @@ namespace BfsdlParser
     namespace Objects
     {
 
-        /* static */ FieldPtr Field::StaticCast
+        /* static */ NumericFieldPtr NumericField::StaticCast
             (
             IObjectPtr& aObject
             )
         {
-            return ( ObjectType::Field == aObject->GetType() )
-                ? std::static_pointer_cast< Field >( aObject )
-                : NULL;
-        }
-
-        Field::~Field()
-        {
-        }
-
-        /* virtual */ FieldType::Id Field::GetFieldType() const
-        {
-            return mFieldType;
-        }
-
-        /* virtual */ std::string const& Field::GetTypeStr() const
-        {
-            if( mTypeStr.empty() )
+            FieldPtr basePtr = Field::StaticCast( aObject );
+            if( ( basePtr == NULL ) ||
+                ( basePtr->GetFieldType() != FieldType::Numeric ) )
             {
-                mTypeStr = "???";
+                return NULL;
             }
-            return mTypeStr;
+
+            return std::static_pointer_cast< NumericField >( aObject );
         }
 
-        Field::Field
+        NumericField::NumericField
             (
-            std::string const& aName,
-            FieldType::Id const aType
+            std::string const& aName
             )
-            : ObjectBase( aName, ObjectType::Field )
-            , mFieldType( aType )
+            : Field( aName, FieldType::Numeric )
+        {
+        }
+
+        NumericField::~NumericField()
         {
         }
 

@@ -39,7 +39,7 @@
 
 // Internal Includes
 #include "BfsdlParser/Objects/Database.hpp"
-#include "BfsdlParser/Objects/Field.hpp"
+#include "BfsdlParser/Objects/NumericField.hpp"
 #include "BfsdlTests/TestUtil.hpp"
 
 namespace BfsdlTests
@@ -48,6 +48,8 @@ namespace BfsdlTests
     using BfsdlParser::Objects::Database;
     using BfsdlParser::Objects::Field;
     using BfsdlParser::Objects::FieldPtr;
+    using BfsdlParser::Objects::NumericField;
+    using BfsdlParser::Objects::NumericFieldPtr;
     using BfsdlParser::Objects::IObject;
     using BfsdlParser::Objects::IObjectPtr;
 
@@ -72,7 +74,17 @@ namespace BfsdlTests
             )
         {
             TestItemList* list = reinterpret_cast< TestItemList* >( aArg );
-            list->push_back( aObject->GetName() );
+            FieldPtr fp = Field::StaticCast( aObject );
+            if( fp != NULL )
+            {
+                std::stringstream ss;
+                ss << fp->GetName() << ":" << fp->GetTypeStr();
+                list->push_back( ss.str() );
+            }
+            else
+            {
+                list->push_back( aObject->GetName() );
+            }
         }
     }
     using namespace BfsdlTestsInternal;
@@ -81,18 +93,18 @@ namespace BfsdlTests
     {
         char const* ExpectedData[] =
         {
-            "f1",
-            "f2"
+            "f1:???",
+            "f2:???"
         };
 
         Database db;
         Database::Handle hOut = Database::InvalidHandle;
 
-        IObjectPtr fp = std::make_shared< Field >( "f1" );
+        IObjectPtr fp = std::make_shared< NumericField >( "f1" );
         ASSERT_TRUE( db.Add( fp, db.GetRoot(), &hOut ) );
         ASSERT_EQ( Database::InvalidHandle, hOut );
 
-        fp = std::make_shared< Field >( "f2" );
+        fp = std::make_shared< NumericField >( "f2" );
         ASSERT_TRUE( db.Add( fp, db.GetRoot() ) );
 
         TestItemList out;

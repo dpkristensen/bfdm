@@ -1,5 +1,5 @@
 /**
-    BFSDL Parser Field Definition
+    BFSDL Parser Numeric Field Declaration
 
     Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
@@ -30,7 +30,10 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// Base includes
+#ifndef BfsdlParser_Objects_NumericField
+#define BfsdlParser_Objects_NumericField
+
+// Base Includes
 #include "BfsdlParser/Objects/Field.hpp"
 
 namespace BfsdlParser
@@ -39,44 +42,33 @@ namespace BfsdlParser
     namespace Objects
     {
 
-        /* static */ FieldPtr Field::StaticCast
-            (
-            IObjectPtr& aObject
-            )
-        {
-            return ( ObjectType::Field == aObject->GetType() )
-                ? std::static_pointer_cast< Field >( aObject )
-                : NULL;
-        }
+        class NumericField;
 
-        Field::~Field()
-        {
-        }
+        typedef std::shared_ptr< NumericField > NumericFieldPtr;
 
-        /* virtual */ FieldType::Id Field::GetFieldType() const
+        //! Numeric Field
+        //!
+        //! Specialization of Field for numeric data types.
+        class NumericField
+            : public Field
         {
-            return mFieldType;
-        }
+        public:
+            static NumericFieldPtr StaticCast
+                (
+                IObjectPtr& aObject
+                );
 
-        /* virtual */ std::string const& Field::GetTypeStr() const
-        {
-            if( mTypeStr.empty() )
-            {
-                mTypeStr = "???";
-            }
-            return mTypeStr;
-        }
+            NumericField
+                (
+                std::string const& aName
+                );
 
-        Field::Field
-            (
-            std::string const& aName,
-            FieldType::Id const aType
-            )
-            : ObjectBase( aName, ObjectType::Field )
-            , mFieldType( aType )
-        {
-        }
+            virtual ~NumericField();
+
+        };
 
     } // namespace Objects
 
 } // namespace BfsdlParser
+
+#endif // BfsdlParser_Objects_NumericField

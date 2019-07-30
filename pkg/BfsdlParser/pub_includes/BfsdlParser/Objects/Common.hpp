@@ -50,6 +50,18 @@ namespace BfsdlParser
             };
         };
 
+        struct FieldType
+        {
+            enum Id
+            {
+                Numeric,
+                String,
+
+                Count,
+                Unknown = Count
+            };
+        };
+
     } // namespace Objects
 
 } // namespace BfsdlParser
