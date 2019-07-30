@@ -123,8 +123,8 @@ namespace BfsdlTests
             if( 0 != std::strcmp( actualIter->c_str(), aExpected[i] ) )
             {
                 return ::testing::AssertionFailure() << "Mismatch at [" << i << "]:" << std::endl
-                    << "  Actual:   " << aExpected[i] << std::endl
-                    << "  Expected: " << actualIter->c_str();
+                    << "  Actual:   " << actualIter->c_str() << std::endl
+                    << "  Expected: " << aExpected[i];
             }
 
             ++actualIter;
