@@ -5,6 +5,10 @@
             "path": "./pkg/Bfdp"
         },
         {
+            "name": "BfdpApp",
+            "path": "pkg/BfdpApp"
+        },
+        {
             "name": "BfsdlParser",
             "path": "pkg/BfsdlParser"
         },
@@ -29,6 +33,7 @@
         "C_Cpp.default.includePath": [
             "pkg/Bfdp/prv_includes",
             "pkg/Bfdp/pub_includes",
+            "pkg/BfdpApp/prv_includes",
             "pkg/BfsdlParser/prv_includes",
             "pkg/BfsdlParser/pub_includes",
             "pkg/BfsdlTests/prv_includes",

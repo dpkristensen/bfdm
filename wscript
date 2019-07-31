@@ -349,6 +349,21 @@ def add_taskgens( bld ):
         )
 
     bld.GLOBITOOL(
+        target="bfdp",
+        project="proj/BfdpApp.gproj",
+        use="Common",
+        tgt_params=dict(
+            warning_levels="max warnings-as-errors",
+            features="cxx warning-level"
+            ),
+        lnk_params=dict(
+            warning_levels="max warnings-as-errors",
+            features="cxx cxxprogram warning-level",
+            subsystem = "CONSOLE"
+            )
+        )
+
+    bld.GLOBITOOL(
         target="BfsdlTests",
         project="proj/BfsdlTests.gproj",
         use="Common GoogleTest",
