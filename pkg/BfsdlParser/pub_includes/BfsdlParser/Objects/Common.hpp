@@ -44,6 +44,19 @@ namespace BfsdlParser
 
         static size_t BFDP_CONSTEXPR MAX_NUMERIC_FIELD_BITS = 64U;
 
+        struct AttributeParseResult
+        {
+            enum Type
+            {
+                Success,
+                Unsupported,
+                InvalidArgument,
+                Redefinition,
+
+                Unknown
+            };
+        };
+
         struct BitBase
         {
             enum Type
