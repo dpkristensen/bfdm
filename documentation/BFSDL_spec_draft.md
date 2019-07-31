@@ -589,7 +589,7 @@ Numeric bit formats are capable of storing real numeric values using a fixed-poi
 
 * `<fixed-point-type>` specifies whether the type is unsigned or signed
 * The sum of `<format-width>` and `<fractional-width>` specify the total number of elements the format occupies, according to the BitBase setting in the Header:
-  * All parsers must support combinations with a total total number of storage bits up to and including 64 bits at a minimum.
+  * All parsers must support combinations with a total number of storage bits up to and including 64 bits at a minimum.
   * For formats whose BitBase=`Byte`, the number of storage bits is 8 times the value specified
 * The default value for `<fractional-width>` is `0`
 
