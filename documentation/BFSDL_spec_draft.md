@@ -849,7 +849,6 @@ The following configuration settings may be specified in Header Scope to identif
 
 * IEEE754Version - Takes a Numeric Literal value specifying the minimum supported revision of the IEEE 754 Specification.
     * Default value = `#1985#`
-        * NOTE: IEEE754Version's value has no storage type
     * Supported values:
         * `#1985#`
         * `#2008#`
