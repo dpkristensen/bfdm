@@ -84,7 +84,8 @@
             "xtree": "cpp",
             "functional": "cpp",
             "iterator": "cpp",
-            "xfunctional": "cpp"
+            "xfunctional": "cpp",
+            "memory": "cpp"
         },
         "C_Cpp.intelliSenseEngineFallback": "Disabled"
     }
