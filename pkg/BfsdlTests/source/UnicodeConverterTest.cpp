@@ -99,7 +99,7 @@ namespace BfsdlTests
 
             std::string coding = sTestData[i].text;
             ASSERT_EQ( sTestData[i].valid, Bfdp::Unicode::IsValidCoding( coding ) );
-            Bfdp::Unicode::IConverterPtr ptr = Bfdp::Unicode::GetCodec( coding );
+            Bfdp::Unicode::IConverterPtr ptr = Bfdp::Unicode::GetCodec( Bfdp::Unicode::GetCodingId( coding ) );
             ASSERT_EQ( sTestData[i].valid, ( ptr != NULL ) );
         }
     }

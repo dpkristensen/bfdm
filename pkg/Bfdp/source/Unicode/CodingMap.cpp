@@ -120,23 +120,34 @@ namespace Bfdp
 
         // PUBLIC API
 
+        IConverterPtr GetCodec
+            (
+            CodingId const aCodingId
+            )
+        {
+            if( InvalidCodingId == aCodingId )
+            {
+                return NULL;
+            }
+
+            FactoryFn factory = reinterpret_cast< FactoryFn >( aCodingId );
+            return factory();
+        }
+
+        CodingId GetCodingId
+            (
+            std::string const& aCoding
+            )
+        {
+            return FindFactory( aCoding );
+        }
+
         bool IsValidCoding
             (
             std::string const& aCoding
             )
         {
             return NULL != FindFactory( aCoding );
-        }
-
-        IConverterPtr GetCodec
-            (
-            std::string const& aCoding
-            )
-        {
-            FactoryFn factory = FindFactory( aCoding );
-            BFDP_RETURNIF_V( factory == NULL, NULL );
-
-            return factory();
         }
 
         // HELPER FUNCTIONS

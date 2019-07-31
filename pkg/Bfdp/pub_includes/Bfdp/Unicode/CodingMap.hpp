@@ -37,6 +37,7 @@
 #include <string>
 
 // Internal Includes
+#include "Bfdp/Macros.hpp"
 #include "Bfdp/Unicode/IConverter.hpp"
 
 namespace Bfdp
@@ -44,6 +45,13 @@ namespace Bfdp
 
     namespace Unicode
     {
+
+        //! Unique ID for supported codecs
+        //!
+        //! @see GetCodingId()
+        typedef void* CodingId;
+
+        static CodingId BFDP_CONSTEXPR InvalidCodingId = NULL;
 
         struct CodingFamily
         {
@@ -65,7 +73,15 @@ namespace Bfdp
             std::string const& aCoding
             );
 
+        //! @return A codec instantiated from a CodingId, or NULL on failure.
         IConverterPtr GetCodec
+            (
+            CodingId const aCodingId
+            );
+
+        //! @return A memory-efficient identifier for a supported codec,
+        //!     or InvalidCodingId if not supported.
+        CodingId GetCodingId
             (
             std::string const& aCoding
             );
