@@ -38,6 +38,7 @@
 #include "Bfdp/Macros.hpp"
 #include "Bfdp/String.hpp"
 #include "Bfdp/Unicode/AsciiConverter.hpp"
+#include "Bfdp/Unicode/CodingMap.hpp"
 #include "Bfdp/Unicode/Ms1252Converter.hpp"
 #include "Bfdp/Unicode/Utf8Converter.hpp"
 #include "BfsdlTests/MockErrorHandler.hpp"
@@ -67,6 +68,40 @@ namespace BfsdlTests
         ASSERT_EQ( 1U, ascii.GetMaxBytes() );
         ASSERT_EQ( 1U, ms1252.GetMaxBytes() );
         ASSERT_EQ( 6U, utf8.GetMaxBytes() );
+    }
+
+    TEST_F( UnicodeConverterTest, CodingMap )
+    {
+        static struct TestData
+        {
+            char const* text;
+            bool valid;
+        } const sTestData[] =
+        {
+            { "ASCII",       true },
+            { "ASC",        false },
+            { "Ascii",      false },
+            { "MS-1252",     true },
+            { "MS",         false },
+            { "MS-1253",    false },
+            { "MS1252",     false },
+            { "ms-1252",    false },
+            { "HP-7J",      false },
+            { "IBM-1",      false },
+            { "IEC-62106",  false },
+            { "ISO-8859-1", false },
+        };
+        static size_t BFDP_CONSTEXPR sNumTests = BFDP_COUNT_OF_ARRAY( sTestData );
+
+        for( size_t i = 0; i < sNumTests; ++i )
+        {
+            SCOPED_TRACE( ::testing::Message( "coding=" ) << sTestData[i].text );
+
+            std::string coding = sTestData[i].text;
+            ASSERT_EQ( sTestData[i].valid, Bfdp::Unicode::IsValidCoding( coding ) );
+            Bfdp::Unicode::IConverterPtr ptr = Bfdp::Unicode::GetCodec( coding );
+            ASSERT_EQ( sTestData[i].valid, ( ptr != NULL ) );
+        }
     }
 
     TEST_F( UnicodeConverterTest, ASCII )

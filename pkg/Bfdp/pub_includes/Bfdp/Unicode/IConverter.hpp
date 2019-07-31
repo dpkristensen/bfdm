@@ -1,7 +1,7 @@
 /**
     BFDP Unicode Converter Interface
 
-    Copyright 2016-2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,9 @@
 
 #ifndef Bfdp_Unicode_IConverter
 #define Bfdp_Unicode_IConverter
+
+// External includes
+#include <memory>
 
 // Internal includes
 #include "Bfdp/Common.hpp"
@@ -87,11 +90,12 @@ namespace Bfdp
             //! @return the maximum number of bytes required to convert all possible symbols
             virtual size_t GetMaxBytes() const = 0;
 
-        protected:
             virtual ~IConverter()
             {
             }
         };
+
+        typedef std::shared_ptr< IConverter > IConverterPtr;
 
     } // namespace Unicode
 
