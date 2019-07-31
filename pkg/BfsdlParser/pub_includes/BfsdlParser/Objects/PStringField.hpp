@@ -1,5 +1,5 @@
 /**
-    BFSDL Parser String Field Definition
+    BFSDL Parser Prefixed-Length String Field Declaration
 
     Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
@@ -30,11 +30,14 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef BfsdlParser_Objects_PStringField
+#define BfsdlParser_Objects_PStringField
+
 // Base Includes
 #include "BfsdlParser/Objects/StringField.hpp"
 
-// External Includes
-#include <sstream>
+// Internal Includes
+#include "Bfdp/Unicode/Common.hpp"
 
 namespace BfsdlParser
 {
@@ -42,62 +45,31 @@ namespace BfsdlParser
     namespace Objects
     {
 
-        /* static */ StringFieldPtr StringField::StaticCast
-            (
-            IObjectPtr& aObject
-            )
+        //! Prefixed-Length String Field Class
+        //!
+        //! String field specialization for strings whose length appears before the data.
+        class PStringField
+            : public StringField
         {
-            FieldPtr basePtr = Field::StaticCast( aObject );
-            if( ( basePtr == NULL ) ||
-                ( basePtr->GetFieldType() != FieldType::String ) )
-            {
-                return NULL;
-            }
+        public:
+            PStringField
+                (
+                std::string const& aName,
+                Bfdp::Unicode::CodePoint const aTermChar,
+                bool const aAllowUnterminated,
+                size_t const aLengthBits
+                );
 
-            return std::static_pointer_cast< StringField >( aObject );
-        }
+            virtual ~PStringField();
 
-        StringField::StringField
-            (
-            std::string const& aName,
-            Bfdp::Unicode::CodePoint const aTermChar,
-            bool const aAllowUnterminated
-            )
-            : Field( aName, FieldType::String )
-            , mAllowUnterminated( aAllowUnterminated )
-            , mTermChar( aTermChar )
-        {
-        }
+        private:
+            BFDP_OVERRIDE( std::string GetConcreteTypeStr() const );
 
-        StringField::~StringField()
-        {
-        }
-
-        /* virtual */ std::string StringField::GetConcreteTypeStr() const
-        {
-            return "b";
-        }
-
-        std::string const& StringField::GetTypeStr() const
-        {
-            if( mTypeStr.empty() )
-            {
-                std::stringstream ss;
-                ss << "string:" << GetConcreteTypeStr();
-                if( mTermChar != Bfdp::Unicode::InvalidCodePoint )
-                {
-                    ss << ":t" << mTermChar;
-                }
-                if( mAllowUnterminated )
-                {
-                    ss << ":tu";
-                }
-                mTypeStr = ss.str();
-            }
-
-            return mTypeStr;
-        }
+            size_t const mLengthBits;
+        };
 
     } // namespace Objects
 
 } // namespace BfsdlParser
+
+#endif // BfsdlParser_Objects_PStringField

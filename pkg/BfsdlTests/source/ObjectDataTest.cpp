@@ -32,7 +32,9 @@
 
 #include "gtest/gtest.h"
 
+#include "BfsdlParser/Objects/FStringField.hpp"
 #include "BfsdlParser/Objects/NumericField.hpp"
+#include "BfsdlParser/Objects/PStringField.hpp"
 #include "BfsdlParser/Objects/StringField.hpp"
 #include "BfsdlParser/Objects/Tree.hpp"
 #include "BfsdlTests/TestUtil.hpp"
@@ -43,12 +45,14 @@ namespace BfsdlTests
     using BfsdlParser::Objects::Field;
     using BfsdlParser::Objects::FieldPtr;
     using BfsdlParser::Objects::FieldType;
+    using BfsdlParser::Objects::FStringField;
     using BfsdlParser::Objects::IObject;
     using BfsdlParser::Objects::IObjectPtr;
     using BfsdlParser::Objects::NumericField;
     using BfsdlParser::Objects::NumericFieldProperties;
     using BfsdlParser::Objects::NumericFieldPtr;
     using BfsdlParser::Objects::ObjectType;
+    using BfsdlParser::Objects::PStringField;
     using BfsdlParser::Objects::StringField;
     using BfsdlParser::Objects::StringFieldPtr;
     using BfsdlParser::Objects::Tree;
@@ -62,6 +66,28 @@ namespace BfsdlTests
             SetDefaultErrorHandlers();
         }
     };
+
+    TEST_F( ObjectDataTest, FStringField )
+    {
+        IObjectPtr op = std::make_shared< FStringField >( "test", 0U, false, 30U );
+
+        ASSERT_TRUE( op != NULL );
+        ASSERT_EQ( ObjectType::Field, op->GetType() );
+        ASSERT_STREQ( "test", op->GetName().c_str() );
+        ASSERT_STREQ( "test", op->GetId().GetStr().c_str() );
+
+        FieldPtr fp = Field::StaticCast( op );
+        ASSERT_TRUE( fp != NULL );
+        ASSERT_STREQ( "test", fp->GetName().c_str() );
+        ASSERT_STREQ( "string:f30:t0", fp->GetTypeStr().c_str() );
+        ASSERT_EQ( FieldType::String, fp->GetFieldType() );
+
+        StringFieldPtr sfp = StringField::StaticCast( op );
+        ASSERT_TRUE( sfp != NULL );
+        ASSERT_STREQ( "test", sfp->GetName().c_str() );
+        ASSERT_STREQ( "string:f30:t0", sfp->GetTypeStr().c_str() );
+        ASSERT_EQ( FieldType::String, sfp->GetFieldType() );
+    }
 
     TEST_F( ObjectDataTest, NumericField )
     {
@@ -92,9 +118,9 @@ namespace BfsdlTests
         ASSERT_STREQ( "u16", fp2->GetTypeStr().c_str() );
     }
 
-    TEST_F( ObjectDataTest, StringField )
+    TEST_F( ObjectDataTest, PStringField )
     {
-        IObjectPtr op = std::make_shared< StringField >( "test" );
+        IObjectPtr op = std::make_shared< PStringField >( "test", 0U, true, 8U );
 
         ASSERT_TRUE( op != NULL );
         ASSERT_EQ( ObjectType::Field, op->GetType() );
@@ -104,13 +130,35 @@ namespace BfsdlTests
         FieldPtr fp = Field::StaticCast( op );
         ASSERT_TRUE( fp != NULL );
         ASSERT_STREQ( "test", fp->GetName().c_str() );
-        ASSERT_STREQ( "???", fp->GetTypeStr().c_str() );
+        ASSERT_STREQ( "string:p8:t0:tu", fp->GetTypeStr().c_str() );
         ASSERT_EQ( FieldType::String, fp->GetFieldType() );
 
         StringFieldPtr sfp = StringField::StaticCast( op );
         ASSERT_TRUE( sfp != NULL );
         ASSERT_STREQ( "test", sfp->GetName().c_str() );
-        ASSERT_STREQ( "???", sfp->GetTypeStr().c_str() );
+        ASSERT_STREQ( "string:p8:t0:tu", sfp->GetTypeStr().c_str() );
+        ASSERT_EQ( FieldType::String, sfp->GetFieldType() );
+    }
+
+    TEST_F( ObjectDataTest, StringField )
+    {
+        IObjectPtr op = std::make_shared< StringField >( "test", 0U, false );
+
+        ASSERT_TRUE( op != NULL );
+        ASSERT_EQ( ObjectType::Field, op->GetType() );
+        ASSERT_STREQ( "test", op->GetName().c_str() );
+        ASSERT_STREQ( "test", op->GetId().GetStr().c_str() );
+
+        FieldPtr fp = Field::StaticCast( op );
+        ASSERT_TRUE( fp != NULL );
+        ASSERT_STREQ( "test", fp->GetName().c_str() );
+        ASSERT_STREQ( "string:b:t0", fp->GetTypeStr().c_str() );
+        ASSERT_EQ( FieldType::String, fp->GetFieldType() );
+
+        StringFieldPtr sfp = StringField::StaticCast( op );
+        ASSERT_TRUE( sfp != NULL );
+        ASSERT_STREQ( "test", sfp->GetName().c_str() );
+        ASSERT_STREQ( "string:b:t0", sfp->GetTypeStr().c_str() );
         ASSERT_EQ( FieldType::String, sfp->GetFieldType() );
     }
 

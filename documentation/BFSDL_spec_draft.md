@@ -544,7 +544,7 @@ Each configuration value must be specified exactly once per header section, unle
         * `"UTF\u0038"`
         * `"UTF\x38"` (`\x38` is interpreted as an ASCII code point, since the new default value has not taken effect)
         * `"UTF\x38".code("MS-1252")` ("code" is an attribute, see appendix D)
-* DefaultStringPad - Takes a Numeric Literal value specifying the code to use for padding when converting a String Literal into a defined bit format.
+* DefaultStringTerm - Takes a Numeric Literal value specifying the code to use for termination when converting a String Literal into a defined bit format.
     * Default Value = `#0#`
 * CustomExtension - Takes a String Literal value specifying a custom extension which must be supported by the parser to interpret the BFSDL Stream correctly.
     * Default behavior: No custom extensions supported
@@ -646,13 +646,27 @@ NOTE: Because floating point numbers typically require floating point support fr
 
 #### 5.2.3 String Bit Format
 
+Strings are character-oriented vectors whose length may be set dynamically.
+
     string-bit-format := 'string'
 
-This format may be modified by Attributes (see Appendix D).  The following built-in types are defined as shorthand for commonly used types:
+This format may be modified by Attributes (see Appendix D).
 
-    string-bit-format += 'cstring'  # Equivalent to string.term(), for C-style strings
+##### 5.2.3.1 C-Style Strings
 
-    string-bit-format += 'pstring'  # Equivalent to string.plen(), for Pascal-style string
+This style of storing strings was used by the C programming language, where a Null terminator character `(0x0)` appears after the string's contents to signal the end of the data.   
+
+    string-bit-format += 'cstring'
+
+This is shorthand for `string.term(#0#)`, regardless of the `DefaultStringTerm` setting.
+
+##### 5.2.3.2 Pascal-Style Strings
+
+This style of storing strings was used by the Pascal programming language, where a byte appeared prior to the string data to indicate the length of the string.
+
+    `string-bit-format += 'pstring'`
+
+This is shorthand for `string.plen(u8).unterm()`.
 
 #### 5.2.4 Supported Bit Formats
 
@@ -905,13 +919,15 @@ All string attributes may be used in conjunction with each other, except as note
 
 `len(<num-bytes>)` - Specifies a fixed length string format.
 
-`<num-bytes>` is a Numeric Literal specifying the number of bytes; any remaining bytes are filled according to the DefaultStringPad setting or `pad()` attribute.
+`<num-bytes>` is a Numeric Literal specifying the number of bytes (including terminator/padding characters); the string must end with the character specified by the `term()` attribute.  This is always in bytes, regardless of the `BitBase` setting, since strings are inherently byte-oriented.
+
+When used without the `unterm()` attribute, `num-bytes` must be greater than or equal to 2.
 
 #### D.1.3 Terminated Strings
 
 `term([<code-point>])` - Specifies that the string is character-terminated.
 
-`<code-point>` is a Numeric Literal specifying the code point of the terminator character, in the same encoding as the string.  NOTE: Default value = `#0#`
+`<code-point>` is a Numeric Literal specifying the code point of the terminator character, in the same encoding as the string.  NOTE: Default value is specified by the `DefaultStringTerm` Configuration Setting.
 
 The terminator character will be expected to immediately follow the last character in the string data.
 
@@ -923,17 +939,9 @@ When used in conjunction with another attribute that specifies a length determin
 
 #### D.1.5 Prefixed-Length Strings
 
-`plen([<numeric-type>])` - Specifies that the string is encoded such that a number exists prior to the beginning of the string which contains the length of the string.
+`plen([<width>])` - Specifies that the string is encoded such that a number exists prior to the beginning of the string which contains the length of the string.
 
-`<numeric-type>` is an integral bit format type.  NOTE: Default = `u8`
-
-NOTE: This method of storing strings was traditionally used by programming languages such as Pascal.
-
-#### D.1.6 Padding
-
-`pad([<code-point>])` - Specifies padding character
-
-`<code-point>` is a Numeric Literal specifying the code point of the padding character (overrides DefaultStringPad for this instance).
+`<width>` is a Numeric Literal specifying how many bits/bytes (according to the `BitBase` setting) the length value occupies (Default = 1 byte).
 
 #### D.2 Field Attributes
 

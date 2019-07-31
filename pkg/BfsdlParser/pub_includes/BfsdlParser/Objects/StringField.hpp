@@ -63,11 +63,21 @@ namespace BfsdlParser
 
             StringField
                 (
-                std::string const& aName
+                std::string const& aName,
+                Bfdp::Unicode::CodePoint const aTermChar,
+                bool const aAllowUnterminated
                 );
 
             virtual ~StringField();
 
+            BFDP_OVERRIDE( std::string const& GetTypeStr() const );
+
+        protected:
+            virtual std::string GetConcreteTypeStr() const;
+
+            Bfdp::Unicode::CodePoint mTermChar;
+
+            bool mAllowUnterminated;
         };
 
     } // namespace Objects

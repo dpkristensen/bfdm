@@ -1,5 +1,5 @@
 /**
-    BFSDL Parser String Field Definition
+    BFSDL Parser Prefixed-Length String Field Definition
 
     Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
@@ -31,7 +31,7 @@
 */
 
 // Base Includes
-#include "BfsdlParser/Objects/StringField.hpp"
+#include "BfsdlParser/Objects/PStringField.hpp"
 
 // External Includes
 #include <sstream>
@@ -42,60 +42,29 @@ namespace BfsdlParser
     namespace Objects
     {
 
-        /* static */ StringFieldPtr StringField::StaticCast
-            (
-            IObjectPtr& aObject
-            )
-        {
-            FieldPtr basePtr = Field::StaticCast( aObject );
-            if( ( basePtr == NULL ) ||
-                ( basePtr->GetFieldType() != FieldType::String ) )
-            {
-                return NULL;
-            }
+        using Bfdp::Unicode::InvalidCodePoint;
 
-            return std::static_pointer_cast< StringField >( aObject );
-        }
-
-        StringField::StringField
+        PStringField::PStringField
             (
             std::string const& aName,
             Bfdp::Unicode::CodePoint const aTermChar,
-            bool const aAllowUnterminated
+            bool const aAllowUnterminated,
+            size_t const aLengthBits
             )
-            : Field( aName, FieldType::String )
-            , mAllowUnterminated( aAllowUnterminated )
-            , mTermChar( aTermChar )
+            : StringField( aName, aTermChar, aAllowUnterminated )
+            , mLengthBits( aLengthBits )
         {
         }
 
-        StringField::~StringField()
+        PStringField::~PStringField()
         {
         }
 
-        /* virtual */ std::string StringField::GetConcreteTypeStr() const
+        std::string PStringField::GetConcreteTypeStr() const
         {
-            return "b";
-        }
-
-        std::string const& StringField::GetTypeStr() const
-        {
-            if( mTypeStr.empty() )
-            {
-                std::stringstream ss;
-                ss << "string:" << GetConcreteTypeStr();
-                if( mTermChar != Bfdp::Unicode::InvalidCodePoint )
-                {
-                    ss << ":t" << mTermChar;
-                }
-                if( mAllowUnterminated )
-                {
-                    ss << ":tu";
-                }
-                mTypeStr = ss.str();
-            }
-
-            return mTypeStr;
+            std::stringstream ss;
+            ss << "p" << mLengthBits;
+            return ss.str();
         }
 
     } // namespace Objects
