@@ -63,6 +63,8 @@ namespace Bfdp
                 IEC,
                 ISO,
                 MS,
+                UTF8,
+                // TODO: UTF16, UTF32, UTF64
 
                 Count
             };

@@ -44,6 +44,7 @@
 #include "Bfdp/ErrorReporter/Functions.hpp"
 #include "Bfdp/Unicode/AsciiConverter.hpp"
 #include "Bfdp/Unicode/Ms1252Converter.hpp"
+#include "Bfdp/Unicode/Utf8Converter.hpp"
 
 #define BFDP_MODULE "Unicode::CodingMap"
 
@@ -99,6 +100,7 @@ namespace Bfdp
 
         DECLARE_CODING( Ascii );
         DECLARE_CODING( Microsoft );
+        DECLARE_CODING( Utf8 );
 
         static FactoryFn UnsupportedFamily
             (
@@ -115,6 +117,7 @@ namespace Bfdp
             { std::string( "IEC" ), UnsupportedFamily },
             { std::string( "ISO" ), UnsupportedFamily },
             { std::string( "MS" ), MicrosoftFamilyLookup },
+            { std::string( "UTF8" ), Utf8FamilyLookup },
         };
         BFDP_CTIME_ASSERT( BFDP_COUNT_OF_ARRAY( sFamily ) == CodingFamily::Count, "Coding family table mismatch" );
 
@@ -179,6 +182,7 @@ namespace Bfdp
         // CODEC ACCESS FUNCTIONS
 
         DEFINE_SINGLE_CODING( Ascii );
+        DEFINE_SINGLE_CODING( Utf8 );
 
         static FactoryFn MicrosoftFamilyLookup
             (

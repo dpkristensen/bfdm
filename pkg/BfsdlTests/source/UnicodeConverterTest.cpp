@@ -90,6 +90,9 @@ namespace BfsdlTests
             { "IBM-1",      false },
             { "IEC-62106",  false },
             { "ISO-8859-1", false },
+            { "UTF8",        true },
+            { "UTF-8",      false },
+            { "Utf8",       false },
         };
         static size_t BFDP_CONSTEXPR sNumTests = BFDP_COUNT_OF_ARRAY( sTestData );
 
