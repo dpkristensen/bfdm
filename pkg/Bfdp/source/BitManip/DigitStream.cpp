@@ -34,6 +34,7 @@
 #include "Bfdp/BitManip/DigitStream.hpp"
 
 // Internal Includes
+#include "Bfdp/BitManip/Conversion.hpp"
 #include "Bfdp/BitManip/GenericBitStream.hpp"
 #include "Bfdp/Macros.hpp"
 
@@ -45,10 +46,50 @@ namespace Bfdp
     namespace BitManip
     {
 
+        bool Digiterator::IsDone() const
+        {
+            return ( mBitsPerDigit == 0 ) || ( mStream.GetBitsTillEnd() < mBitsPerDigit );
+        }
+
+        unsigned int Digiterator::ReadDigit()
+        {
+            unsigned int out = 0U;
+            Byte* outBuf = reinterpret_cast< Byte* >( &out );
+
+            if( ( mBitsPerDigit == 0 ) ||
+                ( !mStream.ReadBits( outBuf, mBitsPerDigit ) ) )
+            {
+                return 0U;
+            }
+
+            return out;
+        }
+
+        Digiterator::Digiterator
+            (
+            BitBuffer& aBuffer,
+            size_t const aBitsPerDigit
+            )
+            : mBitsPerDigit( aBitsPerDigit )
+            , mStream( aBuffer )
+        {
+            if( BitsToBytes( aBitsPerDigit ) > sizeof( unsigned int ) )
+            {
+                // This should never happen...  But seek to the end of the
+                // stream to avoid stack corruption in case of misuse or bugs.
+                BFDP_INTERNAL_ERROR( "unsigned int too narrow" );
+                mStream.SeekBits( mStream.GetBitsTillEnd() );
+            }
+        }
+
         DigitStream::DigitStream()
             : mRadix( Data::InvalidRadix )
         {
+        }
 
+        Digiterator DigitStream::GetIterator()
+        {
+            return Digiterator( mBuffer, Data::GetRadixBits( mRadix ) );
         }
 
         Data::RadixType DigitStream::GetRadix() const

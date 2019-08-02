@@ -58,6 +58,55 @@ namespace BfsdlTests
         ASSERT_EQ( Data::InvalidRadix, stream.GetRadix() );
         std::string outStr = stream.GetStr();
         ASSERT_STREQ( "", outStr.c_str() );
+
+        // Nothing to iterate over
+        BitManip::Digiterator iter = stream.GetIterator();
+        ASSERT_TRUE( iter.IsDone() );
+        ASSERT_EQ( 0U, iter.ReadDigit() );
+    }
+
+    TEST_F( BitManipDigitStreamTest, IterateBase10 )
+    {
+        BitManip::DigitStream stream;
+
+        ASSERT_TRUE( stream.Set( "109", 10 ) );
+        ASSERT_TRUE( stream.IsDefined() );
+
+        BitManip::Digiterator iter = stream.GetIterator();
+
+        ASSERT_FALSE( iter.IsDone() );
+        ASSERT_EQ( 1U, iter.ReadDigit() );
+
+        ASSERT_FALSE( iter.IsDone() );
+        ASSERT_EQ( 0U, iter.ReadDigit() );
+
+        ASSERT_FALSE( iter.IsDone() );
+        ASSERT_EQ( 9U, iter.ReadDigit() );
+
+        ASSERT_TRUE( iter.IsDone() );
+        ASSERT_EQ( 0U, iter.ReadDigit() ); // Read beyond end of stream is safe
+    }
+
+    TEST_F( BitManipDigitStreamTest, IterateBase2 )
+    {
+        BitManip::DigitStream stream;
+
+        ASSERT_TRUE( stream.Set( "011", 2 ) );
+        ASSERT_TRUE( stream.IsDefined() );
+
+        BitManip::Digiterator iter = stream.GetIterator();
+
+        ASSERT_FALSE( iter.IsDone() );
+        ASSERT_EQ( 0U, iter.ReadDigit() );
+
+        ASSERT_FALSE( iter.IsDone() );
+        ASSERT_EQ( 1U, iter.ReadDigit() );
+
+        ASSERT_FALSE( iter.IsDone() );
+        ASSERT_EQ( 1U, iter.ReadDigit() );
+
+        ASSERT_TRUE( iter.IsDone() );
+        ASSERT_EQ( 0U, iter.ReadDigit() ); // Read beyond end of stream is safe
     }
 
     TEST_F( BitManipDigitStreamTest, SetDigits )

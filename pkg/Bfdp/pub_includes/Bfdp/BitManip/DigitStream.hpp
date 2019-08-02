@@ -38,6 +38,7 @@
 
 // Internal Includes
 #include "Bfdp/BitManip/BitBuffer.hpp"
+#include "Bfdp/BitManip/GenericBitStream.hpp"
 #include "Bfdp/Data/Radix.hpp"
 
 namespace Bfdp
@@ -46,6 +47,29 @@ namespace Bfdp
     namespace BitManip
     {
 
+        class DigitStream;
+
+        //! Digit Stream Iterator
+        class Digiterator BFDP_FINAL
+        {
+        public:
+            bool IsDone() const;
+
+            unsigned int ReadDigit();
+
+        private:
+            friend class DigitStream;
+
+            Digiterator
+                (
+                BitBuffer& aBuffer,
+                size_t const aBitsPerDigit
+                );
+
+            size_t mBitsPerDigit;
+            GenericBitStream mStream;
+        };
+
         //! Digit Stream
         //!
         //! This class encapsulates a bitstream of numeric digits
@@ -53,6 +77,8 @@ namespace Bfdp
         {
         public:
             DigitStream();
+
+            Digiterator GetIterator();
 
             Data::RadixType GetRadix() const;
 
