@@ -42,6 +42,8 @@
 namespace BfsdlTests
 {
 
+    using Bfdp::Unicode::GetCodingId;
+
     using BfsdlParser::Objects::Field;
     using BfsdlParser::Objects::FieldPtr;
     using BfsdlParser::Objects::FieldType;
@@ -69,7 +71,7 @@ namespace BfsdlTests
 
     TEST_F( ObjectDataTest, FStringField )
     {
-        IObjectPtr op = std::make_shared< FStringField >( "test", 0U, false, 30U );
+        IObjectPtr op = std::make_shared< FStringField >( "test", 0U, false, GetCodingId( "UTF8" ), 30U );
 
         ASSERT_TRUE( op != NULL );
         ASSERT_EQ( ObjectType::Field, op->GetType() );
@@ -79,13 +81,13 @@ namespace BfsdlTests
         FieldPtr fp = Field::StaticCast( op );
         ASSERT_TRUE( fp != NULL );
         ASSERT_STREQ( "test", fp->GetName().c_str() );
-        ASSERT_STREQ( "string:f30:t0", fp->GetTypeStr().c_str() );
+        ASSERT_STREQ( "string:f30:t0;utf8", fp->GetTypeStr().c_str() );
         ASSERT_EQ( FieldType::String, fp->GetFieldType() );
 
         StringFieldPtr sfp = StringField::StaticCast( op );
         ASSERT_TRUE( sfp != NULL );
         ASSERT_STREQ( "test", sfp->GetName().c_str() );
-        ASSERT_STREQ( "string:f30:t0", sfp->GetTypeStr().c_str() );
+        ASSERT_STREQ( "string:f30:t0;utf8", sfp->GetTypeStr().c_str() );
         ASSERT_EQ( FieldType::String, sfp->GetFieldType() );
     }
 
@@ -120,7 +122,7 @@ namespace BfsdlTests
 
     TEST_F( ObjectDataTest, PStringField )
     {
-        IObjectPtr op = std::make_shared< PStringField >( "test", 0U, true, 8U );
+        IObjectPtr op = std::make_shared< PStringField >( "test", 0U, true, GetCodingId( "MS-1252" ), 8U );
 
         ASSERT_TRUE( op != NULL );
         ASSERT_EQ( ObjectType::Field, op->GetType() );
@@ -130,19 +132,19 @@ namespace BfsdlTests
         FieldPtr fp = Field::StaticCast( op );
         ASSERT_TRUE( fp != NULL );
         ASSERT_STREQ( "test", fp->GetName().c_str() );
-        ASSERT_STREQ( "string:p8:t0:tu", fp->GetTypeStr().c_str() );
+        ASSERT_STREQ( "string:p8:t0:tu;ms1252", fp->GetTypeStr().c_str() );
         ASSERT_EQ( FieldType::String, fp->GetFieldType() );
 
         StringFieldPtr sfp = StringField::StaticCast( op );
         ASSERT_TRUE( sfp != NULL );
         ASSERT_STREQ( "test", sfp->GetName().c_str() );
-        ASSERT_STREQ( "string:p8:t0:tu", sfp->GetTypeStr().c_str() );
+        ASSERT_STREQ( "string:p8:t0:tu;ms1252", sfp->GetTypeStr().c_str() );
         ASSERT_EQ( FieldType::String, sfp->GetFieldType() );
     }
 
     TEST_F( ObjectDataTest, StringField )
     {
-        IObjectPtr op = std::make_shared< StringField >( "test", 0U, false );
+        IObjectPtr op = std::make_shared< StringField >( "test", 0U, false, GetCodingId( "ASCII" ) );
 
         ASSERT_TRUE( op != NULL );
         ASSERT_EQ( ObjectType::Field, op->GetType() );
@@ -152,13 +154,13 @@ namespace BfsdlTests
         FieldPtr fp = Field::StaticCast( op );
         ASSERT_TRUE( fp != NULL );
         ASSERT_STREQ( "test", fp->GetName().c_str() );
-        ASSERT_STREQ( "string:b:t0", fp->GetTypeStr().c_str() );
+        ASSERT_STREQ( "string:b:t0;ascii", fp->GetTypeStr().c_str() );
         ASSERT_EQ( FieldType::String, fp->GetFieldType() );
 
         StringFieldPtr sfp = StringField::StaticCast( op );
         ASSERT_TRUE( sfp != NULL );
         ASSERT_STREQ( "test", sfp->GetName().c_str() );
-        ASSERT_STREQ( "string:b:t0", sfp->GetTypeStr().c_str() );
+        ASSERT_STREQ( "string:b:t0;ascii", sfp->GetTypeStr().c_str() );
         ASSERT_EQ( FieldType::String, sfp->GetFieldType() );
     }
 

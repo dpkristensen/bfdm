@@ -70,6 +70,9 @@ namespace Bfdp
 
             //! @copydoc IConverter::GetMaxBytes
             BFDP_OVERRIDE( size_t GetMaxBytes() const );
+
+            //! @copydoc IConverter::GetTypeStr
+            BFDP_OVERRIDE( std::string GetTypeStr() const );
         };
 
     } // namespace Unicode

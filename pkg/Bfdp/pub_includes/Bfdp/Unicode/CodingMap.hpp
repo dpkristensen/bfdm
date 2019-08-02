@@ -88,6 +88,12 @@ namespace Bfdp
             std::string const& aCoding
             );
 
+        //! @return A NON-CANONICAL description of CodingId.
+        std::string GetCodingTypeStr
+            (
+            CodingId const aCodingId
+            );
+
     } // namespace Unicode
 
 } // namespace Bfdp

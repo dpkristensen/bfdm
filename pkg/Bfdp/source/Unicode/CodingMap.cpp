@@ -153,6 +153,19 @@ namespace Bfdp
             return NULL != FindFactory( aCoding );
         }
 
+        std::string GetCodingTypeStr
+            (
+            CodingId const aCodingId
+            )
+        {
+            BFDP_RETURNIF_V( aCodingId == InvalidCodingId, "<unknown>" );
+
+            IConverterPtr obj = GetCodec( aCodingId );
+            BFDP_RETURNIF_V( aCodingId == InvalidCodingId, "<error>" );
+
+            return obj->GetTypeStr();
+        }
+
         // HELPER FUNCTIONS
 
         template< class T >

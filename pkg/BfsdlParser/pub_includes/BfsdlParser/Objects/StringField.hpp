@@ -38,6 +38,7 @@
 
 // Internal Includes
 #include "Bfdp/Unicode/Common.hpp"
+#include "Bfdp/Unicode/CodingMap.hpp"
 
 namespace BfsdlParser
 {
@@ -65,7 +66,8 @@ namespace BfsdlParser
                 (
                 std::string const& aName,
                 Bfdp::Unicode::CodePoint const aTermChar,
-                bool const aAllowUnterminated
+                bool const aAllowUnterminated,
+                Bfdp::Unicode::CodingId const aCode
                 );
 
             virtual ~StringField();
@@ -75,9 +77,11 @@ namespace BfsdlParser
         protected:
             virtual std::string GetConcreteTypeStr() const;
 
-            Bfdp::Unicode::CodePoint mTermChar;
+            Bfdp::Unicode::CodePoint const mTermChar;
 
-            bool mAllowUnterminated;
+            bool const mAllowUnterminated;
+
+            Bfdp::Unicode::CodingId const mCode;
         };
 
     } // namespace Objects

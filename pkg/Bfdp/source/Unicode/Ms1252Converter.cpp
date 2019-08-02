@@ -104,7 +104,7 @@ namespace Bfdp
         {
         }
 
-        /* virtual */ size_t Ms1252Converter::ConvertBytes
+        size_t Ms1252Converter::ConvertBytes
             (
             Byte const* const aBytesIn,
             size_t const aByteCount,
@@ -122,7 +122,7 @@ namespace Bfdp
             return Transcode( false, Conv, NumConv, ms1252, aSymbolOut );
         }
 
-        /* virtual */ size_t Ms1252Converter::ConvertSymbol
+        size_t Ms1252Converter::ConvertSymbol
             (
             CodePoint const& aSymbolIn,
             Byte* const aBytesOut,
@@ -147,9 +147,14 @@ namespace Bfdp
             return bytesUsed;
         }
 
-        /* virtual */ size_t Ms1252Converter::GetMaxBytes() const
+        size_t Ms1252Converter::GetMaxBytes() const
         {
             return 1;
+        }
+
+        std::string Ms1252Converter::GetTypeStr() const
+        {
+            return "ms1252";
         }
 
     } // namespace Unicode

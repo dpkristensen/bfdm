@@ -61,11 +61,13 @@ namespace BfsdlParser
             (
             std::string const& aName,
             Bfdp::Unicode::CodePoint const aTermChar,
-            bool const aAllowUnterminated
+            bool const aAllowUnterminated,
+            Bfdp::Unicode::CodingId const aCode
             )
             : Field( aName, FieldType::String )
             , mAllowUnterminated( aAllowUnterminated )
             , mTermChar( aTermChar )
+            , mCode( aCode )
         {
         }
 
@@ -92,6 +94,8 @@ namespace BfsdlParser
                 {
                     ss << ":tu";
                 }
+                // Encoding info should be last
+                ss << ";" << Bfdp::Unicode::GetCodingTypeStr( mCode );
                 mTypeStr = ss.str();
             }
 

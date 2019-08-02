@@ -95,7 +95,7 @@ namespace Bfdp
         {
         }
 
-        /* virtual */ size_t Utf8Converter::ConvertBytes
+        size_t Utf8Converter::ConvertBytes
             (
             Byte const* const aBytesIn,
             size_t const aByteCount,
@@ -156,7 +156,7 @@ namespace Bfdp
             return bytesToRead;
         }
 
-        /* virtual */ size_t Utf8Converter::ConvertSymbol
+        size_t Utf8Converter::ConvertSymbol
             (
             CodePoint const& aSymbolIn,
             Byte* const aBytesOut,
@@ -227,9 +227,14 @@ namespace Bfdp
             return numBytesToConvert;
         }
 
-        /* virtual */ size_t Utf8Converter::GetMaxBytes() const
+        size_t Utf8Converter::GetMaxBytes() const
         {
             return 6;
+        }
+
+        std::string Utf8Converter::GetTypeStr() const
+        {
+            return "utf8";
         }
 
     } // namespace Unicode

@@ -49,9 +49,10 @@ namespace BfsdlParser
             std::string const& aName,
             Bfdp::Unicode::CodePoint const aTermChar,
             bool const aAllowUnterminated,
+            Bfdp::Unicode::CodingId const aCode,
             size_t const aNumBytes
             )
-            : StringField( aName, aTermChar, aAllowUnterminated )
+            : StringField( aName, aTermChar, aAllowUnterminated, aCode )
             , mNumBytes( aNumBytes )
         {
         }

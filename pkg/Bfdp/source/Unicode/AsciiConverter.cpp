@@ -75,7 +75,7 @@ namespace Bfdp
         {
         }
 
-        /* virtual */ size_t AsciiConverter::ConvertBytes
+        size_t AsciiConverter::ConvertBytes
             (
             Byte const* const aBytesIn,
             size_t const aByteCount,
@@ -93,7 +93,7 @@ namespace Bfdp
             return Transcode( false, Conv, NumConv, ascii, aSymbolOut );
         }
 
-        /* virtual */ size_t AsciiConverter::ConvertSymbol
+        size_t AsciiConverter::ConvertSymbol
             (
             CodePoint const& aSymbolIn,
             Byte* const aBytesOut,
@@ -118,9 +118,14 @@ namespace Bfdp
             return bytesUsed;
         }
 
-        /* virtual */ size_t AsciiConverter::GetMaxBytes() const
+        size_t AsciiConverter::GetMaxBytes() const
         {
             return 1;
+        }
+
+        std::string AsciiConverter::GetTypeStr() const
+        {
+            return "ascii";
         }
 
     } // namespace Unicode

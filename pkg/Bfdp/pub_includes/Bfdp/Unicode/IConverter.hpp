@@ -35,6 +35,7 @@
 
 // External includes
 #include <memory>
+#include <string>
 
 // Internal includes
 #include "Bfdp/Common.hpp"
@@ -93,6 +94,9 @@ namespace Bfdp
             virtual ~IConverter()
             {
             }
+
+            //! @return A NON-CANONICAL description of the coding conversion.
+            virtual std::string GetTypeStr() const = 0;
         };
 
         typedef std::shared_ptr< IConverter > IConverterPtr;
