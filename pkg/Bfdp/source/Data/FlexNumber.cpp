@@ -52,7 +52,7 @@ namespace Bfdp
         std::string FlexNumber::Component::GetStr
             (
             bool const aVerbose
-            )
+            ) const
         {
             std::ostringstream out;
 
@@ -78,7 +78,7 @@ namespace Bfdp
         std::string FlexNumber::GetStr
             (
             bool const aVerbose
-            )
+            ) const
         {
             std::ostringstream out;
 

@@ -51,7 +51,7 @@ namespace Bfdp
             return ( mBitsPerDigit == 0 ) || ( mStream.GetBitsTillEnd() < mBitsPerDigit );
         }
 
-        unsigned int Digiterator::ReadDigit()
+        unsigned int Digiterator::ReadDigit() const
         {
             unsigned int out = 0U;
             Byte* outBuf = reinterpret_cast< Byte* >( &out );
@@ -87,9 +87,9 @@ namespace Bfdp
         {
         }
 
-        Digiterator DigitStream::GetIterator()
+        Digiterator DigitStream::GetIterator() const
         {
-            return Digiterator( mBuffer, Data::GetRadixBits( mRadix ) );
+            return Digiterator( const_cast< BitBuffer& >( mBuffer ), Data::GetRadixBits( mRadix ) );
         }
 
         Data::RadixType DigitStream::GetRadix() const
@@ -102,7 +102,7 @@ namespace Bfdp
             return mRadix != Data::InvalidRadix;
         }
 
-        std::string DigitStream::GetStr()
+        std::string DigitStream::GetStr() const
         {
             size_t bitsPerDigit = Data::GetRadixBits( mRadix );
             BFDP_RETURNIF_V( bitsPerDigit == 0, std::string() );
@@ -115,7 +115,7 @@ namespace Bfdp
 
             // Need enough characters for one digit per symbol
             std::string digits( mBuffer.GetDataBits() / bitsPerDigit, '\0' );
-            BitManip::GenericBitStream bs( mBuffer );
+            BitManip::GenericBitStream bs( const_cast< BitBuffer& >( mBuffer ) );
 
             Byte value = 0;
             size_t i = 0;

@@ -82,7 +82,7 @@ namespace Bfdp
                 (
                 Byte* const aOutData,
                 size_t const aNumBits
-                );
+                ) const;
 
             //! Read all the bits of aValue
             //!
@@ -91,7 +91,7 @@ namespace Bfdp
             bool ReadValue
                 (
                 T& aOutValue
-                );
+                ) const;
 
             //! Seek to a given position
             //!
@@ -131,18 +131,18 @@ namespace Bfdp
                 size_t& aInByteCtr,
                 size_t& aInBitCtr,
                 size_t const aNumBits
-                );
+                ) const;
 
             BitBuffer& mBuffer;
-            size_t mCurBit;
-            size_t mCurByte;
+            mutable size_t mCurBit;
+            mutable size_t mCurByte;
         };
 
         template< class T >
         bool GenericBitStream ::ReadValue
             (
             typename T& aValue
-            )
+            ) const
         {
             BFDP_CTIME_ASSERT( std::numeric_limits< typename T >::is_integer, "Unsupported Type" );
             return ReadBits( &aValue, BytesToBits( sizeof( aValue ) ) );

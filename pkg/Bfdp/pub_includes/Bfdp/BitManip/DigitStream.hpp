@@ -55,7 +55,7 @@ namespace Bfdp
         public:
             bool IsDone() const;
 
-            unsigned int ReadDigit();
+            unsigned int ReadDigit() const;
 
         private:
             friend class DigitStream;
@@ -78,13 +78,13 @@ namespace Bfdp
         public:
             DigitStream();
 
-            Digiterator GetIterator();
+            Digiterator GetIterator() const;
 
             Data::RadixType GetRadix() const;
 
             //! @return A string representation of the digits, or an empty
             //!     string on error.
-            std::string GetStr();
+            std::string GetStr() const;
 
             //! @return true if a value has been set
             bool IsDefined() const;

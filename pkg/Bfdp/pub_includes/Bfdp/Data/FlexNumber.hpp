@@ -84,7 +84,7 @@ namespace Bfdp
                 std::string GetStr
                     (
                     bool const aVerbose = false
-                    );
+                    ) const;
 
                 void Reset();
 
@@ -98,7 +98,7 @@ namespace Bfdp
             std::string GetStr
                 (
                 bool const aVerbose = false
-                );
+                ) const;
 
             void Reset();
 

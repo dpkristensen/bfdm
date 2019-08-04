@@ -70,7 +70,7 @@ namespace Bfdp
             (
             Byte* const aOutData,
             size_t const aNumBits
-            )
+            ) const
         {
             size_t outByte = 0;
             size_t outBit = 0;
@@ -138,7 +138,7 @@ namespace Bfdp
             size_t& aInByteCtr,
             size_t& aInBitCtr,
             size_t const aNumBits
-            )
+            ) const
         {
             // Detect overrun in such a way as to avoid overflows
             if( GetBitsTillEnd() < aNumBits )
