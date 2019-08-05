@@ -335,9 +335,10 @@ The resulting number value is the result of the following *mathematical* express
     ( <integral-component>.<fractional-component> ) * ( b ^ <exponential-component> )
 
 where:
+
 * Digits from `<integral-component>`, `<fractional-component>`, and `<exponential-component>` are interpreted according to `<radix-marker>`
 * `b` is the exponential power base defined by an associated floating-point bit format.
-  * NOTE: This value is undefined for a Numeric Literal until a specific floating-point format is applied.
+* NOTE: This value is undefined for a Numeric Literal until a specific floating-point format is applied.
 
 #### 3.1.4 Exceptions for Support of Fractional Values
 
