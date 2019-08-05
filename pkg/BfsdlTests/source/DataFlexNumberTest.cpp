@@ -61,27 +61,28 @@ namespace BfsdlTests
             Sign::Value sign;
             char const* integral;
             char const* fractional;
-            bool defined;
+            bool isDefined;
+            bool isIntegral;
             char const* str;
         } const testData[] =
         {
             // Variations of sign
-            { Sign::Unspecified, NULL, NULL, false, "?0" },
-            { Sign::Positive, NULL, NULL, false, "+0" },
-            { Sign::Negative, NULL, NULL, false, "-0" },
+            { Sign::Unspecified, NULL, NULL, false, false, "?0" },
+            { Sign::Positive, NULL, NULL, false, false, "+0" },
+            { Sign::Negative, NULL, NULL, false, false, "-0" },
 
             // Variations of integral values
-            { Sign::Unspecified, "123", NULL, false, "?123" },
-            { Sign::Positive, "123", NULL, true, "+123" },
+            { Sign::Unspecified, "123", NULL, false, false, "?123" },
+            { Sign::Positive, "123", NULL, true, true, "+123" },
 
             // Variations of fractional values
-            { Sign::Unspecified, NULL, "456", false, "?0.456" },
-            { Sign::Negative, NULL, "456", true, "-0.456" },
+            { Sign::Unspecified, NULL, "456", false, false, "?0.456" },
+            { Sign::Negative, NULL, "456", true, false, "-0.456" },
 
             // Variations of combined values
-            { Sign::Unspecified, "123", "456", false, "?123.456" },
-            { Sign::Positive, "123", "456", true, "+123.456" },
-            { Sign::Negative, "123", "456", true, "-123.456" }
+            { Sign::Unspecified, "123", "456", false, false, "?123.456" },
+            { Sign::Positive, "123", "456", true, false, "+123.456" },
+            { Sign::Negative, "123", "456", true, false, "-123.456" }
         };
         static size_t const testCount = BFDP_COUNT_OF_ARRAY( testData );
 
@@ -105,116 +106,140 @@ namespace BfsdlTests
             {
                 ASSERT_TRUE( c.fractional.Set( testData[i].fractional, 10 ) );
             }
-            ASSERT_EQ( testData[i].defined, c.IsDefined() );
+            ASSERT_EQ( testData[i].isDefined, c.IsDefined() );
+            ASSERT_EQ( testData[i].isIntegral, c.IsIntegral() );
             ASSERT_STREQ( testData[i].str, c.GetStr( true ).c_str() );
-        }
 
+        }
     }
 
     TEST_F( DataFlexNumberTest, DefaultState )
     {
         FlexNumber defaultNumber;
         ASSERT_FALSE( defaultNumber.IsDefined() );
+        ASSERT_FALSE( defaultNumber.HasSignificand() );
+        ASSERT_FALSE( defaultNumber.HasExponent() );
+        ASSERT_FALSE( defaultNumber.IsIntegral() );
+        ASSERT_FALSE( defaultNumber.significand.IsDefined() );
+        ASSERT_FALSE( defaultNumber.significand.sign.IsSpecified() );
+        ASSERT_FALSE( defaultNumber.significand.integral.IsDefined() );
+        ASSERT_FALSE( defaultNumber.significand.fractional.IsDefined() );
+        ASSERT_FALSE( defaultNumber.exponent.IsDefined() );
+        ASSERT_FALSE( defaultNumber.exponent.sign.IsSpecified() );
+        ASSERT_FALSE( defaultNumber.exponent.integral.IsDefined() );
+        ASSERT_FALSE( defaultNumber.exponent.fractional.IsDefined() );
         ASSERT_STREQ( "", defaultNumber.GetStr().c_str() );
         ASSERT_STREQ( "", defaultNumber.GetStr( true ).c_str() );
     }
 
     TEST_F( DataFlexNumberTest, Set )
     {
+        static struct TestDataType
+        {
+            struct TestDataComponentType
+            {
+                Sign::Value sign;
+                char const* integral;
+                char const* fractional;
+                bool isDefined;
+                bool isIntegral;
+
+                void Verify
+                    (
+                    FlexNumber::Component& aComponent
+                    ) const
+                {
+                    aComponent.sign = sign;
+                    if( integral )
+                    {
+                        ASSERT_TRUE( aComponent.integral.Set( integral, 16 ) );
+                    }
+                    if( fractional )
+                    {
+                        ASSERT_TRUE( aComponent.fractional.Set( fractional, 16 ) );
+                    }
+                    ASSERT_EQ( isDefined, aComponent.IsDefined() );
+                    ASSERT_EQ( isIntegral, aComponent.IsIntegral() );
+                }
+            };
+            TestDataComponentType sig;
+            TestDataComponentType base;
+            TestDataComponentType exp;
+            bool hasExponent;
+            bool hasSignificand;
+            bool isDefined;
+            bool isIntegral;
+            char const* resultStr;
+        } const testData[] =
+        {
+            { // Case 0: sign
+                // Sign              int    frac  isDef? isInt?
+                { Sign::Positive,    NULL,  NULL, false, false }, // integral
+                { Sign::Unspecified, NULL,  NULL, false, false }, // base
+                { Sign::Unspecified, NULL,  NULL, false, false }, // fractional
+                // hasE? hasS?  isDef? isInt?  string
+                false,   false, false, false,  ""
+            },
+            { // Case 1: sign + integral
+                // Sign              int   frac   isDef? isInt?
+                { Sign::Positive,    "12", NULL,  true,  true }, // integral
+                { Sign::Unspecified, NULL, NULL, false, false }, // base
+                { Sign::Unspecified, NULL, NULL, false, false }, // fractional
+                // hasE? hasS?  isDef? isInt?  string
+                false,   true,  true,  true,  "+12"
+            },
+            { // Case 2: sign + fractional
+                // Sign              int    frac  isDef? isInt?
+                { Sign::Positive,    NULL,  "ab",  true, false }, // integral
+                { Sign::Unspecified, NULL,  NULL, false, false }, // base
+                { Sign::Unspecified, NULL,  NULL, false, false }, // fractional
+                // hasE? hasS?  isDef? isInt?  string
+                false,   true,  true, false,  "+0.ab"
+            },
+            { // Case 3: sign + integral + fractional
+                // Sign              int    frac  isDef? isInt?
+                { Sign::Negative,    "12",  "34",  true, false }, // integral
+                { Sign::Unspecified, NULL,  NULL, false, false }, // base
+                { Sign::Unspecified, NULL,  NULL, false, false }, // fractional
+                // hasE? hasS?  isDef? isInt?  string
+                false,   true,  true, false,  "-12.34"
+            },
+            { // Case 4: all component elements
+                // Sign              int    frac  isDef? isInt?
+                { Sign::Positive,    "12",  "34",  true, false }, // integral
+                { Sign::Positive,    "56",  "78",  true, false }, // base
+                { Sign::Negative,    "90",  "ab",  true, false }, // fractional
+                // hasE? hasS?  isDef? isInt?  string
+                true,    true,  true, false,  "+12.34 x +56.78 ^ -90.ab"
+            },
+            { // Case 5: int part only
+                // Sign              int    frac  isDef? isInt?
+                { Sign::Positive,    "12",  NULL,  true,  true }, // integral
+                { Sign::Positive,    "56",  NULL,  true,  true }, // base
+                { Sign::Negative,    "90",  NULL,  true,  true }, // fractional
+                // hasE? hasS?  isDef? isInt?  string
+                true,    true,  true, false,  "+12 x +56 ^ -90"
+            },
+        };
+        static size_t const testCount = BFDP_COUNT_OF_ARRAY( testData );
+
         FlexNumber number;
 
-        // Significand
+        for( size_t i = 0; i < testCount; ++i )
+        {
+            SCOPED_TRACE( ::testing::Message( "i=" ) << i );
 
-        number.significand.sign = Data::Sign::Positive;
-        ASSERT_FALSE( number.IsDefined() );
-        ASSERT_FALSE( number.significand.IsDefined() );
-        ASSERT_FALSE( number.significand.integral.IsDefined() );
-        ASSERT_FALSE( number.significand.fractional.IsDefined() );
-        ASSERT_STREQ( "", number.GetStr( true ).c_str() );
+            number.Reset();  // Reset between iterations
 
-        ASSERT_TRUE( number.significand.integral.Set( "135", 16 ) );
-        ASSERT_TRUE( number.IsDefined() );
-        ASSERT_TRUE( number.significand.IsDefined() );
-        ASSERT_TRUE( number.significand.integral.IsDefined() );
-        ASSERT_FALSE( number.significand.fractional.IsDefined() );
-        ASSERT_STREQ( "+135", number.GetStr( true ).c_str() );
-
-        number.significand.integral.Reset();
-        ASSERT_FALSE( number.IsDefined() );
-        ASSERT_FALSE( number.significand.IsDefined() );
-        ASSERT_FALSE( number.significand.integral.IsDefined() );
-        ASSERT_FALSE( number.significand.fractional.IsDefined() );
-        ASSERT_STREQ( "", number.GetStr( true ).c_str() );
-
-        ASSERT_TRUE( number.significand.fractional.Set( "def", 16 ) );
-        ASSERT_TRUE( number.IsDefined() );
-        ASSERT_TRUE( number.significand.IsDefined() );
-        ASSERT_FALSE( number.significand.integral.IsDefined() );
-        ASSERT_TRUE( number.significand.fractional.IsDefined() );
-        ASSERT_STREQ( "+0.def", number.GetStr( true ).c_str() );
-
-        ASSERT_TRUE( number.significand.integral.Set( "abc", 16 ) );
-        ASSERT_TRUE( number.IsDefined() );
-        ASSERT_TRUE( number.significand.IsDefined() );
-        ASSERT_TRUE( number.significand.integral.IsDefined() );
-        ASSERT_TRUE( number.significand.fractional.IsDefined() );
-        ASSERT_STREQ( "+abc.def", number.GetStr( true ).c_str() );
-
-        // Base
-
-        ASSERT_TRUE( number.base.fractional.Set( "456", 16 ) );
-        ASSERT_TRUE( number.IsDefined() );
-        ASSERT_FALSE( number.base.IsDefined() );
-        ASSERT_FALSE( number.base.integral.IsDefined() );
-        ASSERT_TRUE( number.base.fractional.IsDefined() );
-        ASSERT_STREQ( "+abc.def", number.GetStr( true ).c_str() );
-
-        ASSERT_TRUE( number.base.integral.Set( "123", 16 ) );
-        ASSERT_TRUE( number.IsDefined() );
-        ASSERT_FALSE( number.base.IsDefined() );
-        ASSERT_TRUE( number.base.integral.IsDefined() );
-        ASSERT_TRUE( number.base.fractional.IsDefined() );
-        ASSERT_STREQ( "+abc.def", number.GetStr( true ).c_str() );
-
-        number.base.sign = Data::Sign::Positive;
-        ASSERT_TRUE( number.IsDefined() );
-        ASSERT_TRUE( number.base.IsDefined() );
-        ASSERT_TRUE( number.base.integral.IsDefined() );
-        ASSERT_TRUE( number.base.fractional.IsDefined() );
-        ASSERT_STREQ( "+abc.def", number.GetStr( true ).c_str() );
-
-        // Exponent
-
-        number.exponent.sign = Data::Sign::Negative;
-        ASSERT_TRUE( number.IsDefined() );
-        ASSERT_FALSE( number.exponent.IsDefined() );
-        ASSERT_FALSE( number.exponent.integral.IsDefined() );
-        ASSERT_FALSE( number.exponent.fractional.IsDefined() );
-        ASSERT_STREQ( "+abc.def", number.GetStr( true ).c_str() );
-
-        ASSERT_TRUE( number.exponent.integral.Set( "78", 16 ) );
-        ASSERT_TRUE( number.IsDefined() );
-        ASSERT_TRUE( number.exponent.IsDefined() );
-        ASSERT_TRUE( number.exponent.integral.IsDefined() );
-        ASSERT_FALSE( number.exponent.fractional.IsDefined() );
-        ASSERT_STREQ( "+abc.def x +123.456 ^ -78", number.GetStr( true ).c_str() );
-
-        ASSERT_TRUE( number.exponent.fractional.Set( "90", 16 ) );
-        ASSERT_TRUE( number.IsDefined() );
-        ASSERT_TRUE( number.exponent.IsDefined() );
-        ASSERT_TRUE( number.exponent.integral.IsDefined() );
-        ASSERT_TRUE( number.exponent.fractional.IsDefined() );
-        ASSERT_STREQ( "+abc.def x +123.456 ^ -78.90", number.GetStr( true ).c_str() );
-
-        ASSERT_TRUE( number.significand.IsDefined() );
-        ASSERT_TRUE( number.significand.integral.IsDefined() );
-        ASSERT_TRUE( number.significand.fractional.IsDefined() );
-        ASSERT_TRUE( number.base.IsDefined() );
-        ASSERT_TRUE( number.base.integral.IsDefined() );
-        ASSERT_TRUE( number.base.fractional.IsDefined() );
-        ASSERT_TRUE( number.exponent.IsDefined() );
-        ASSERT_TRUE( number.exponent.integral.IsDefined() );
-        ASSERT_TRUE( number.exponent.fractional.IsDefined() );
+            ASSERT_NO_FATAL_FAILURE( testData[i].sig.Verify( number.significand ) );
+            ASSERT_NO_FATAL_FAILURE( testData[i].base.Verify( number.base ) );
+            ASSERT_NO_FATAL_FAILURE( testData[i].exp.Verify( number.exponent ) );
+            ASSERT_EQ( testData[i].hasExponent, number.HasExponent() );
+            ASSERT_EQ( testData[i].hasSignificand, number.HasSignificand() );
+            ASSERT_EQ( testData[i].isDefined, number.IsDefined() );
+            ASSERT_EQ( testData[i].isIntegral, number.IsIntegral() );
+            ASSERT_STREQ( testData[i].resultStr, number.GetStr( true ).c_str() );
+        }
     }
 
     TEST_F( DataFlexNumberTest, Reset )

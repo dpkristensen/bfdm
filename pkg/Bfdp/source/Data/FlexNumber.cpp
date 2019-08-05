@@ -68,6 +68,11 @@ namespace Bfdp
             return out.str();
         }
 
+        bool FlexNumber::Component::IsIntegral() const
+        {
+            return sign.IsSpecified() && integral.IsDefined() && !fractional.IsDefined();
+        }
+
         void FlexNumber::Component::Reset()
         {
             sign = Sign::Unspecified;
@@ -103,9 +108,24 @@ namespace Bfdp
             return out.str();
         }
 
+        bool FlexNumber::HasExponent() const
+        {
+            return base.IsDefined() && exponent.IsDefined();
+        }
+
+        bool FlexNumber::HasSignificand() const
+        {
+            return significand.IsDefined();
+        }
+
         bool FlexNumber::IsDefined() const
         {
-            return significand.IsDefined() || ( base.IsDefined() && exponent.IsDefined() );
+            return HasSignificand() || HasExponent();
+        }
+
+        bool FlexNumber::IsIntegral() const
+        {
+            return significand.IsIntegral() && !HasExponent();
         }
 
         void FlexNumber::Reset()

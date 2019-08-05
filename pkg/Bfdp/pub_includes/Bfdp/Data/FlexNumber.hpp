@@ -86,6 +86,8 @@ namespace Bfdp
                     bool const aVerbose = false
                     ) const;
 
+                bool IsIntegral() const;
+
                 void Reset();
 
                 Sign sign;
@@ -93,7 +95,13 @@ namespace Bfdp
                 BitManip::DigitStream fractional;
             };
 
+            bool HasExponent() const;
+
+            bool HasSignificand() const;
+
             bool IsDefined() const;
+
+            bool IsIntegral() const;
 
             std::string GetStr
                 (
