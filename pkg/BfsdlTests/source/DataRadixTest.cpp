@@ -141,27 +141,28 @@ namespace BfsdlTests
             Data::RadixType radix;
             bool valid;
             size_t bits;
+            bool powerOf2;
         } TestData[] =
         {
-            {  0, false, 0 },
-            {  1, false, 0 },
-            {  2, true,  1 },
-            {  3, true,  2 },
-            {  4, true,  2 },
-            {  5, true,  3 },
-            {  7, true,  3 },
-            {  8, true,  3 },
-            {  9, true,  4 },
-            { 10, true,  4 },
-            { 15, true,  4 },
-            { 16, true,  4 },
-            { 17, true,  5 },
-            { 31, true,  5 },
-            { 32, true,  5 },
-            { 33, true,  6 },
-            { 35, true,  6 },
-            { 36, true,  6 },
-            { 37, false, 0 },
+            {  0, false, 0, false },
+            {  1, false, 0, false },
+            {  2, true,  1, true  },
+            {  3, true,  2, false },
+            {  4, true,  2, true  },
+            {  5, true,  3, false },
+            {  7, true,  3, false },
+            {  8, true,  3, true  },
+            {  9, true,  4, false },
+            { 10, true,  4, false },
+            { 15, true,  4, false },
+            { 16, true,  4, true  },
+            { 17, true,  5, false },
+            { 31, true,  5, false },
+            { 32, true,  5, true  },
+            { 33, true,  6, false },
+            { 35, true,  6, false },
+            { 36, true,  6, false },
+            { 37, false, 0, false },
         };
         static size_t const TestCount = BFDP_COUNT_OF_ARRAY( TestData );
 
@@ -172,6 +173,7 @@ namespace BfsdlTests
 
             ASSERT_EQ( t.valid, Data::IsValidRadix( t.radix ) );
             ASSERT_EQ( t.bits, Data::GetRadixBits( t.radix ) );
+            ASSERT_EQ( t.powerOf2, Data::IsRadixPowerOf2( t.radix ) );
         }
     }
 

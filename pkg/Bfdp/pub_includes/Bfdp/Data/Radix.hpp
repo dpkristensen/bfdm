@@ -75,6 +75,11 @@ namespace Bfdp
             RadixType const aRadix
             );
 
+        bool IsRadixPowerOf2
+            (
+            RadixType const aRadix
+            );
+
         inline bool IsValidRadix
             (
             RadixType const aRadix

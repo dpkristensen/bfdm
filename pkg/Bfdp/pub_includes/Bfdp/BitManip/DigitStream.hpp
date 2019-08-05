@@ -80,11 +80,22 @@ namespace Bfdp
 
             Digiterator GetIterator() const;
 
+            size_t GetNumDigits() const;
+
             Data::RadixType GetRadix() const;
 
             //! @return A string representation of the digits, or an empty
             //!     string on error.
             std::string GetStr() const;
+
+            //! Get the value of the digits as an unsigned integer
+            //!
+            //! @note aOut may be modified even on failure.
+            //! @return true if the value can be expressed, false otherwise.
+            bool GetUint64
+                (
+                uint64_t& aOut
+                ) const;
 
             //! @return true if a value has been set
             bool IsDefined() const;

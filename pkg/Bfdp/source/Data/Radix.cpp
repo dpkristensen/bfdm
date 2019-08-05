@@ -126,6 +126,22 @@ namespace Bfdp
             return bits;
         }
 
+        bool IsRadixPowerOf2
+            (
+            RadixType const aRadix
+            )
+        {
+            BFDP_RETURNIF_V( !IsValidRadix( aRadix ), false );
+
+            RadixType val = aRadix;
+            while( ( val & 0x1 ) == 0 )
+            {
+                val >>= 1U;
+            }
+
+            return val == 1U;
+        }
+
     } // namespace Data
 
 } // namespace Bfdp

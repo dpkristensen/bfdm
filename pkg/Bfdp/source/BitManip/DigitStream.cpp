@@ -92,9 +92,58 @@ namespace Bfdp
             return Digiterator( const_cast< BitBuffer& >( mBuffer ), Data::GetRadixBits( mRadix ) );
         }
 
+        size_t DigitStream::GetNumDigits() const
+        {
+            BFDP_RETURNIF_V( mRadix == Data::InvalidRadix, 0U );
+            size_t bitsPerDigit = Data::GetRadixBits( mRadix );
+            return mBuffer.GetDataBits() / bitsPerDigit;
+        }
+
         Data::RadixType DigitStream::GetRadix() const
         {
             return mRadix;
+        }
+
+        bool DigitStream::GetUint64
+            (
+            uint64_t& aOut
+            ) const
+        {
+            aOut = 0;
+            Digiterator iter = GetIterator();
+
+            if( Data::IsRadixPowerOf2( mRadix ) )
+            {
+                // Optimization for powers of 2: use simple operations
+                BFDP_RETURNIF_V( mBuffer.GetDataBits() > 64U, false );
+
+                size_t const shift = Data::GetRadixBits( mRadix );
+                while( !iter.IsDone() )
+                {
+                    aOut <<= shift;
+                    aOut += iter.ReadDigit();
+                }
+            }
+            else
+            {
+                // For others: use the REALLY SLOW method...
+                while( !iter.IsDone() )
+                {
+                    uint64_t temp = aOut;
+                    unsigned int digit = iter.ReadDigit();
+
+                    temp *= mRadix;
+                    if( ( ( temp / mRadix ) != aOut ) ||
+                        ( ( UINT64_MAX - temp ) < digit ) )
+                    {
+                        // Overflow
+                        return false;
+                    }
+                    aOut = temp + digit;
+                }
+            }
+
+            return true;
         }
 
         bool DigitStream::IsDefined() const

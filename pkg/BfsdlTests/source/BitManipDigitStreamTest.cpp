@@ -58,11 +58,64 @@ namespace BfsdlTests
         ASSERT_EQ( Data::InvalidRadix, stream.GetRadix() );
         std::string outStr = stream.GetStr();
         ASSERT_STREQ( "", outStr.c_str() );
+        ASSERT_EQ( 0U, stream.GetNumDigits() );
 
         // Nothing to iterate over
         BitManip::Digiterator iter = stream.GetIterator();
         ASSERT_TRUE( iter.IsDone() );
         ASSERT_EQ( 0U, iter.ReadDigit() );
+    }
+
+    TEST_F( BitManipDigitStreamTest, GetUint64 )
+    {
+        static uint64_t BFDP_CONSTEXPR X = 0ULL;
+
+        BitManip::DigitStream stream;
+
+        struct TestDataType
+        {
+            std::string input;
+            Data::RadixType radix;
+            bool result;
+            uint64_t u64;
+        } const testData[] =
+        {
+            { "0", 10, true, 0ULL },
+            { "1", 10, true, 1ULL },
+            { "18446744073709551615", 10, true, UINT64_MAX },
+            { "18446744073709551616", 10, false, X },
+
+            { "0", 2, true, 0ULL },
+            { "1", 2, true, 1ULL },
+            { "1111111111111111111111111111111111111111111111111111111111111111", 2, true, UINT64_MAX },
+            { "10000000000000000000000000000000000000000000000000000000000000000", 2, false, X },
+
+            { "0", 16, true, 0x0ULL },
+            { "1", 16, true, 0x1ULL },
+            { "FFFFFFFFFFFFFFFF", 16, true, UINT64_MAX },
+            { "10000000000000000", 16, false, X },
+        };
+        static size_t const testCount = BFDP_COUNT_OF_ARRAY( testData );
+
+        for( size_t i = 0; i < testCount; ++i )
+        {
+            SCOPED_TRACE
+                (
+                ::testing::Message( "[" ) << i << "]"
+                    << " input=" << testData[i].input
+                    << " radix=" << testData[i].radix
+                );
+
+            ASSERT_TRUE( stream.Set( testData[i].input, testData[i].radix ) );
+            uint64_t out64;
+            ASSERT_EQ( testData[i].result, stream.GetUint64( out64 ) );
+            if( testData[i].result )
+            {
+                ASSERT_EQ( testData[i].u64, out64 );
+            }
+
+            stream.Reset();
+        }
     }
 
     TEST_F( BitManipDigitStreamTest, IterateBase10 )
@@ -71,6 +124,7 @@ namespace BfsdlTests
 
         ASSERT_TRUE( stream.Set( "109", 10 ) );
         ASSERT_TRUE( stream.IsDefined() );
+        ASSERT_EQ( 3U, stream.GetNumDigits() );
 
         BitManip::Digiterator iter = stream.GetIterator();
 
@@ -93,6 +147,7 @@ namespace BfsdlTests
 
         ASSERT_TRUE( stream.Set( "011", 2 ) );
         ASSERT_TRUE( stream.IsDefined() );
+        ASSERT_EQ( 3U, stream.GetNumDigits() );
 
         BitManip::Digiterator iter = stream.GetIterator();
 
@@ -169,6 +224,12 @@ namespace BfsdlTests
             if( testData[i].result )
             {
                 ASSERT_EQ( testData[i].radix, stream.GetRadix() );
+                ASSERT_EQ( testData[i].input.size(), stream.GetNumDigits() );
+            }
+            else
+            {
+                ASSERT_EQ( Data::InvalidRadix, stream.GetRadix() );
+                ASSERT_EQ( 0U, stream.GetNumDigits() );
             }
             std::string outStr = stream.GetStr();
             ASSERT_STREQ( testData[i].output, outStr.c_str() );
