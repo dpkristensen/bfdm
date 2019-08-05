@@ -85,7 +85,13 @@
             "functional": "cpp",
             "iterator": "cpp",
             "xfunctional": "cpp",
-            "memory": "cpp"
+            "memory": "cpp",
+            "deque": "cpp",
+            "forward_list": "cpp",
+            "fstream": "cpp",
+            "hash_map": "cpp",
+            "hash_set": "cpp",
+            "xhash": "cpp"
         },
         "C_Cpp.intelliSenseEngineFallback": "Disabled"
     }
