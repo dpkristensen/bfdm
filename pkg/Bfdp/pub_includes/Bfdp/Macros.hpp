@@ -72,6 +72,9 @@
     #define BFDP_FINAL
 #endif
 
+#define BFDP_OFFSET_BYTE( _ptr, _pos ) \
+    ( reinterpret_cast< char* >( _ptr  ) + _pos )
+
 #if( ( __cplusplus >= 201103L ) || \
      ( defined( _MSC_VER ) && ( _MSC_VER >= 1600 ) ) )
     #define BFDP_OVERRIDE( _declaration ) \

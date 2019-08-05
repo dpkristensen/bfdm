@@ -86,6 +86,12 @@ namespace Bfdp
                     bool const aVerbose = false
                     ) const;
 
+                bool GetUint64
+                    (
+                    uint64_t& aOut,
+                    size_t const aMaxBits
+                    ) const;
+
                 bool IsIntegral() const;
 
                 void Reset();

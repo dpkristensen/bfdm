@@ -34,7 +34,9 @@
 #include "BfsdlParser/Objects/NumericLiteral.hpp"
 
 // Internal Includes
+#include "Bfdp/BitManip/Conversion.hpp"
 #include "Bfdp/BitManip/GenericBitStream.hpp"
+#include "Bfdp/Compiler.hpp"
 #include "Bfdp/Macros.hpp"
 
 #define BFDP_MODULE "Objects::NumericLiteral"
@@ -152,6 +154,27 @@ namespace BfsdlParser
             )
         {
             mRadix = aRadix;
+        }
+
+        bool NumericLiteral::GetUintImpl
+            (
+            void* const aOut,
+            size_t const aMaxBits
+            ) const
+        {
+            BFDP_RETURNIF_V( !mNumber.IsIntegral(), false );
+
+            uint64_t val;
+            BFDP_RETURNIF_V( !mNumber.significand.GetUint64( val, aMaxBits ), false );
+
+            size_t numBytes = BitManip::BitsToBytes( aMaxBits );
+            #if( BFDP_HOST_ENDIAN_LE() )
+                std::memcpy( aOut, &val, numBytes );
+            #else
+                std::memcpy( aOut, BFDP_OFFSET_BYTE( &val, sizeof( val ) - numBytes ), numBytes );
+            #endif
+
+            return true;
         }
 
     } // namespace Objects

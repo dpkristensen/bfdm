@@ -34,6 +34,7 @@
 #define BfsdlParser_Objects_NumericLiteral
 
 // External includes
+#include <limits>
 #include <string>
 
 // Internal includes
@@ -67,6 +68,22 @@ namespace BfsdlParser
                 (
                 bool const aVerbose
                 ) const;
+
+            //! Read as an unsigned integral
+            //!
+            //! @return true if the literal can be expressed, false otherwise.
+            template< typename T >
+            bool GetUint
+                (
+                T& aOut, //!< [out] Where to save the result
+                size_t const aMaxBits
+                ) const
+            {
+                BFDP_CTIME_ASSERT( !std::numeric_limits< T >::is_signed, "Must be unsigned" );
+                BFDP_CTIME_ASSERT( std::numeric_limits< T >::is_integer, "Must be integer" );
+                BFDP_RETURNIF_V( aMaxBits > ( sizeof( T ) * CHAR_BIT ), false );
+                return GetUintImpl( &aOut, aMaxBits );
+            }
 
             //! @return true if a radix has been set (not necessarily valid)
             bool HasRadix() const;
@@ -109,6 +126,12 @@ namespace BfsdlParser
                 );
 
         private:
+            bool GetUintImpl
+                (
+                void* const aOut,
+                size_t const aMaxBits
+                ) const;
+
             //! FlexNumber stores all underlying data
             Bfdp::Data::FlexNumber mNumber;
 

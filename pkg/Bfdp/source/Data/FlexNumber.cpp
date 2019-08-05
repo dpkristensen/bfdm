@@ -36,6 +36,9 @@
 // External Includes
 #include <sstream>
 
+// Internal Includes
+#include "Bfdp/BitManip/Mask.hpp"
+
 #define BFDP_MODULE "Data::FlexNumber"
 
 namespace Bfdp
@@ -66,6 +69,28 @@ namespace Bfdp
             }
 
             return out.str();
+        }
+
+        bool FlexNumber::Component::GetUint64
+            (
+            uint64_t& aOut,
+            size_t const aMaxBits
+            ) const
+        {
+            uint64_t value = 0;
+            uint64_t mask = BitManip::CreateMask< uint64_t >( aMaxBits );
+
+            bool ok = ( sign == Sign::Positive )
+                && ( fractional.GetNumDigits() == 0U )
+                && ( aMaxBits != 0U )
+                && integral.GetUint64( value )
+                && ( 0 == ( value & ~mask ) );
+
+            if( ok )
+            {
+                aOut = value & mask;
+            }
+            return ok;
         }
 
         bool FlexNumber::Component::IsIntegral() const
