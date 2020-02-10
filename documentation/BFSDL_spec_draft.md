@@ -477,7 +477,7 @@ At the beginning of the stream, a header must appear to set configuration settin
 
 ### 4.1 Format and Types of Settings
 
-Settings in the header begin with a colon and continue until a `<line-break>` or the start of a new setting.  There are two types of settings:
+Settings in the header begin with a colon and continue until a the start of a new setting.  The types of settings are as follows:
 
 #### 4.1.1 Keyword Setting
 
@@ -499,10 +499,7 @@ This is represented by just a single colon:
 
     blank-setting := ':'
 
-The purpose of this is to facilitate:
-
-* Separating settings in a BFSDL Stream with line breaks for readability.
-* Following the of the settings block for BFSDL Stream with no `<line-break>` to separate the block from following content..
+The presence of `blank-setting` has no effect on parsing; this could be used for separating groups of settings for readability.
 
 ### 4.2 Defined Settings
 
@@ -510,8 +507,8 @@ Setting `<identifier>` fields are case-sensitive and defined below by type.
 
 #### 4.2.1 Keyword Settings
 
-* BFSDL_HEADER - Must appear as the first non-whitespace element in the BFSDL Stream.
-* END_HEADER - Must be the last non-blank setting, which marks the end of the block.
+* BFSDL_HEADER - Must appear as the first non-blank setting in the BFSDL Stream.
+* END_HEADER - Must be the last non-blank setting, which marks the end of the header.
 
 #### 4.2.2 Configuration Settings
 
