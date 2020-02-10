@@ -652,7 +652,7 @@ This format may be modified by Attributes (see Appendix D).
 
 ##### 5.2.3.1 C-Style Strings
 
-This style of storing strings was used by the C programming language, where a Null terminator character `(0x0)` appears after the string's contents to signal the end of the data.   
+This style of storing strings was used by the C programming language, where a Null terminator character `(0x0)` appears after the string's contents to signal the end of the data.
 
     string-bit-format += 'cstring'
 
