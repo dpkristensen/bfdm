@@ -1,7 +1,7 @@
 /**
-    BFSDL Parser Token Category Declarations
+    BFDP Lexer Category Base Constants
 
-    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2020, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -30,40 +30,31 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef BfsdlParser_Token_Category
-#define BfsdlParser_Token_Category
+#ifndef Bfdp_Lexer_CategoryBase
+#define Bfdp_Lexer_CategoryBase
 
-// Base Includes
-#include "Bfdp/Lexer/CategoryBase.hpp"
+// Internal includes
+#include "Bfdp/Macros.hpp"
 
-namespace BfsdlParser
+namespace Bfdp
 {
 
-    namespace Token
+    namespace Lexer
     {
 
-        struct Category
+        struct CategoryBase
         {
             enum Type
             {
-                Backslash = Bfdp::Lexer::CategoryBase::Start,
-                Control,
-                DecimalDigits,
-                DoubleQuotes,
-                Hash,
-                Letters,
-                Operators,
-                Period,
-                Tilde,
-                Underscore,
-                Whitespace,
+                NoCategory = -2, // For internal use only
+                Unknown = -1, // For initialization/detection use, DO NOT MAP
 
-                Unknown = Bfdp::Lexer::CategoryBase::Unknown // DO NOT MAP
+                Start = 0
             };
         };
 
-    } // namespace Token
+    } // namespace Lexer
 
-} // namespace BfsdlParser
+} // namespace Bfdp
 
-#endif // BfsdlParser_Token_Category
+#endif // Bfdp_Lexer_CategoryBase

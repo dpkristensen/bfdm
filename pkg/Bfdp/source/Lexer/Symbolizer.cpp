@@ -42,6 +42,7 @@
 #include "Bfdp/Common.hpp"
 #include "Bfdp/Data/ByteBuffer.hpp"
 #include "Bfdp/ErrorReporter/Functions.hpp"
+#include "Bfdp/Lexer/CategoryBase.hpp"
 #include "Bfdp/Unicode/Utf8Converter.hpp"
 
 #define BFDP_MODULE "Lexer::Symbolizer"
@@ -52,9 +53,6 @@ namespace Bfdp
     namespace Lexer
     {
 
-        static int const NoCategory = -2;
-        static int const Uncategorized = -1;
-
         Symbolizer::Symbolizer
             (
             ISymbolObserver& aObserver,
@@ -63,7 +61,7 @@ namespace Bfdp
             )
             : mObserver( aObserver )
             , mSymbolBuffer( aSymbolBuffer )
-            , mSavedCategory( NoCategory )
+            , mSavedCategory( CategoryBase::NoCategory )
             , mByteConverter( aByteConverter )
             , mLastMapEntry( mSymbolMap.cend() )
         {
@@ -169,14 +167,14 @@ namespace Bfdp
 
                 /* Categorize the symbol */
 
-                int category = Uncategorized;
+                int category = CategoryBase::Unknown;
                 bool shouldConcatenate = true;
                 LookupCategory( symbol, category, shouldConcatenate );
 
                 /* Detect category boundary and send cached data */
 
                 // See if the previous category is complete
-                if( mSavedCategory != NoCategory )
+                if( mSavedCategory != CategoryBase::NoCategory )
                 {
                     // Report the symbol when changing categories
                     if( category != mSavedCategory )
@@ -194,8 +192,8 @@ namespace Bfdp
 
                 mSavedCategory = category;
                 bool saved = mSymbolBuffer.Add( symbol );
-                if( ( !saved                    ) &&
-                    ( category == Uncategorized ) )
+                if( ( !saved                            ) &&
+                    ( category == CategoryBase::Unknown ) )
                 {
                     // For uncategorized data which does not fit in the buffer, send the result and
                     // add it again; this isn't an error since this data could be anything.
@@ -230,7 +228,7 @@ namespace Bfdp
 
             // If the final section of data was uncategorized, treat it as complete and fire the
             // event.  Categorized data may span multiple Parse() calls.
-            if( mSavedCategory == Uncategorized )
+            if( mSavedCategory == CategoryBase::Unknown )
             {
                 // Report the data, but ignore the return value since Parse() is done anyway
                 ReportSymbolFound( mSavedCategory );
@@ -242,7 +240,7 @@ namespace Bfdp
         void Symbolizer::Reset()
         {
             mSymbolBuffer.Clear();
-            mSavedCategory = NoCategory;
+            mSavedCategory = CategoryBase::NoCategory;
             // There is no need to reset the last map entry; it may or may not help the next parsing
             // operation.
         }
@@ -318,7 +316,7 @@ namespace Bfdp
                 utf8String << buf.GetString( bytesConverted );
             }
 
-            bool keepParsing = ( aCategory == Uncategorized )
+            bool keepParsing = ( aCategory == CategoryBase::Unknown )
                 ? mObserver.OnUnmappedSymbols( utf8String.str(), mSymbolBuffer.GetSize() )
                 : mObserver.OnMappedSymbols( aCategory, utf8String.str(), mSymbolBuffer.GetSize() );
 
