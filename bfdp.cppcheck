@@ -8,7 +8,6 @@
         <dir name="pkg/Bfdp/pub_includes/"/>
         <dir name="pkg/BfsdlParser/prv_includes/"/>
         <dir name="pkg/BfsdlParser/pub_includes/"/>
-        <dir name="pkg/BfsdlTests/prv_includes/"/>
     </includedir>
     <defines>
         <define name="UNICODE"/>
@@ -16,8 +15,10 @@
     </defines>
     <exclude>
         <path name="_out/"/>
+        <path name="pkg/BfsdlTests/"/>
     </exclude>
     <suppressions>
         <suppression>noExplicitConstructor</suppression>
+        <suppression>unusedFunction</suppression>
     </suppressions>
 </project>
