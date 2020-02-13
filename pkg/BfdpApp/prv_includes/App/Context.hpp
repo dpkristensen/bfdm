@@ -1,8 +1,7 @@
-#!/usr/bin/env python
-"""
-    build-world - Build and run tests for all available targets
+/**
+    BFDP Console Application Context
 
-    Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2020, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -29,27 +28,69 @@
     CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
     OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-"""
+*/
 
-import os
+#ifndef App_Context
+#define App_Context
 
-PLATFORMS = ["win32", "win64"]
-MODES = ["development", "release"]
+#include <cstdio>
 
-def check_cmd(cmdline):
-    rc = os.system(cmdline)
-    if rc != 0:
-        print("FAILED on {}".format(cmdline))
-        exit(rc)
+namespace App
+{
+    struct Context
+    {
+        struct LogLevel
+        {
+            enum Type
+            {
+                Problem,
+                Info,
+                Debug,
 
-def run_cmd():
-    for p in PLATFORMS:
-        for m in MODES:
-            check_cmd("waf build -p {} -m {}".format(p, m))
-            check_cmd(os.path.join("_out", "{}_{}".format(p, m), "BfsdlTests"))
-            check_cmd(os.path.join("_out", "{}_{}".format(p, m), "bfdp -vv tests"))
+                Max = Debug
+            };
+        };
 
-    return 0
+        Context();
 
-if __name__ == "__main__":
-    exit( run_cmd() )
+        void Debug
+            (
+            char const* const aFormat,
+            ...
+            );
+
+        void Error
+            (
+            char const* const aFormat,
+            ...
+            );
+
+        void IncreaseLogLevel();
+
+        void Info
+            (
+            char const* const aFormat,
+            ...
+            );
+
+        void LogStr
+            (
+            FILE* const aFile,
+            char const* const aTag,
+            char const* const aMsg
+            );
+
+        void Warn
+            (
+            char const* const aFormat,
+            ...
+            );
+
+    private:
+        unsigned int mLogLevel;
+        char mMsgBuf[512];
+    };
+
+} // namespace App
+
+#endif // App_Context
