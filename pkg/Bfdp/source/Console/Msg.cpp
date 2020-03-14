@@ -1,5 +1,5 @@
 /**
-    BFDP Console Application Output Formatter
+    BFDP Msg Class
 
     Copyright 2020, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
@@ -30,81 +30,83 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef App_OutputFormatter
-#define App_OutputFormatter
+// Base Includes
+#include "Bfdp/Console/Msg.hpp"
 
-// External Includes
-#include <cstdio>
-#include <string>
-
-namespace App
+namespace Bfdp
 {
-    class OutputFormatter
+
+    namespace Console
     {
-    public:
-        OutputFormatter();
 
-        virtual ~OutputFormatter();
+        Msg::Msg()
+            : mEmpty( true )
+        {
+        }
 
-        void Print
+        Msg::Msg
             (
-            std::string const& aString
-            );
+            char const* const aText
+            )
+            : mEmpty( false )
+        {
+            mStream << aText;
+        }
 
-        void PrintH
+        Msg::Msg
             (
-            char const* const aHeader,
-            std::string const& aString
-            );
+            std::string const& aText
+            )
+            : mEmpty( false )
+        {
+            mStream << aText;
+        }
 
-        void PrintArg
+        Msg::Msg
             (
-            std::string const& aArg,
-            std::string const& aDescription
-            );
+            Msg const& aOther
+            )
+        {
+            operator =( aOther );
+        }
 
-        void PrintArgD
+        bool Msg::Empty() const
+        {
+            return mEmpty;
+        }
+
+        std::string Msg::Get() const
+        {
+            return mStream.str();
+        }
+
+        Msg& Msg::operator =
             (
-            std::string const& aArg,
-            std::string const& aDescription,
-            std::string const& aDefault
-            );
+            Msg const& aOther
+            )
+        {
+            mEmpty = aOther.mEmpty;
+            mStream.str( "" );
+            mStream.clear();
+            mStream << aOther.mStream.str();
+            return *this;
+        }
 
-        OutputFormatter& operator <<
+        Msg& Msg::operator <<
             (
-            std::string const& aIn
-            );
+            std::string const& aText
+            )
+        {
+            mStream << aText;
+            mEmpty = false;
+            return *this;
+        }
 
-        OutputFormatter& operator ++ ();
+        Msg::operator std::string () const
+        {
+            return mStream.str();
+        }
 
-        OutputFormatter& operator -- ();
+    } // namespace Console
 
-    private:
-        void Write
-            (
-            char const* const aHeader,
-            void const* const aData,
-            size_t const aSize
-            );
-
-        std::FILE* mFile;
-        unsigned int mIndent;
-    };
-
-    class IndentedSection
-    {
-    public:
-        IndentedSection
-            (
-            OutputFormatter& aOut
-            );
-
-        ~IndentedSection();
-
-    private:
-        OutputFormatter& mOut;
-    };
-
-} // App
-
-#endif // App_OutputFormatter
+} // namespace Bfdp

@@ -38,7 +38,8 @@
 
 // Internal Includes
 #include "App/Context.hpp"
-#include "App/OutputFormatter.hpp"
+#include "Bfdp/Console/Msg.hpp"
+#include "Bfdp/Console/Printer.hpp"
 
 using namespace App;
 
@@ -98,7 +99,9 @@ int BFDP_app_main
 
 static void PrintHelp()
 {
-    OutputFormatter out;
+    using Bfdp::Console::Indent;
+    using Bfdp::Console::Msg;
+    Bfdp::Console::Printer out;
 
     out << "Binary Format Data Parser"
         << ""
@@ -107,13 +110,17 @@ static void PrintHelp()
 
     out << "options:";
     {
-        IndentedSection indent( out );
-        out.PrintArgD( "-v,--verbose", "Specify verbosity of output messages (stacks up to 2 times)", "Problems only" );
+        Indent indentOptions( out );
+        {
+            Indent indentOptionsVerbose( out, "-v,--verbose", "" );
+            out << "Specify verbosity of output messages (stacks up to 2 times)"
+                << "Default: Problems only";
+        }
     }
 
     out << "command: help";
     {
-        IndentedSection indent( out );
+        Indent indentHelp( out );
         out.Print( "Print this help text" );
     }
 }

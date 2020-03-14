@@ -43,6 +43,11 @@
 #include "Bfdp/ErrorReporter/Functions.hpp"
 #include "Bfdp/String.hpp"
 
+// Macro to help comparing things that are implicitly convertible into std::string
+// because GoogleTest's ASSERT_EQ and ASSERT_STREQ macros can't handle std::string vs char const*.
+#define BFDP_ASSERT_STREQ( _expected, _actual ) \
+    ASSERT_TRUE( StrEq( _expected, _actual ) )
+
 namespace BfsdlTests
 {
 
@@ -66,6 +71,12 @@ namespace BfsdlTests
             ? aNullValue
             : aPtr;
     }
+
+    ::testing::AssertionResult StrEq
+        (
+        std::string const& aExpected,
+        std::string const& aActual
+        );
 
     ::testing::AssertionResult StrListsMatch
         (

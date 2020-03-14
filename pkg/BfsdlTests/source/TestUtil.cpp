@@ -105,6 +105,23 @@ namespace BfsdlTests
         ErrorReporter::SetRunTimeErrorHandler( RunTimeErrorHandler );
     }
 
+    ::testing::AssertionResult StrEq
+        (
+        std::string const& aExpected,
+        std::string const& aActual
+        )
+    {
+        if( aActual == aExpected )
+        {
+            return ::testing::AssertionSuccess();
+        }
+
+        return ::testing::AssertionFailure()
+            << "FAIL:" << std::endl
+            << "  Expected: '" << aExpected << "'" << std::endl
+            << "  Actual: '" << aActual << "'";
+    }
+
     ::testing::AssertionResult StrListsMatch
         (
         char const* const* aExpected,
