@@ -40,6 +40,7 @@
             "pkg/BfsdlTests/pub_includes"
         ],
         "files.associations": {
+            "wscript": "python",
             "xiosbase": "cpp",
             "xlocale": "cpp",
             "system_error": "cpp",
@@ -96,7 +97,8 @@
             "fstream": "cpp",
             "hash_map": "cpp",
             "hash_set": "cpp",
-            "xhash": "cpp"
+            "xhash": "cpp",
+            "cstdarg": "cpp"
         },
         "C_Cpp.intelliSenseEngineFallback": "Disabled"
     }
