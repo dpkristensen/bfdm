@@ -83,6 +83,11 @@ namespace Bfdp
                 std::string const& aText
                 );
 
+            Msg& operator <<
+                (
+                char const aChar
+                );
+
             operator std::string () const;
 
         private:

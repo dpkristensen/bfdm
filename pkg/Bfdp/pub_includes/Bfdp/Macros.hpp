@@ -98,6 +98,8 @@
         return _value; \
     }
 
+#define BFDP_UNUSED_PARAMETER( _param ) (void)( _param )
+
 #define BFDP_UNUSED_RETURN( _func ) (void)_func
 
 #endif // Bfdp_Macros

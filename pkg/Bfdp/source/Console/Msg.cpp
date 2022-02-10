@@ -102,6 +102,16 @@ namespace Bfdp
             return *this;
         }
 
+        Msg& Msg::operator <<
+            (
+            char const aChar
+            )
+        {
+            mStream << aChar;
+            mEmpty = false;
+            return *this;
+        }
+
         Msg::operator std::string () const
         {
             return mStream.str();

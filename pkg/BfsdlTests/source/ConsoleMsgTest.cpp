@@ -126,6 +126,10 @@ namespace BfsdlTests
         msg << " 3" << " 4";
         ASSERT_FALSE( msg.Empty() );
         BFDP_ASSERT_STREQ( "1 2 3 4", msg );
+
+        msg << ' ' << '5';
+        ASSERT_FALSE( msg.Empty() );
+        BFDP_ASSERT_STREQ( "1 2 3 4 5", msg );
     }
 
 } // namespace BfsdlTests
