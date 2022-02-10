@@ -48,6 +48,14 @@ namespace Bfdp
     namespace Console
     {
 
+        /* static */ Param Param::CreateCommand
+            (
+            std::string const& aName
+            )
+        {
+            return Param( aName, '\0', true ).SetTerminator();
+        }
+
         /* static */ Param Param::CreateLong
             (
             std::string const& aLongName,
@@ -183,6 +191,11 @@ namespace Bfdp
             return mIsPositional;
         }
 
+        bool Param::IsTerminator() const
+        {
+            return mIsTerminator;
+        }
+
         bool Param::MatchLongName
             (
             std::string const& aText
@@ -262,6 +275,12 @@ namespace Bfdp
             return *this;
         }
 
+        Param& Param::SetTerminator()
+        {
+            mIsTerminator = true;
+            return *this;
+        }
+
         Param& Param::SetUserdata
             (
             uintptr_t const aValue
@@ -291,6 +310,7 @@ namespace Bfdp
             , mHasValue( false )
             , mIsOptional( false )
             , mIsPositional( aIsPositional )
+            , mIsTerminator( false )
             , mLongName( aLongName )
             , mShortName( aShortName )
             , mUserdata( 0U )

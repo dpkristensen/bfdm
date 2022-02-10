@@ -95,6 +95,15 @@ namespace Bfdp
             //! @return The active command name
             std::string GetName() const;
 
+            //! Get Parse Index
+            //!
+            //! Before Parse() is called, returns 0
+            //! During Parse(), this is the index of the parsed argument
+            //! After Parse(), this is the end of the list or a terminator argument
+            //!
+            //! @return The current index of the argument list
+            int GetParseIndex() const;
+
             //! Parse C stdlib-style argument list
             //!
             //! @pre Neither aArgV or any element of aArgV may be NULL
@@ -159,6 +168,7 @@ namespace Bfdp
             bool mKeepParsing;
             std::string mName;
             ParamList mParams;
+            int mParseIndex;
             bool mSkipNextArg;
             int mResult;
         };

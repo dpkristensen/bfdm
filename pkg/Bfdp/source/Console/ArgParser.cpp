@@ -59,6 +59,7 @@ namespace Bfdp
             , mDefaultCallback( aDefaultCallback )
             , mDefaultUserdata( aDefaultUserdata )
             , mKeepParsing( false )
+            , mParseIndex( 0 )
             , mResult( 0 )
         {
         }
@@ -101,6 +102,11 @@ namespace Bfdp
         std::string ArgParser::GetName() const
         {
             return mName;
+        }
+
+        int ArgParser::GetParseIndex() const
+        {
+            return mParseIndex;
         }
 
         int ArgParser::Parse
@@ -146,20 +152,26 @@ namespace Bfdp
             }
 
             // Handle each parameter as it's observed; pass all remaining parameters for length detection
-            for( int i = 1; ( i < aArgC ) && mKeepParsing; ++i )
+            for( mParseIndex = 1; mParseIndex < aArgC; ++mParseIndex )
             {
-                if( nullptr == aArgV[i] )
+                if( nullptr == aArgV[mParseIndex] )
                 {
                     BFDP_MISUSE_ERROR( "Null argument list" );
                     mResult = 1;
                     mKeepParsing = false;
                     break;
                 }
-                ProcArgs( aArgV[i], &aArgV[i + 1], aArgC - i );
+                ProcArgs( aArgV[mParseIndex], &aArgV[mParseIndex + 1], aArgC - mParseIndex );
                 if( mSkipNextArg )
                 {
-                    ++i;
+                    ++mParseIndex;
                     mSkipNextArg = false;
+                }
+
+                if( !mKeepParsing )
+                {
+                    // Break before the increment to preserve the index
+                    break;
                 }
             }
 
@@ -257,7 +269,7 @@ namespace Bfdp
             )
         {
             std::string value;
-            if( aParam.HasValue() || aParam.IsPositional() )
+            if( aParam.HasValue() )
             {
                 if( aArgC == 0 )
                 {
@@ -271,6 +283,11 @@ namespace Bfdp
                 value = aArgV[0];
                 mSkipNextArg = true;
             }
+            else if( aParam.IsPositional() )
+            {
+                // Positional arguments' values are the data
+                value = aArgV[0];
+            }
 
             Param::ArgumentCallback paramCallback = aParam.GetCallback();
             if( paramCallback )
@@ -282,6 +299,12 @@ namespace Bfdp
             {
                 mResult = mCurCallback( *this, aParam, value, mCurUserdata );
                 mKeepParsing = ( mResult == 0 );
+            }
+
+            if( aParam.IsTerminator() )
+            {
+                // Always stop parsing on terminators
+                mKeepParsing = false;
             }
         }
 

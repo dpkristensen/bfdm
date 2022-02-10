@@ -59,6 +59,14 @@ namespace Bfdp
                 uintptr_t const aUserdata
                 );
 
+            //! @note This stops the parser, allowing the rest of the arguments to be passed to a
+            //!     sub-parser, if desired.
+            //! @return A positional terminator parameter
+            static Param CreateCommand
+                (
+                std::string const& aCommandName = "command"
+                );
+
             //! @return A switched parameter with a long-form name, and optionally a short name as well
             static Param CreateLong
                 (
@@ -127,6 +135,9 @@ namespace Bfdp
             //! @return True if the parameter is a positional argument, False otherwise.
             bool IsPositional() const;
 
+            //! @return True if parsing should stop on this argument.
+            bool IsTerminator() const;
+
             //! @return true if the text matches the long name, false otherwise
             bool MatchLongName
                 (
@@ -170,6 +181,10 @@ namespace Bfdp
                 (
                 std::string const& aDescription
                 );
+
+            //! Set this parameter as a terminator
+            //! @return Reference for call chaining
+            Param& SetTerminator();
 
             //! Set the value as optional
             //!
@@ -238,6 +253,7 @@ namespace Bfdp
             bool mHasValue;
             bool mIsOptional;
             bool mIsPositional;
+            bool mIsTerminator;
             std::string mLongName;
             char mShortName;
             uintptr_t mUserdata;

@@ -91,8 +91,8 @@ namespace BfsdlTests
             }
             std::stringstream ss;
 
-            ss << ctx->mType << "." << aParser.GetName() << ":" << aParam.GetShortDescription()
-                << "=" << aValue;
+            ss << ctx->mType << "." << aParser.GetName() << "[" << aParser.GetParseIndex() << "]:"
+                << aParam.GetShortDescription() << "=" << aValue;
             ctx->mCaptureList->push_back( ss.str() );
 
             return 0;
@@ -103,7 +103,8 @@ namespace BfsdlTests
             int const aExpectedResult,
             ArgParser& aParser,
             char const* const* const aArgV,
-            int const aArgC
+            int const aArgC,
+            int const aFinalIndex
             )
         {
             CallbackContext ctx = { sMAGIC };
@@ -120,6 +121,14 @@ namespace BfsdlTests
                     << "  Actual: " << result;
             }
 
+            int pos = aParser.GetParseIndex();
+            if( pos != aFinalIndex )
+            {
+                return ::testing::AssertionFailure() << "Post-parse position mismatch:" << std::endl
+                    << "Expected: " << aFinalIndex << std::endl
+                    << "  Actual: " << pos;
+            }
+
             return ::testing::AssertionSuccess();
         }
 
@@ -131,9 +140,20 @@ namespace BfsdlTests
             char const* const (&aArgV)[COUNT]
             )
         {
-            return ParseWithCallbacksImpl( aExpectedResult, aParser, aArgV, COUNT );
+            return ParseWithCallbacksImpl( aExpectedResult, aParser, aArgV, COUNT, COUNT );
         }
 
+        template< int COUNT >
+        ::testing::AssertionResult ParseWithCallbacksAtIdx
+            (
+            int const aExpectedResult,
+            ArgParser& aParser,
+            int const aFinalIndex,
+            char const* const (&aArgV)[COUNT]
+            )
+        {
+            return ParseWithCallbacksImpl( aExpectedResult, aParser, aArgV, COUNT, aFinalIndex );
+        }
 
         ::testing::AssertionResult VerifyCallback
             (
@@ -160,6 +180,21 @@ namespace BfsdlTests
             return ::testing::AssertionSuccess();
         }
 
+        ::testing::AssertionResult VerifyNoMoreCallbacks()
+        {
+            if( !mObservedCallbacks.empty() )
+            {
+                std::string result = mObservedCallbacks.front();
+                // Clear the list to prevent duplicate message on test teardown
+                mObservedCallbacks.clear();
+                return ::testing::AssertionFailure() << "Unexpected callback:" << std::endl
+                        << "Expected: <none>" << std::endl
+                        << "  Actual: " << result;
+            }
+
+            return ::testing::AssertionSuccess();
+        }
+
         std::list< std::string > mObservedCallbacks;
     };
 
@@ -180,14 +215,16 @@ namespace BfsdlTests
 
         // Test sequence 1
         ASSERT_TRUE( ParseWithCallbacks( 0, parser, { "cmd1", "--foo", "testABC", "BAZvalue" } ) );
-        ASSERT_TRUE( VerifyCallback( "parser.cmd1:foo <bar>=testABC" ) );
+        ASSERT_TRUE( VerifyCallback( "parser.cmd1[1]:foo <bar>=testABC" ) );
         // -t optional with no value, not observed
-        ASSERT_TRUE( VerifyCallback( "parser.cmd1:baz=BAZvalue" ) );
+        ASSERT_TRUE( VerifyCallback( "parser.cmd1[3]:baz=BAZvalue" ) );
+        ASSERT_TRUE( VerifyNoMoreCallbacks() );
 
         // Test sequence 2
         ASSERT_TRUE( ParseWithCallbacks( 0, parser, { "cmd2", "--foo", "testDEF", "-t" } ) );
-        ASSERT_TRUE( VerifyCallback( "parser.cmd2:foo <bar>=testDEF" ) );
-        ASSERT_TRUE( VerifyCallback( "param.cmd2:t=" ) );
+        ASSERT_TRUE( VerifyCallback( "parser.cmd2[1]:foo <bar>=testDEF" ) );
+        ASSERT_TRUE( VerifyCallback( "param.cmd2[3]:t=" ) );
+        ASSERT_TRUE( VerifyNoMoreCallbacks() );
     }
 
     TEST_F( ConsoleArgParserTest, DefaultHelp )
@@ -292,6 +329,52 @@ namespace BfsdlTests
         ASSERT_EQ( 0, parser.Parse( testArgs0, BFDP_COUNT_OF_ARRAY( testArgs0 ) ) );
         name = parser.GetName();
         ASSERT_STREQ( "Command2", name.c_str() );
+    }
+
+    TEST_F( ConsoleArgParserTest, TerminateImplicit )
+    {
+        ArgParser parser = ArgParser()
+            .Add( Param::CreateShort( 't' )
+                .SetOptional() )
+            .Add( Param::CreateShort( 'f' )
+                .SetOptional() );
+
+        // Verify the parser stops on the implicit -- terminator
+        ASSERT_TRUE( ParseWithCallbacksAtIdx( 0, parser, 2, { "do_stuff", "-t", "--", "-f" } ) );
+        ASSERT_TRUE( VerifyCallback( "parser.do_stuff[1]:t=" ) );
+        ASSERT_TRUE( VerifyNoMoreCallbacks() );
+    }
+
+    TEST_F( ConsoleArgParserTest, TerminateOnCommand )
+    {
+        ArgParser parser = ArgParser()
+            .Add( Param::CreateShort( 't' )
+                .SetOptional() )
+            .Add( Param::CreateShort( 'f' )
+                .SetOptional() )
+            .Add( Param::CreateCommand() );
+
+        // Verify the parser stops on a command (which is always a terminator)
+        ASSERT_TRUE( ParseWithCallbacksAtIdx( 0, parser, 2, { "do", "-t", "stuff", "-f" } ) );
+        ASSERT_TRUE( VerifyCallback( "parser.do[1]:t=" ) );
+        ASSERT_TRUE( VerifyCallback( "parser.do[2]:command=stuff" ) );
+        ASSERT_TRUE( VerifyNoMoreCallbacks() );
+    }
+
+    TEST_F( ConsoleArgParserTest, TerminateOnCommand2 )
+    {
+        ArgParser parser = ArgParser()
+            .Add( Param::CreateShort( 't' )
+                .SetOptional() )
+            .Add( Param::CreateShort( 'f' )
+                .SetOptional() )
+            .Add( Param::CreateCommand( "what" ) );
+
+        // Verify the parser stops on a command (which is always a terminator)
+        ASSERT_TRUE( ParseWithCallbacksAtIdx( 0, parser, 2, { "do", "-f", "things", "-f", "-t" } ) );
+        ASSERT_TRUE( VerifyCallback( "parser.do[1]:f=" ) );
+        ASSERT_TRUE( VerifyCallback( "parser.do[2]:what=things" ) );
+        ASSERT_TRUE( VerifyNoMoreCallbacks() );
     }
 
 } // namespace BfsdlTests

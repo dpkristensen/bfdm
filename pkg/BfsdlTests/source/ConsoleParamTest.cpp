@@ -48,6 +48,46 @@ namespace BfsdlTests
     {
     };
 
+    TEST_F( ConsoleParamTest, ConstructCommand )
+    {
+        Param p = Param::CreateCommand();
+
+        ASSERT_TRUE( StrEq( "", p.GetDescription() ) );
+        ASSERT_EQ( 0U, p.GetUserdata() );
+        ASSERT_FALSE( p.HasValue() );
+        ASSERT_TRUE( StrEq( "", p.GetDefaultValue() ) );
+        ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
+        ASSERT_FALSE( p.IsOptional() );
+        ASSERT_TRUE( p.IsPositional() );
+        ASSERT_TRUE( p.IsTerminator() );
+
+        // Commands don't match by name at all
+        ASSERT_FALSE( p.MatchLongName( "command" ) );
+        ASSERT_FALSE( p.MatchLongName( "c" ) );
+        ASSERT_FALSE( p.MatchShortName( "command" ) );
+        ASSERT_FALSE( p.MatchShortName( "c" ) );
+    }
+
+    TEST_F( ConsoleParamTest, ConstructCommandNamed )
+    {
+        Param p = Param::CreateCommand( "cmd_name" );
+
+        ASSERT_TRUE( StrEq( "", p.GetDescription() ) );
+        ASSERT_EQ( 0U, p.GetUserdata() );
+        ASSERT_FALSE( p.HasValue() );
+        ASSERT_TRUE( StrEq( "", p.GetDefaultValue() ) );
+        ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
+        ASSERT_FALSE( p.IsOptional() );
+        ASSERT_TRUE( p.IsPositional() );
+        ASSERT_TRUE( p.IsTerminator() );
+
+        // Commands don't match by name at all
+        ASSERT_FALSE( p.MatchLongName( "cmd_name" ) );
+        ASSERT_FALSE( p.MatchLongName( "c" ) );
+        ASSERT_FALSE( p.MatchShortName( "cmd_name" ) );
+        ASSERT_FALSE( p.MatchShortName( "c" ) );
+    }
+
     TEST_F( ConsoleParamTest, ConstructLongName )
     {
         Param p = Param::CreateLong( "copy" );
@@ -59,6 +99,8 @@ namespace BfsdlTests
         ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
         ASSERT_FALSE( p.IsOptional() );
         ASSERT_FALSE( p.IsPositional() );
+        ASSERT_FALSE( p.IsTerminator() );
+
         ASSERT_TRUE( p.MatchLongName( "copy" ) );
         ASSERT_FALSE( p.MatchLongName( "c" ) );
         ASSERT_FALSE( p.MatchShortName( "copy" ) ); // Invalid use case
@@ -76,6 +118,8 @@ namespace BfsdlTests
         ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
         ASSERT_FALSE( p.IsOptional() );
         ASSERT_FALSE( p.IsPositional() );
+        ASSERT_FALSE( p.IsTerminator() );
+
         ASSERT_TRUE( p.MatchLongName( "copy" ) );
         ASSERT_FALSE( p.MatchLongName( "c" ) );
         ASSERT_FALSE( p.MatchShortName( "copy" ) ); // Invalid use case
@@ -93,6 +137,7 @@ namespace BfsdlTests
         ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
         ASSERT_FALSE( p.IsOptional() );
         ASSERT_TRUE( p.IsPositional() );
+        ASSERT_FALSE( p.IsTerminator() );
 
         // Positionals don't match by name at all
         ASSERT_FALSE( p.MatchLongName( "copy_src" ) );
@@ -112,6 +157,8 @@ namespace BfsdlTests
         ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
         ASSERT_FALSE( p.IsOptional() );
         ASSERT_FALSE( p.IsPositional() );
+        ASSERT_FALSE( p.IsTerminator() );
+
         ASSERT_FALSE( p.MatchLongName( "c" ) );
         ASSERT_TRUE( p.MatchShortName( "c" ) );
     }
@@ -128,6 +175,7 @@ namespace BfsdlTests
         ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
         ASSERT_TRUE( p.IsOptional() );
         ASSERT_FALSE( p.IsPositional() );
+        ASSERT_FALSE( p.IsTerminator() );
     }
 
     TEST_F( ConsoleParamTest, SetDefaultValueAndName )
@@ -142,6 +190,7 @@ namespace BfsdlTests
         ASSERT_TRUE( StrEq( "derp", p.GetValueName() ) );
         ASSERT_TRUE( p.IsOptional() );
         ASSERT_FALSE( p.IsPositional() );
+        ASSERT_FALSE( p.IsTerminator() );
     }
 
     TEST_F( ConsoleParamTest, SetCallChaining )
@@ -163,6 +212,7 @@ namespace BfsdlTests
         ASSERT_TRUE( StrEq( "copy_src", p.GetValueName() ) );
         ASSERT_TRUE( p.IsOptional() );
         ASSERT_FALSE( p.IsPositional() );
+        ASSERT_FALSE( p.IsTerminator() );
     }
 
     TEST_F( ConsoleParamTest, SetOptional )
@@ -177,6 +227,22 @@ namespace BfsdlTests
         ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
         ASSERT_TRUE( p.IsOptional() );
         ASSERT_FALSE( p.IsPositional() );
+        ASSERT_FALSE( p.IsTerminator() );
+    }
+
+    TEST_F( ConsoleParamTest, SetTerminator )
+    {
+        Param p = Param::CreateShort( 'c' )
+            .SetTerminator();
+
+        ASSERT_TRUE( StrEq( "", p.GetDescription() ) );
+        ASSERT_EQ( 0U, p.GetUserdata() );
+        ASSERT_FALSE( p.HasValue() );
+        ASSERT_TRUE( StrEq( "", p.GetDefaultValue() ) );
+        ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
+        ASSERT_FALSE( p.IsOptional() );
+        ASSERT_FALSE( p.IsPositional() );
+        ASSERT_TRUE( p.IsTerminator() );
     }
 
     TEST_F( ConsoleParamTest, SetUserdata )
@@ -191,6 +257,7 @@ namespace BfsdlTests
         ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
         ASSERT_FALSE( p.IsOptional() );
         ASSERT_FALSE( p.IsPositional() );
+        ASSERT_FALSE( p.IsTerminator() );
     }
 
     TEST_F( ConsoleParamTest, SetValueName )
@@ -205,6 +272,7 @@ namespace BfsdlTests
         ASSERT_TRUE( StrEq( "derp", p.GetValueName() ) );
         ASSERT_FALSE( p.IsOptional() );
         ASSERT_FALSE( p.IsPositional() );
+        ASSERT_FALSE( p.IsTerminator() );
     }
 
 } // namespace BfsdlTests
