@@ -662,7 +662,7 @@ This is shorthand for `string.term(#0#)`, regardless of the `DefaultStringTerm` 
 
 This style of storing strings was used by the Pascal programming language, where a byte appeared prior to the string data to indicate the length of the string.
 
-    `string-bit-format += 'pstring'`
+    string-bit-format += 'pstring'
 
 This is shorthand for `string.plen(u8).unterm()`.
 
@@ -736,14 +736,15 @@ External Libraries are the preferred method of importing definitions from anothe
     library-identifier := <word>
     library-definition := 'library'<whitespace><library-identifier>'('<external-source>')'
 
-This defines the Stream Scope of the External Stream found at `<external-source>` as a sub-scope named `<library-identifier>` in the Current Stream's current scope.  After parsing this statement:
+This defines the Stream Scope of the External Stream found at `<external-source>` as a sub-scope named `<library-identifier>` in the Current Stream's current scope.
 
 The location of external source must be one of:
+
 * A file name accessible on the local system
 * A file name accessible via a network, referenced via network path of the type:
-** Uniform Naming Convention (ex: \\server\share\path\to\file)
-** POSIX pathname (ex: hostname:/path/to/file)
-** URI specifying any file-like transfer protocol (ex: http://server/path/to/file).
+  * Uniform Naming Convention (ex: \\server\share\path\to\file)
+  * POSIX pathname (ex: hostname:/path/to/file)
+  * URI specifying any file-like transfer protocol (ex: http://server/path/to/file).
 
 The following rules apply to implementations of BFSDL parsers:
 * BFSDL parsers are not required to support any method of reading an External Stream which differs from how the Current Stream is read.
