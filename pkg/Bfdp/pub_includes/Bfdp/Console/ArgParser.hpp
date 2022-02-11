@@ -125,10 +125,33 @@ namespace Bfdp
                 std::FILE* const aOut
                 ) const;
 
-            //! Set the name of this command, for use in help text
+            //! Set Epilogue
             //!
+            //! Set text to be printed below usage in help.
+            //!
+            //! @return Reference to parser for call chaining
+            ArgParser& SetEpilogue
+                (
+                std::string const& aText
+                );
+
+            //! Set Prologue
+            //!
+            //! Set text to be printed above usage in help.
+            //!
+            //! @return Reference to parser for call chaining
+            ArgParser& SetPrologue
+                (
+                std::string const& aText
+                );
+
+            //! Set the name of this command
+            //!
+            //! Set the name of the command as it should appear in help usage.
             //! Setting this will override automatic import from Parse().
-            void SetName
+            //!
+            //! @return Reference to parser for call chaining
+            ArgParser& SetName
                 (
                 std::string const& aName
                 );
@@ -165,9 +188,11 @@ namespace Bfdp
             uintptr_t mCurUserdata;
             Param::ArgumentCallback mDefaultCallback;
             uintptr_t mDefaultUserdata;
+            std::string mEpilogue;
             bool mKeepParsing;
             std::string mName;
             ParamList mParams;
+            std::string mPrologue;
             int mParseIndex;
             bool mSkipNextArg;
             int mResult;

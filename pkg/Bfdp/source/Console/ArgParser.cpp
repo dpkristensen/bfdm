@@ -227,8 +227,10 @@ namespace Bfdp
         {
             std::stringstream ss;
 
-            // TODO: Legal notice
-            // TODO: App description
+            if( !mPrologue.empty() )
+            {
+                ss << mPrologue << std::endl << std::endl;
+            }
 
             if( !mName.empty() )
             {
@@ -249,16 +251,40 @@ namespace Bfdp
             }
             ss << std::endl;
 
+            if( !mEpilogue.empty() )
+            {
+                ss << mPrologue << std::endl << std::endl;
+            }
+
             std::string s = ss.str();
             std::fputs( s.c_str(), aOut );
         }
 
-        void ArgParser::SetName
+        ArgParser& ArgParser::SetEpilogue
+            (
+            std::string const& aText
+            )
+        {
+            mEpilogue = aText;
+            return *this;
+        }
+
+        ArgParser& ArgParser::SetName
             (
             std::string const& aName
             )
         {
             mName = aName;
+            return *this;
+        }
+
+        ArgParser& ArgParser::SetPrologue
+            (
+            std::string const& aText
+            )
+        {
+            mPrologue = aText;
+            return *this;
         }
 
         void ArgParser::Dispatch

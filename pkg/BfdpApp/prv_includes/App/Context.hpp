@@ -35,10 +35,13 @@
 
 #include <cstdio>
 
+#include "Bfdp/Console/Msg.hpp"
+
 namespace App
 {
     struct Context
     {
+    public:
         struct LogLevel
         {
             enum Type
@@ -53,42 +56,29 @@ namespace App
 
         Context();
 
-        void Debug
-            (
-            char const* const aFormat,
-            ...
-            );
-
-        void Error
-            (
-            char const* const aFormat,
-            ...
-            );
-
         void IncreaseLogLevel();
 
-        void Info
+        bool IsVerbose
             (
-            char const* const aFormat,
-            ...
-            );
+            LogLevel::Type const aMinLevel
+            ) const;
 
-        void LogStr
+        void Log
             (
             FILE* const aFile,
-            char const* const aTag,
-            char const* const aMsg
+            std::string const& aMsg,
+            LogLevel::Type const aMinLevel = LogLevel::Problem
             );
 
-        void Warn
+        void Log
             (
-            char const* const aFormat,
-            ...
+            FILE* const aFile,
+            Bfdp::Console::Msg const& aMsg,
+            LogLevel::Type const aMinLevel = LogLevel::Problem
             );
 
     private:
-        unsigned int mLogLevel;
-        char mMsgBuf[512];
+        int mLogLevel;
     };
 
 } // namespace App

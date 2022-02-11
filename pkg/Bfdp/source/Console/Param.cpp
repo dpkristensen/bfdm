@@ -149,7 +149,11 @@ namespace Bfdp
 
             BFDP_RETURNIF_V( nvd.empty(), std::string() );
 
-            if( !mLongName.empty() )
+            if( mIsPositional )
+            {
+                ss << nvd;
+            }
+            else if( !mLongName.empty() )
             {
                 ss << "--" << nvd;
             }

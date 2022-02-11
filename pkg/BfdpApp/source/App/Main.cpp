@@ -30,34 +30,50 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#define BFDP_MODULE "App::Main"
+
 // Base Includes
 #include "App/Main.h"
 
 // External Includes
+#include <cstdio>
 #include <string>
+#include <sstream>
 
 // Internal Includes
 #include "App/Context.hpp"
+#include "Bfdp/Console/ArgParser.hpp"
 #include "Bfdp/Console/Msg.hpp"
 #include "Bfdp/Console/Printer.hpp"
+#include "Bfdp/ErrorReporter/Functions.hpp"
+#include "Bfdp/Macros.hpp"
 
 using namespace App;
+using Bfdp::Console::ArgParser;
+using Bfdp::Console::Param;
 
-static void PrintHelp();
-
-static int ProcGlobalOption
+static void OnInternalError
     (
-    Context& aContext,
-    std::string const& aOption
+    char const* const aModuleName,
+    unsigned int const aLine,
+    char const* const aErrorText
     );
 
-static int ProcCommand
+static void OnMisuseError
     (
-    Context& aContext,
-    std::string const& aCommand,
-    char const* const* const aArgs,
-    int const aNumArgs
+    char const* const aModuleName,
+    unsigned int const aLine,
+    char const* const aErrorText
     );
+
+static void OnRunTimeError
+    (
+    char const* const aModuleName,
+    unsigned int const aLine,
+    char const* const aErrorText
+    );
+
+static Context gContext = Context();
 
 int BFDP_app_main
     (
@@ -66,134 +82,135 @@ int BFDP_app_main
     )
 {
     int ret = 0;
-    Context ctx;
 
-    char const* cmdString = "help";
-    char const* const* cmdArgList = NULL;
-    int cmdArgCount = 0;
+    Bfdp::ErrorReporter::SetInternalErrorHandler( OnInternalError );
+    Bfdp::ErrorReporter::SetMisuseErrorHandler( OnMisuseError );
+    Bfdp::ErrorReporter::SetRunTimeErrorHandler( OnRunTimeError );
 
-    for( int i = 1; ( 0 == ret ) && ( i < argc ); ++i )
+    ArgParser parser = ArgParser()
+        .SetName( "bfdp" )
+        .SetPrologue( "Binary Format Data Parser" )
+        .AddHelp()
+        .Add
+            (
+            Param::CreateLong( "verbose", 'v' )
+                .SetDescription( "Increase verbosity level (stacks up to 2 times)" )
+                .SetOptional()
+                .SetCallback
+                    ( // Lambda
+                    [] (
+                        ArgParser const& aParser,
+                        Param const& aParam,
+                        std::string const& aValue,
+                        uintptr_t const aUserdata
+                        )
+                    {
+                        BFDP_UNUSED_PARAMETER( aParser );
+                        BFDP_UNUSED_PARAMETER( aParam );
+                        BFDP_UNUSED_PARAMETER( aValue );
+                        BFDP_UNUSED_PARAMETER( aUserdata );
+                        gContext.IncreaseLogLevel();
+                        return 0;
+                    } )
+            )
+        .Add
+            (
+            Param::CreateCommand()
+                .SetDescription( "Command to execute" )
+            );
+
+    std::stringstream cmdText;
+    cmdText << "Commands:" << std::endl
+        << "    help - Show this help text" << std::endl;
+
+    ret = parser.Parse( argv, argc );
+    int cmdIdx = parser.GetParseIndex();
+
+    if( 0 != ret )
     {
-        char const* argData = argv[i];
-        if( argData[0] == '-' )
-        {
-            ret = ProcGlobalOption( ctx, std::string( &argData[1] ) );
-            if( ret != 0 )
-            {
-                return ret;
-            }
-        }
-        else
-        {
-            cmdString = argData;
-            cmdArgList = &argv[i + 1];
-            cmdArgCount = argc - i - 1;
-            break;
-        }
+        // Error logged by the parser
+        parser.PrintHelp( stdout );
     }
-
-    ret = ProcCommand( ctx, cmdString, cmdArgList, cmdArgCount );
-
-    return ret;
-}
-
-static void PrintHelp()
-{
-    using Bfdp::Console::Indent;
-    using Bfdp::Console::Msg;
-    Bfdp::Console::Printer out;
-
-    out << "Binary Format Data Parser"
-        << ""
-        << "bfdp <options> <command>"
-        << "";
-
-    out << "options:";
+    else if( cmdIdx >= argc )
     {
-        Indent indentOptions( out );
-        {
-            Indent indentOptionsVerbose( out, "-v,--verbose", "" );
-            out << "Specify verbosity of output messages (stacks up to 2 times)"
-                << "Default: Problems only";
-        }
-    }
-
-    out << "command: help";
-    {
-        Indent indentHelp( out );
-        out.Print( "Print this help text" );
-    }
-}
-
-static int ProcGlobalOption
-    (
-    Context& aContext,
-    std::string const& aOption
-    )
-{
-    int ret = 0;
-
-    // Long-form option
-    if( aOption[0] == '-' )
-    {
-        if( aOption == "-verbose" )
-        {
-            aContext.IncreaseLogLevel();
-        }
-        else
-        {
-            aContext.Error( "Invalid option: -%s", aOption );
-            ret = 1;
-        }
-
-        return ret;
-    }
-
-    // Short-form options
-    for( size_t i = 0; ( 0 == ret ) && ( i < aOption.size() ); ++i )
-    {
-        switch( aOption[i] )
-        {
-            case 'v':
-                aContext.IncreaseLogLevel();
-                break;
-
-            default:
-                aContext.Error( "Invalid option: %c", aOption[i] );
-                ret = 1;
-                break;
-        }
-    }
-
-    return ret;
-}
-
-static int ProcCommand
-    (
-    Context& aContext,
-    std::string const& aCommand,
-    char const* const* const /* aArgs */,
-    int const /* aNumArgs */
-    )
-{
-    int ret = 0;
-    if( aCommand == "help" )
-    {
-        PrintHelp();
-    }
-    else if( aCommand == "tests" )
-    {
-        // Undocumented command to run internal smoke tests
-        aContext.Debug( "Test Debug");
-        aContext.Info( "Test Info");
-        aContext.Warn( "Test Warn");
-        aContext.Error( "Test Error");
+        BFDP_INTERNAL_ERROR( "No command found" );
+        ret = 1;
     }
     else
     {
-        aContext.Error( "Invalid command: %s", aCommand );
-        ret = 1;
+        std::string cmd = argv[cmdIdx];
+
+        if( cmd == "help" )
+        {
+            parser.PrintHelp( stdout );
+        }
+        else if( cmd == "tests" )
+        {
+            // Undocumented command to run internal smoke tests
+            BFDP_INTERNAL_ERROR( "Test Internal Error");
+            BFDP_MISUSE_ERROR( "Test Misuse Error");
+            BFDP_RUNTIME_ERROR( "Test RunTime Error");
+        }
+        else
+        {
+            BFDP_MISUSE_ERROR( "Invalid command" );
+            ret = 1;
+        }
     }
 
     return ret;
+}
+
+static void OnInternalError
+    (
+    char const* const aModuleName,
+    unsigned int const aLine,
+    char const* const aErrorText
+    )
+{
+    std::stringstream ss;
+
+    ss << "Misuse Error: " << aModuleName;
+    if( gContext.IsVerbose( Context::LogLevel::Debug ) )
+    {
+        ss << "@" << aLine;
+    }
+    ss << " " << aErrorText;
+    gContext.Log( stderr, ss.str(), Context::LogLevel::Info );
+}
+
+static void OnMisuseError
+    (
+    char const* const aModuleName,
+    unsigned int const aLine,
+    char const* const aErrorText
+    )
+{
+    std::stringstream ss;
+
+    ss << "Misuse Error: " << aModuleName;
+    if( gContext.IsVerbose( Context::LogLevel::Debug ) )
+    {
+        ss << "@" << aLine;
+    }
+    ss << " " << aErrorText;
+    gContext.Log( stderr, ss.str(), Context::LogLevel::Info );
+}
+
+static void OnRunTimeError
+    (
+    char const* const aModuleName,
+    unsigned int const aLine,
+    char const* const aErrorText
+    )
+{
+    std::stringstream ss;
+
+    ss << "RunTime Error: " << aModuleName;
+    if( gContext.IsVerbose( Context::LogLevel::Debug ) )
+    {
+        ss << "@" << aLine;
+    }
+    ss << " " << aErrorText;
+    gContext.Log( stderr, ss.str() );
 }

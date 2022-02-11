@@ -44,30 +44,6 @@ namespace App
     {
     }
 
-    void Context::Debug( char const* const aFormat, ... )
-    {
-        if( mLogLevel >= LogLevel::Debug )
-        {
-            va_list args;
-            va_start( args, aFormat );
-            vsnprintf( mMsgBuf, sizeof( mMsgBuf ), aFormat, args );
-            va_end( args );
-
-            LogStr( stdout, "DEBUG", mMsgBuf );
-        }
-    }
-
-
-    void Context::Error( char const* const aFormat, ... )
-    {
-        va_list args;
-        va_start( args, aFormat );
-        vsnprintf( mMsgBuf, sizeof( mMsgBuf ), aFormat, args );
-        va_end( args );
-
-        LogStr( stderr, "ERROR", mMsgBuf );
-    }
-
     void Context::IncreaseLogLevel()
     {
         if( mLogLevel < LogLevel::Max )
@@ -76,40 +52,39 @@ namespace App
         }
     }
 
-    void Context::Info( char const* const aFormat, ... )
+    bool Context::IsVerbose
+            (
+            LogLevel::Type const aMinLevel
+            ) const
     {
-        if( mLogLevel >= LogLevel::Info )
-        {
-            va_list args;
-            va_start( args, aFormat );
-            vsnprintf( mMsgBuf, sizeof( mMsgBuf ), aFormat, args );
-            va_end( args );
+        return aMinLevel <= mLogLevel;
+    }
 
-            LogStr( stdout, "INFO", mMsgBuf );
+    void Context::Log
+        (
+        FILE* const aFile,
+        std::string const& aMsg,
+        LogLevel::Type const aMinLevel
+        )
+    {
+        if( IsVerbose( aMinLevel ) )
+        {
+            std::fputs( aMsg.c_str(), aFile );
+            std::fputc( '\n', aFile );
         }
     }
 
-    void Context::LogStr
+    void Context::Log
         (
         FILE* const aFile,
-        char const* const aTag,
-        char const* const aMsg
+        Bfdp::Console::Msg const& aMsg,
+        LogLevel::Type const aMinLevel
         )
     {
-        std::fputs( aTag, aFile );
-        std::fputs( ": ", aFile );
-        std::fputs( aMsg, aFile );
-        std::fputc( '\n', aFile );
-    }
-
-    void Context::Warn( char const* const aFormat, ... )
-    {
-        va_list args;
-        va_start( args, aFormat );
-        vsnprintf( mMsgBuf, sizeof( mMsgBuf ), aFormat, args );
-        va_end( args );
-
-        LogStr( stderr, "WARNING", mMsgBuf );
+        if( !aMsg.Empty() )
+        {
+            Log( aFile, aMsg.Get(), aMinLevel );
+        }
     }
 
 } // namespace App
