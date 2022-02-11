@@ -189,7 +189,7 @@ namespace Bfdp
                         char const* arg = defaultValue.c_str();
                         Dispatch( *p, &arg, 1 );
                     }
-                    // Optional parameters without a value are
+                    // Optional parameters without a value (e.g., counters) are otherwise ignored
                 }
                 else
                 {
@@ -341,6 +341,8 @@ namespace Bfdp
             bool const aShortForm
             )
         {
+            Param const* retParam = nullptr;
+
             for( ParamPtrList::iterator iter = mCurParams.begin(); iter != mCurParams.end(); ++iter )
             {
                 Param const* param = *iter;
@@ -348,17 +350,25 @@ namespace Bfdp
                 // Match the short name first, as it's likely faster
                 if( aShortForm && param->MatchShortName( aText ) )
                 {
-                    mCurParams.erase( iter );
-                    return param;
+                    retParam = param;
                 }
                 else if( aLongForm && param->MatchLongName( aText ) )
                 {
-                    mCurParams.erase( iter );
-                    return param;
+                    retParam = param;
+                }
+
+                if( retParam != nullptr )
+                {
+                    // Erase parameters as they are discovered, except for counters
+                    if( !param->IsCounter() )
+                    {
+                        mCurParams.erase( iter );
+                    }
+                    break;
                 }
             }
 
-            return nullptr;
+            return retParam;
         }
 
         Param const* ArgParser::GetNextPositional()

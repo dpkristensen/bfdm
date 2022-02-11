@@ -95,7 +95,7 @@ int BFDP_app_main
             (
             Param::CreateLong( "verbose", 'v' )
                 .SetDescription( "Increase verbosity level (stacks up to 2 times)" )
-                .SetOptional()
+                .SetCounter()
                 .SetCallback
                     ( // Lambda
                     [] (

@@ -57,6 +57,7 @@ namespace BfsdlTests
         ASSERT_FALSE( p.HasValue() );
         ASSERT_TRUE( StrEq( "", p.GetDefaultValue() ) );
         ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
+        ASSERT_FALSE( p.IsCounter() );
         ASSERT_FALSE( p.IsOptional() );
         ASSERT_TRUE( p.IsPositional() );
         ASSERT_TRUE( p.IsTerminator() );
@@ -77,6 +78,7 @@ namespace BfsdlTests
         ASSERT_FALSE( p.HasValue() );
         ASSERT_TRUE( StrEq( "", p.GetDefaultValue() ) );
         ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
+        ASSERT_FALSE( p.IsCounter() );
         ASSERT_FALSE( p.IsOptional() );
         ASSERT_TRUE( p.IsPositional() );
         ASSERT_TRUE( p.IsTerminator() );
@@ -97,6 +99,7 @@ namespace BfsdlTests
         ASSERT_FALSE( p.HasValue() );
         ASSERT_TRUE( StrEq( "", p.GetDefaultValue() ) );
         ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
+        ASSERT_FALSE( p.IsCounter() );
         ASSERT_FALSE( p.IsOptional() );
         ASSERT_FALSE( p.IsPositional() );
         ASSERT_FALSE( p.IsTerminator() );
@@ -116,6 +119,7 @@ namespace BfsdlTests
         ASSERT_FALSE( p.HasValue() );
         ASSERT_TRUE( StrEq( "", p.GetDefaultValue() ) );
         ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
+        ASSERT_FALSE( p.IsCounter() );
         ASSERT_FALSE( p.IsOptional() );
         ASSERT_FALSE( p.IsPositional() );
         ASSERT_FALSE( p.IsTerminator() );
@@ -135,6 +139,7 @@ namespace BfsdlTests
         ASSERT_FALSE( p.HasValue() );
         ASSERT_TRUE( StrEq( "", p.GetDefaultValue() ) );
         ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
+        ASSERT_FALSE( p.IsCounter() );
         ASSERT_FALSE( p.IsOptional() );
         ASSERT_TRUE( p.IsPositional() );
         ASSERT_FALSE( p.IsTerminator() );
@@ -155,6 +160,7 @@ namespace BfsdlTests
         ASSERT_FALSE( p.HasValue() );
         ASSERT_TRUE( StrEq( "", p.GetDefaultValue() ) );
         ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
+        ASSERT_FALSE( p.IsCounter() );
         ASSERT_FALSE( p.IsOptional() );
         ASSERT_FALSE( p.IsPositional() );
         ASSERT_FALSE( p.IsTerminator() );
@@ -173,6 +179,7 @@ namespace BfsdlTests
         ASSERT_TRUE( p.HasValue() );
         ASSERT_TRUE( StrEq( "herp", p.GetDefaultValue() ) );
         ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
+        ASSERT_FALSE( p.IsCounter() );
         ASSERT_TRUE( p.IsOptional() );
         ASSERT_FALSE( p.IsPositional() );
         ASSERT_FALSE( p.IsTerminator() );
@@ -188,6 +195,7 @@ namespace BfsdlTests
         ASSERT_TRUE( p.HasValue() );
         ASSERT_TRUE( StrEq( "herp", p.GetDefaultValue() ) );
         ASSERT_TRUE( StrEq( "derp", p.GetValueName() ) );
+        ASSERT_FALSE( p.IsCounter() );
         ASSERT_TRUE( p.IsOptional() );
         ASSERT_FALSE( p.IsPositional() );
         ASSERT_FALSE( p.IsTerminator() );
@@ -210,6 +218,21 @@ namespace BfsdlTests
         ASSERT_TRUE( p.HasValue() );
         ASSERT_TRUE( StrEq( "~/Documents/foo.txt", p.GetDefaultValue() ) );
         ASSERT_TRUE( StrEq( "copy_src", p.GetValueName() ) );
+        ASSERT_FALSE( p.IsCounter() );
+        ASSERT_TRUE( p.IsOptional() );
+        ASSERT_FALSE( p.IsPositional() );
+        ASSERT_FALSE( p.IsTerminator() );
+    }
+
+    TEST_F( ConsoleParamTest, SetCounter )
+    {
+        Param p = Param::CreateShort( 'c' )
+            .SetCounter();
+
+        ASSERT_TRUE( StrEq( "", p.GetDescription() ) );
+        ASSERT_EQ( 0U, p.GetUserdata() );
+        ASSERT_FALSE( p.HasValue() );
+        ASSERT_TRUE( p.IsCounter() );
         ASSERT_TRUE( p.IsOptional() );
         ASSERT_FALSE( p.IsPositional() );
         ASSERT_FALSE( p.IsTerminator() );
@@ -225,6 +248,7 @@ namespace BfsdlTests
         ASSERT_FALSE( p.HasValue() );
         ASSERT_TRUE( StrEq( "", p.GetDefaultValue() ) );
         ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
+        ASSERT_FALSE( p.IsCounter() );
         ASSERT_TRUE( p.IsOptional() );
         ASSERT_FALSE( p.IsPositional() );
         ASSERT_FALSE( p.IsTerminator() );
@@ -240,6 +264,7 @@ namespace BfsdlTests
         ASSERT_FALSE( p.HasValue() );
         ASSERT_TRUE( StrEq( "", p.GetDefaultValue() ) );
         ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
+        ASSERT_FALSE( p.IsCounter() );
         ASSERT_FALSE( p.IsOptional() );
         ASSERT_FALSE( p.IsPositional() );
         ASSERT_TRUE( p.IsTerminator() );
@@ -255,6 +280,7 @@ namespace BfsdlTests
         ASSERT_FALSE( p.HasValue() );
         ASSERT_TRUE( StrEq( "", p.GetDefaultValue() ) );
         ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
+        ASSERT_FALSE( p.IsCounter() );
         ASSERT_FALSE( p.IsOptional() );
         ASSERT_FALSE( p.IsPositional() );
         ASSERT_FALSE( p.IsTerminator() );
@@ -270,6 +296,7 @@ namespace BfsdlTests
         ASSERT_TRUE( p.HasValue() );
         ASSERT_TRUE( StrEq( "", p.GetDefaultValue() ) );
         ASSERT_TRUE( StrEq( "derp", p.GetValueName() ) );
+        ASSERT_FALSE( p.IsCounter() );
         ASSERT_FALSE( p.IsOptional() );
         ASSERT_FALSE( p.IsPositional() );
         ASSERT_FALSE( p.IsTerminator() );

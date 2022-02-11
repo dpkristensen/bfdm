@@ -26,5 +26,16 @@
             "environment": [],
             "console": "internalConsole"
         }
+        {
+            "name": "win64-bfdp",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/_out/win64_development/bfdp.exe",
+            "args": ["-vvv", "tests"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "internalConsole"
+        }
     ]
 }

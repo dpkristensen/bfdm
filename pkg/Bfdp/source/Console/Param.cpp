@@ -185,6 +185,11 @@ namespace Bfdp
             return mHasValue;
         }
 
+        bool Param::IsCounter() const
+        {
+            return mIsCounter;
+        }
+
         bool Param::IsOptional() const
         {
             return mIsOptional;
@@ -230,6 +235,24 @@ namespace Bfdp
             return *this;
         }
 
+        Param& Param::SetCounter()
+        {
+            if( mHasValue )
+            {
+                BFDP_INTERNAL_ERROR( "Arguments with values can't be counters" );
+            }
+            else if( mIsTerminator )
+            {
+                BFDP_INTERNAL_ERROR( "Terminators can't be counters" );
+            }
+            else
+            {
+                mIsCounter = true;
+                mIsOptional = true;
+            }
+            return *this;
+        }
+
         Param& Param::SetDefault
             (
             std::string const& aValue,
@@ -243,6 +266,10 @@ namespace Bfdp
             else if( mIsPositional )
             {
                 BFDP_MISUSE_ERROR( "Positional arguments can't have default values" );
+            }
+            else if( mIsCounter )
+            {
+                BFDP_MISUSE_ERROR( "Counter arguments can't have values" );
             }
             else
             {
@@ -281,7 +308,14 @@ namespace Bfdp
 
         Param& Param::SetTerminator()
         {
-            mIsTerminator = true;
+            if( mIsCounter )
+            {
+                BFDP_INTERNAL_ERROR( "Counters can't terminate" );
+            }
+            else
+            {
+                mIsTerminator = true;
+            }
             return *this;
         }
 
@@ -299,8 +333,15 @@ namespace Bfdp
             std::string const& aValueName
             )
         {
-            mValueName = aValueName;
-            mHasValue = true;
+            if( mIsCounter )
+            {
+                BFDP_MISUSE_ERROR( "Counter arguments can't have values" );
+            }
+            else
+            {
+                mValueName = aValueName;
+                mHasValue = true;
+            }
             return *this;
         }
 
@@ -312,6 +353,7 @@ namespace Bfdp
             )
             : mCallback( nullptr )
             , mHasValue( false )
+            , mIsCounter( false )
             , mIsOptional( false )
             , mIsPositional( aIsPositional )
             , mIsTerminator( false )

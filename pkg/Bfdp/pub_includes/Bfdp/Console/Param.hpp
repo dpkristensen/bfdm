@@ -129,6 +129,9 @@ namespace Bfdp
             //! @return True if the parameter expects a value, False otherwise.
             bool HasValue() const;
 
+            //! @return True if multiple instances of the parameter may be seen.
+            bool IsCounter() const;
+
             //! @return True if the parameter is optional, False otherwise.
             bool IsOptional() const;
 
@@ -182,16 +185,24 @@ namespace Bfdp
                 std::string const& aDescription
                 );
 
-            //! Set this parameter as a terminator
-            //! @return Reference for call chaining
-            Param& SetTerminator();
-
             //! Set the value as optional
             //!
             //! @pre Cannot use with SetDefault()
             //! @post IsOptional() returns true
             //! @return Reference for call chaining
             Param& SetOptional();
+
+            //! Allow multiple instances of the parameter
+            //!
+            //! @pre Cannot use with associated values
+            //! @post IsCounter() returns true
+            //! @post IsOptional() returns true
+            //! @return Reference for call chaining
+            Param& SetCounter();
+
+            //! Set this parameter as a terminator
+            //! @return Reference for call chaining
+            Param& SetTerminator();
 
             //! Set a descriptive name associated with the value
             //!
@@ -251,6 +262,7 @@ namespace Bfdp
             std::string mDefaultValue;
             std::string mDescription;
             bool mHasValue;
+            bool mIsCounter;
             bool mIsOptional;
             bool mIsPositional;
             bool mIsTerminator;
