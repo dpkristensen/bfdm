@@ -41,6 +41,7 @@
 #include <sstream>
 
 // Internal Includes
+#include "App/Commands.hpp"
 #include "App/Context.hpp"
 #include "Bfdp/Console/ArgParser.hpp"
 #include "Bfdp/Console/Msg.hpp"
@@ -88,7 +89,7 @@ int BFDP_app_main
     Bfdp::ErrorReporter::SetRunTimeErrorHandler( OnRunTimeError );
 
     ArgParser parser = ArgParser()
-        .SetName( "bfdp" )
+        .SetName( APP_NAME )
         .SetPrologue( "Binary Format Data Parser" )
         .AddHelp()
         .Add
@@ -121,7 +122,9 @@ int BFDP_app_main
 
     std::stringstream cmdText;
     cmdText << "Commands:" << std::endl
-        << "    help - Show this help text" << std::endl;
+        << "    help - Show this help text" << std::endl
+        << "    " APP_CMD_VALIDATE_SPEC_NAME " - " APP_CMD_VALIDATE_SPEC_DESC;
+    parser.SetEpilogue( cmdText.str() );
 
     ret = parser.Parse( argv, argc );
     int cmdIdx = parser.GetParseIndex();
@@ -150,6 +153,10 @@ int BFDP_app_main
             BFDP_INTERNAL_ERROR( "Test Internal Error");
             BFDP_MISUSE_ERROR( "Test Misuse Error");
             BFDP_RUNTIME_ERROR( "Test RunTime Error");
+        }
+        else if( cmd == APP_CMD_VALIDATE_SPEC_NAME )
+        {
+            ret = CmdValidateSpec( gContext, argc - cmdIdx, &argv[cmdIdx] );
         }
         else
         {

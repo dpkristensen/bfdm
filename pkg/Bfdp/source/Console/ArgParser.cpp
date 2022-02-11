@@ -253,7 +253,7 @@ namespace Bfdp
 
             if( !mEpilogue.empty() )
             {
-                ss << mPrologue << std::endl << std::endl;
+                ss << mEpilogue << std::endl;
             }
 
             std::string s = ss.str();
@@ -297,7 +297,7 @@ namespace Bfdp
             std::string value;
             if( aParam.HasValue() )
             {
-                if( aArgC == 0 )
+                if( aArgC <= 1 )
                 {
                     std::string msg = ( Msg( "Argument " ) << aParam.GetName() << " requires <" << aParam.GetValueName() << ">!" ).Get();
                     BFDP_RUNTIME_ERROR( msg.c_str() );
