@@ -35,9 +35,13 @@
 // Base Includes
 #include "App/Commands.hpp"
 
+// External Includes
+#include <fstream>
+
 // Internal Includes
 #include "App/Common.hpp"
 #include "Bfdp/ErrorReporter/Functions.hpp"
+#include "BfsdlParser/StreamParser.hpp"
 
 using Bfdp::Console::ArgParser;
 using Bfdp::Console::Msg;
@@ -79,9 +83,17 @@ namespace App
         std::string specFile = args["file"];
         aContext.Log( stdout, Msg( "File: " ) << specFile, Context::LogLevel::Info );
 
-        // TODO: Parse the file
-        BFDP_RUNTIME_ERROR( "Not yet implemented" );
-        ret = 1;
+        std::fstream fs( specFile.c_str(), std::ios::in | std::ios::binary );
+        if( !fs.is_open() )
+        {
+            BFDP_RUNTIME_ERROR( "Cannot open file" );
+            ret = 1;
+        }
+        else
+        {
+            ret = BfsdlParser::ParseStream( fs, 4096 );
+            fs.close();
+        }
 
         return ret;
     }
