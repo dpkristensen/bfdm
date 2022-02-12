@@ -173,6 +173,11 @@ namespace BfsdlTests
             { "#d:123#",        true,       "+123" },
             { "#x:7b#",         true,       "+7b" },
             { "#o:8#",          false,      NULL },
+
+            // Unterminated numeric literals
+            { "#d:123 ",        true,       NULL }, // Error detected after Parse()
+            { "#d:123\t",       true,       NULL }, // Error detected after Parse()
+            { "#d:123;",        false,      NULL },
         };
         static size_t const numTests = BFDP_COUNT_OF_ARRAY( testData );
 
@@ -289,6 +294,10 @@ namespace BfsdlTests
             { "\"\\\\\"",       true,       "5c" },
             // Multiple escape sequences together
             { "\"\\\"\\t\\r\\n\\\\t\"", true, "22 08 0d 0a 5c 74" },
+            // Unterminated string literal
+            { "\"abc123 ",      true,       NULL }, // Error detected after Parse()
+            { "\"abc123\t",     true,       NULL }, // Error detected after Parse()
+            { "\"abc123;",      true,       NULL }, // Error detected after Parse()
         };
         static size_t const numTests = BFDP_COUNT_OF_ARRAY( testData );
 

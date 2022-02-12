@@ -323,7 +323,7 @@ Numeric literals must contain an real integer component.  Optionally, they may a
     fractional-component := <period><numerals>
     exponential-component := <exponent-marker>[<sign-marker>]<numerals>
 
-    numeric-literal := <hash><integral-component>[<fractional-component>][<exponential-component>](<hash>|<whitespace>)
+    numeric-literal := <hash><integral-component>[<fractional-component>][<exponential-component>]<hash>
 
 * The default value for `<sign-marker>` is `+`.
 * The default value for `<radix-marker>` is `d`.
