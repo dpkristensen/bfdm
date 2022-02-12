@@ -192,16 +192,13 @@ namespace BfsdlParser
             {
                 BFDP_RUNTIME_ERROR( "Cannot parse; Tokenizer failed to initialize" );
                 mParseError = true;
-                return false;
             }
-
-            if( !mSymbolizer.Parse( aBytes, aNumBytes, aBytesRead ) )
+            else if( !mSymbolizer.Parse( aBytes, aNumBytes, aBytesRead ) )
             {
                 mParseError = true;
-                return false;
             }
 
-            return true;
+            return mState.keepParsing && !mParseError;
         }
 
         Tokenizer::StateVariables::StateVariables()
@@ -248,7 +245,9 @@ namespace BfsdlParser
         {
             BFDP_RUNTIME_ERROR( "Unexpected symbol" );
             mParseError = true;
-            return false;
+            mState.keepParsing = false;
+
+            return mState.keepParsing;
         }
 
         void Tokenizer::StateMainSequenceEvaluate()

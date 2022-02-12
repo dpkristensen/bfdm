@@ -364,6 +364,13 @@ namespace BfsdlParser
 
         void StringLiteralParser::StateEscapeDigitsEvaluate()
         {
+            if( mState.symbols.category == Category::DoubleQuotes )
+            {
+                BFDP_RUNTIME_ERROR( "Missing digits in string-literal escape-sequence" );
+                mLastParseResult = ParseResult::Error;
+                return;
+            }
+
             switch( ParseEscapeCodePoint( mState.escapeRadix ) )
             {
             case ParseResult::Error:

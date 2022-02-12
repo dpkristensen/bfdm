@@ -159,19 +159,20 @@ namespace BfsdlTests
         struct TestData
         {
             char const* input;
+            bool parseOk;
             char const* output;
         };
 
         // Test condition table
         // NOTE: This does not need to be extremely verbose
         static TestData const testData[] =
-        { //  Input             Output
-            { "#",              NULL },
-            { "##",             NULL },
-            { "#b:01111011#",   "+01111011" },
-            { "#d:123#",        "+123" },
-            { "#x:7b#",         "+7b" },
-            { "#o:8#",          NULL },
+        { //  Input             Parse OK    Output
+            { "#",              true,       NULL }, // Parse() returns OK on incomplete literal
+            { "##",             false,      NULL },
+            { "#b:01111011#",   true,       "+01111011" },
+            { "#d:123#",        true,       "+123" },
+            { "#x:7b#",         true,       "+7b" },
+            { "#o:8#",          false,      NULL },
         };
         static size_t const numTests = BFDP_COUNT_OF_ARRAY( testData );
 
@@ -186,10 +187,10 @@ namespace BfsdlTests
             size_t dataLen = std::strlen( testData[i].input );
 
             // Set expectations for this iteration
-            errWorkspace.ExpectRunTimeError( testData[i].output == NULL );
+            errWorkspace.ExpectRunTimeError( ( testData[i].output == NULL ) );
 
             // Parse data for this iteration
-            ASSERT_TRUE( tokenizer.Parse( reinterpret_cast< Byte const * >( testData[i].input ), dataLen, bytesRead ) );
+            ASSERT_EQ( testData[i].parseOk, tokenizer.Parse( reinterpret_cast< Byte const * >( testData[i].input ), dataLen, bytesRead ) );
             tokenizer.EndParsing();
 
             // Verify postconditions
@@ -217,76 +218,77 @@ namespace BfsdlTests
         struct TestData
         {
             char const* input;
+            bool parseOk;
             char const* output;
         };
 
         // Test condition table
         // NOTE: This does not need to be extremely verbose.  Output is always in utf8
         static TestData const testData[] =
-        { //  Input             Output
-            { "\"",             NULL },
-            { "\"\"",           "" },
-            { "\"abc123\"",     "61 62 63 31 32 33" },
+        { //  Input             Parse OK    Output
+            { "\"",             true,       NULL }, // Parse() returns OK on incomplete literal
+            { "\"\"",           true,       "" },
+            { "\"abc123\"",     true,       "61 62 63 31 32 33" },
             // Hex escape sequences
-            { "\"\\x62c3\"",    "62 63 33" },
-            { "\"\\0x62c3\"",   NULL },
-            { "\"\\1x62c3\"",   "06 32 63 33" },
-            { "\"\\4x62c3\"",   "e6 8b 83" },
-            { "\"\\8x12345678\"", "fc 92 8d 85 99 b8" },
-            { "\"\\9x123456780\"", NULL },
-            { "\"\\x80\"",      "c2 80" },
-            { "\"\\x00\"",      "00" },
-            { "\"\\x0g\"",      NULL },
-            { "\"\\x0z\"",      NULL },
-            { "\"\\x\"",        NULL },
-            { "\"\\x1\"",       NULL },
+            { "\"\\x62c3\"",    true,       "62 63 33" },
+            { "\"\\0x62c3\"",   false,      NULL },
+            { "\"\\1x62c3\"",   true,       "06 32 63 33" },
+            { "\"\\4x62c3\"",   true,       "e6 8b 83" },
+            { "\"\\8x12345678\"", true,     "fc 92 8d 85 99 b8" },
+            { "\"\\9x123456780\"", false,   NULL },
+            { "\"\\x80\"",      true,       "c2 80" },
+            { "\"\\x00\"",      true,       "00" },
+            { "\"\\x0g\"",      false,      NULL },
+            { "\"\\x0z\"",      false,      NULL },
+            { "\"\\x\"",        false,      NULL },
+            { "\"\\x1\"",       false,      NULL },
             // Ascii escape sequences
-            { "\"\\a41\"",      "41" },
-            { "\"\\a7f\"",      "7f" },
-            { "\"\\a80\"",      NULL },
-            { "\"\\0a7f\"",     NULL },
-            { "\"\\2a7f\"",     NULL },
-            { "\"\\a0g\"",      NULL },
-            { "\"\\a0z\"",      NULL },
-            { "\"\\a\"",        NULL },
-            { "\"\\a7\"",       NULL },
+            { "\"\\a41\"",      true,       "41" },
+            { "\"\\a7f\"",      true,       "7f" },
+            { "\"\\a80\"",      false,      NULL },
+            { "\"\\0a7f\"",     false,      NULL },
+            { "\"\\2a7f\"",     false,      NULL },
+            { "\"\\a0g\"",      false,      NULL },
+            { "\"\\a0z\"",      false,      NULL },
+            { "\"\\a\"",        false,      NULL },
+            { "\"\\a7\"",       false,      NULL },
             // MS-1252 escape sequences
-            { "\"\\w41\"",      "41" },
-            { "\"\\w7e\"",      "7e" },
-            { "\"\\w7f\"",      NULL },
-            { "\"\\w80\"",      "e2 82 ac" },
-            { "\"\\w8c\"",      "c5 92" },
-            { "\"\\w8d\"",      NULL },
-            { "\"\\w8e\"",      "c5 bd" },
-            { "\"\\0w7f\"",     NULL },
-            { "\"\\2w7f\"",     NULL },
-            { "\"\\w0g\"",      NULL },
-            { "\"\\w0z\"",      NULL },
-            { "\"\\w\"",        NULL },
-            { "\"\\w7\"",       NULL },
+            { "\"\\w41\"",      true,       "41" },
+            { "\"\\w7e\"",      true,       "7e" },
+            { "\"\\w7f\"",      false,      NULL },
+            { "\"\\w80\"",      true,       "e2 82 ac" },
+            { "\"\\w8c\"",      true,       "c5 92" },
+            { "\"\\w8d\"",      false,      NULL },
+            { "\"\\w8e\"",      true,       "c5 bd" },
+            { "\"\\0w7f\"",     false,      NULL },
+            { "\"\\2w7f\"",     false,      NULL },
+            { "\"\\w0g\"",      false,      NULL },
+            { "\"\\w0z\"",      false,      NULL },
+            { "\"\\w\"",        false,      NULL },
+            { "\"\\w7\"",       false,      NULL },
             // Unicode escape sequences
-            { "\"\\u0000\"",        "00" },
-            { "\"\\u00b9\"",        "c2 b9" },
-            { "\"\\4u000b9\"",      "0b 39" },
-            { "\"\\5u000b9\"",      "c2 b9" },
-            { "\"\\5u1f913\"",      "f0 9f a4 93" },
-            { "\"\\8u7fffffff\"",   "fd bf bf bf bf bf" },
-            { "\"\\8u80000000\"",   NULL },
-            { "\"\\9u0000000b9\"",  NULL },
-            { "\"\\0u1234\"",       NULL },
-            { "\"\\u000g\"",        NULL },
-            { "\"\\u000z\"",        NULL },
-            { "\"\\u\"",            NULL },
-            { "\"\\u7\"",           NULL },
-            { "\"\\u123\"",         NULL },
+            { "\"\\u0000\"",        true,       "00" },
+            { "\"\\u00b9\"",        true,       "c2 b9" },
+            { "\"\\4u000b9\"",      true,       "0b 39" },
+            { "\"\\5u000b9\"",      true,       "c2 b9" },
+            { "\"\\5u1f913\"",      true,       "f0 9f a4 93" },
+            { "\"\\8u7fffffff\"",   true,       "fd bf bf bf bf bf" },
+            { "\"\\8u80000000\"",   false,      NULL },
+            { "\"\\9u0000000b9\"",  false,      NULL },
+            { "\"\\0u1234\"",       false,      NULL },
+            { "\"\\u000g\"",        false,      NULL },
+            { "\"\\u000z\"",        false,      NULL },
+            { "\"\\u\"",            false,      NULL },
+            { "\"\\u7\"",           false,      NULL },
+            { "\"\\u123\"",         false,      NULL },
             // Other escape sequences
-            { "\"\\\"\"",       "22" },
-            { "\"\\t\"",        "08" },
-            { "\"\\r\"",        "0d" },
-            { "\"\\n\"",        "0a" },
-            { "\"\\\\\"",       "5c" },
+            { "\"\\\"\"",       true,       "22" },
+            { "\"\\t\"",        true,       "08" },
+            { "\"\\r\"",        true,       "0d" },
+            { "\"\\n\"",        true,       "0a" },
+            { "\"\\\\\"",       true,       "5c" },
             // Multiple escape sequences together
-            { "\"\\\"\\t\\r\\n\\\\t\"", "22 08 0d 0a 5c 74" },
+            { "\"\\\"\\t\\r\\n\\\\t\"", true, "22 08 0d 0a 5c 74" },
         };
         static size_t const numTests = BFDP_COUNT_OF_ARRAY( testData );
 
@@ -304,7 +306,7 @@ namespace BfsdlTests
             errWorkspace.ExpectRunTimeError( testData[i].output == NULL );
 
             // Parse data for this iteration
-            ASSERT_TRUE( tokenizer.Parse( reinterpret_cast< Byte const * >( testData[i].input ), dataLen, bytesRead ) );
+            ASSERT_EQ( testData[i].parseOk, tokenizer.Parse( reinterpret_cast< Byte const * >( testData[i].input ), dataLen, bytesRead ) );
             tokenizer.EndParsing();
 
             // Verify postconditions
