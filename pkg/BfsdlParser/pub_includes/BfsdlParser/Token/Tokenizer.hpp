@@ -51,6 +51,7 @@
 #include "BfsdlParser/Objects/NumericLiteral.hpp"
 #include "BfsdlParser/Token/ITokenObserver.hpp"
 #include "BfsdlParser/Token/NumericLiteralParser.hpp"
+#include "BfsdlParser/Token/ParseResult.hpp"
 #include "BfsdlParser/Token/StringLiteralParser.hpp"
 #include "BfsdlParser/Token/SymbolSequence.hpp"
 
@@ -106,6 +107,8 @@ namespace BfsdlParser
                 SymbolSequence symbols;
                 bool keepParsing;
                 bool reEvaluate;
+                std::stringstream ngraphBuilder;
+                std::string ngraph;
                 std::stringstream word;
             };
 
@@ -113,6 +116,11 @@ namespace BfsdlParser
             static size_t const MAX_TOKEN_LENGTH = 256;
 
             void EmitWord();
+
+            //! Handle transitions for an N-Graph found in the main sequence
+            //!
+            //! @pre ParseNGraph() returned true.
+            void HandleNGraphEntryFromMainSequence();
 
             //! @copydoc Lexer::ISymbolizer::OnMappedSymbols
             BFDP_OVERRIDE( bool OnMappedSymbols
@@ -129,8 +137,24 @@ namespace BfsdlParser
                 size_t const aNumSymbols
                 ) );
 
+            //! Parse the current N-Graph
+            //!
+            //! Look for an unambiguous digraph in the current state
+            //!
+            //! @pre Characters to be evaluated as an N-Graph must be added to ngraphBuilder.
+            //! @post ngraph contains the result, if something was found.
+            //! @return Result of the operation.
+            ParseResult::Value ParseNGraph
+                (
+                bool const aFinal //!< [in] Whether this is the last part of the N-Graph
+                );
+
             // States
+            void StateCommentMLEvaluate();
+            void StateCommentSLEvaluate();
             void StateMainSequenceEvaluate();
+            void StateNGraphEntry();
+            void StateNGraphEvaluate();
             void StateNumericLiteralEntry();
             void StateNumericLiteralEvaluate();
             void StateStringLiteralEntry();

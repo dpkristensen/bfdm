@@ -100,6 +100,69 @@ namespace BfsdlTests
         ASSERT_TRUE( observer.VerifyNone() );
     }
 
+    TEST_F( TokenizerTest, Comments )
+    {
+        MockTokenObserver observer;
+        SetMockErrorHandlers();
+        MockErrorHandler::Workspace errWorkspace;
+
+        struct TestData
+        {
+            char const* input;
+            bool parseOk;
+            char const* output;
+        };
+
+        // Test condition table
+        static TestData const testData[] =
+        { //  Input             Parse OK    Output
+            { "foo // baz",     true,       "foo" },
+            { "//foo\nbar",     true,       "bar" },
+            { "/ foo\nbar",     false,       NULL },
+            { "/ /foo\nbar",    false,       NULL },
+            { "*/foo\nbar",     false,       NULL },
+            { "/*foo\nbar",     true,        NULL }, // Error during EndParsing()
+            { "/*foo*/\nbar",   true,        "bar" },
+            { "/*foo\n*/bar",   true,        "bar" },
+            { "/*foo\n//*/bar", true,        "bar" },
+            { "/*//foo\n*/bar", true,        "bar" },
+            { "/*//foo\nbar*/ baz", true,    "baz" },
+            { "/*\n//foo*/ baz", true,       "baz" },
+        };
+        static size_t const numTests = BFDP_COUNT_OF_ARRAY( testData );
+
+        // Loop through test conditions
+        for( size_t i = 0; i < numTests; ++i )
+        {
+            SCOPED_TRACE( ::testing::Message( "input=" ) << testData[i].input << std::endl );
+
+            Token::Tokenizer tokenizer( observer );
+            ASSERT_TRUE( tokenizer.IsInitOk() );
+            size_t bytesRead = 0;
+            size_t dataLen = std::strlen( testData[i].input );
+
+            // Set expectations for this iteration
+            errWorkspace.ExpectRunTimeError( ( testData[i].output == NULL ) );
+
+            // Parse data for this iteration
+            ASSERT_EQ( testData[i].parseOk, tokenizer.Parse( reinterpret_cast< Byte const * >( testData[i].input ), dataLen, bytesRead ) );
+            tokenizer.EndParsing();
+
+            // Verify postconditions
+            errWorkspace.VerifyRunTimeError();
+            if( testData[i].output )
+            {
+                ASSERT_TRUE( observer.VerifyNext( testData[i].output ) );
+            }
+            ASSERT_TRUE( observer.VerifyNone() );
+
+            if( testData[i].output )
+            {
+                ASSERT_EQ( dataLen, bytesRead );
+            }
+        }
+    }
+
     TEST_F( TokenizerTest, ControlCharacters )
     {
         MockTokenObserver observer;
@@ -175,6 +238,7 @@ namespace BfsdlTests
             { "#o:8#",          false,      NULL },
 
             // Unterminated numeric literals
+            { "#d:123",         true,       NULL }, // Error detected after Parse()
             { "#d:123 ",        true,       NULL }, // Error detected after Parse()
             { "#d:123\t",       true,       NULL }, // Error detected after Parse()
             { "#d:123;",        false,      NULL },

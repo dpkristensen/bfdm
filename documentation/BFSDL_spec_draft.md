@@ -184,13 +184,13 @@ For example:
 
 #### 0.2.9 Comments
 
-Comments may be used to help describe the text.  These begin with a `#` and continue to the end of the line:
+Comments may be used to help describe the text of this specification.  These begin with a `//` and continue to the end of the line:
 
-    # Comment text taking the whole line
-    (*)  # Comment text after the end of the line
-    '#'  # Comment after Literal Text containing a hash
+    // Comment text taking the whole line
+    (*)  // Comment text after the end of the line
+    '//'  // Comment after Literal Text containing two slashes
 
-Hashes in Literal Text do not begin a comment.
+Hashes in Literal Text do not begin a comment. For documentation on how comments may exist in the stream itself, see section 2.6.
 
 #### 0.2.10 Literal Ranges
 
@@ -198,7 +198,7 @@ A set of literals may be defined as Switchable Content by using the "to" keyword
 
     ('a' to 'z')
     ( 0-9|'.' )
-    (1 to 3)  # same as (1|2|3)
+    (1 to 3)  // same as (1|2|3)
 
 ## 1 BFSDL Stream Format Overview
 
@@ -256,8 +256,8 @@ White space is Text Content which is useful for separating other forms of conten
 
 A statement block represents a collection of statements enclosed by curly braces:
 
-    block-begin = '{'
-	block-end = '}'
+    block-begin := '{'
+    block-end := '}'
     statement-block := <block-begin>(* except <block-begin>)<block-end>
 
 These may not be used by themselves, but appear as part of other constructs such as a class.
@@ -269,6 +269,26 @@ Words represent a complete sequence of text that appears in the BFSDL Stream:
     word := ('a' to 'z'|'A' to 'Z'|'0' to '9'|'_')...
 
 Words are used for identifiers and reserved keywords.  This is a very limited character set for consistency, and so that words only contain characters which fit into a single 8-bit code point.
+
+### 2.6 Comments
+
+Comments should be used to document specification references, notes, and any other information helpful to human readers of a BFSDL stream.  Comments in a BFSDL stream take the place of a statement, and are not considered statements themselves.
+
+#### 2.6.1 Single-Line Comment:
+
+Single-line comments are defined as:
+
+    forward-slash := (48|x2f)
+    single-line-comment := <forward-slash>...2(* except <forward-slash>)(<line-break>|<eos>)
+
+#### 2.6.2 Multi-Line Comment:
+
+Multi-line comments are defined as:
+
+    asterisk := (43|x2a)
+    mlc-begin := <forward-slash><asterisk>
+    mlc-end := <asterisk><forward-slash>
+    multi-line-comment := <mlc-begin>(* except <mlc-end>)<mlc-end>
 
 ## 3 Predefined Raw Data
 
@@ -402,36 +422,36 @@ It is possible to build a string literal across multiple lines using Concatenati
 Escape sequences may be used with `<string-literal-value>` to store characters in a string literal that are otherwise difficult to represent.
 
     back-slash := '\'
-    escape-sequence := <back-slash><double-quote>               # Ex: \" = Unicode 34
-                       <back-slash><back-slash>                 # Ex: \\ = Unicode 92
-                       <back-slash>'t'                          # Ex: \t = Unicode 8
-                       <back-slash>'r'                          # Ex: \r = Unicode 13
-                       <back-slash>'n'                          # Ex: \n = Unicode 10
-                       <back-slash>'a'(<radix-16-digits>...2)   # Ex: \a38 = ASCII 56
-                       <back-slash>'w'(<radix-16-digits>...2)   # Ex: \w7f = MS-1252 127
+    escape-sequence := <back-slash><double-quote>               // Ex: \" = Unicode 34
+                       <back-slash><back-slash>                 // Ex: \\ = Unicode 92
+                       <back-slash>'t'                          // Ex: \t = Unicode 8
+                       <back-slash>'r'                          // Ex: \r = Unicode 13
+                       <back-slash>'n'                          // Ex: \n = Unicode 10
+                       <back-slash>'a'(<radix-16-digits>...2)   // Ex: \a38 = ASCII 56
+                       <back-slash>'w'(<radix-16-digits>...2)   // Ex: \w7f = MS-1252 127
 
 Some escape sequences allow a variable number of digits to follow:
 
     escape-digits := <radix-10-digits>...
     escape-sequence += <back-slash>[<escape-digits>]'x'(<radix-16-digits>...<escape-digits>)
-        # Default for <escape-digits> = 2
-        # Smallest supported range of <escape-digits> is 1-8
-        # Examples:
-        #   \x34 = String code 52
-        #   \4x1234 = String code 4660
+        // Default for <escape-digits> = 2
+        // Smallest supported range of <escape-digits> is 1-8
+        // Examples:
+        //   \x34 = String code 52
+        //   \4x1234 = String code 4660
     escape-sequence += <back-slash>[<escape-digits>]'b'(<radix-2-digits>...<escape-digits>)
-        # Default for <escape-digits> = 8
-        # Smallest supported range of <escape-digits> is 1-32
-        # Examples:
-        #   \b00110001 = String code 49
-        #   \4b0001 = String code 1
-        #   \16b0001001100110111 = String code 4919
+        // Default for <escape-digits> = 8
+        // Smallest supported range of <escape-digits> is 1-32
+        // Examples:
+        //   \b00110001 = String code 49
+        //   \4b0001 = String code 1
+        //   \16b0001001100110111 = String code 4919
     escape-sequence += <back-slash>[<escape-digits>]'u'(<radix-16-digits>...<escape-digits>)
-        # Default for <escape-digits> = 4
-        # Smallest supported range of <escape-digits> is 1-8
-        # Examples:
-        #   \u1234 = Unicode 4660
-        #   \6u10FFFF = Unicode 1114111
+        // Default for <escape-digits> = 4
+        // Smallest supported range of <escape-digits> is 1-8
+        // Examples:
+        //   \u1234 = Unicode 4660
+        //   \6u10FFFF = Unicode 1114111
 
 Note that the numeric value of escape sequences corresponds to the *code point*, whose interpretation is dependent upon the encoding of the string.
 

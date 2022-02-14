@@ -105,6 +105,7 @@ namespace BfsdlParser
                     ParseTilde();
                     break;
 
+                case Category::EndOfLine:
                 case Category::Whitespace:
                     BFDP_RUNTIME_ERROR( "Illegal whitespace in numeric-literal" );
                     mLastParseResult = ParseResult::Error;

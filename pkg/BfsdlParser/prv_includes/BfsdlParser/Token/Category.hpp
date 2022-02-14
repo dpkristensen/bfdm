@@ -46,10 +46,13 @@ namespace BfsdlParser
         {
             enum Type
             {
-                Backslash = Bfdp::Lexer::CategoryBase::Start,
+                Asterisk = Bfdp::Lexer::CategoryBase::Start,
+                Backslash,
                 Control,
                 DecimalDigits,
                 DoubleQuotes,
+                EndOfLine,
+                ForwardSlash,
                 Hash,
                 Letters,
                 Operators,
