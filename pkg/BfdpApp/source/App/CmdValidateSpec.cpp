@@ -91,7 +91,7 @@ namespace App
         }
         else
         {
-            ret = BfsdlParser::ParseStream( fs, 4096 );
+            ret = BfsdlParser::ParseStream( specFile, fs, 4096 );
             fs.close();
         }
 

@@ -48,6 +48,7 @@ namespace BfsdlParser
     //! @return 0 on success, false otherwise.
     int ParseStream
         (
+        std::string const& aName,
         std::istream& aIn,
         size_t const aChunkSize
         );

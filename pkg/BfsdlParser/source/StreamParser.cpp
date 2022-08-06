@@ -37,11 +37,13 @@
 
 // External Includes
 #include <cstring>
+#include <sstream>
 
 // Internal Includes
 #include "Bfdp/Data/ByteBuffer.hpp"
 #include "Bfdp/ErrorReporter/Functions.hpp"
 #include "Bfdp/Lexer/Symbolizer.hpp"
+#include "BfsdlParser/ParsePosition.hpp"
 #include "BfsdlParser/Token/Interpreter.hpp"
 #include "BfsdlParser/Token/Tokenizer.hpp"
 
@@ -63,6 +65,7 @@ namespace BfsdlParser
     //! @return 0 on success, 1 otherwise.
     int ParseStream
         (
+        std::string const& aName,
         std::istream& aIn,
         size_t const aChunkSize
         )
@@ -75,6 +78,8 @@ namespace BfsdlParser
         Bfdp::Data::ByteBuffer buf;
         BFDP_RETURNIF_VE( !buf.Allocate( aChunkSize ), 1, "Failed to allocate read buffer" );
         buf.Clear();
+
+        ParsePosition parsePos(aName, 10, 6);
 
         bool ok = true;
         size_t dataStart = 0;
@@ -97,9 +102,30 @@ namespace BfsdlParser
                 size_t bytesLeft = bytesRead - i;
                 DEBUG_TRACE( "parse: " << i << "..+" << bytesLeft );
                 ok = tokenizer.Parse( &buf[i], bytesLeft, bytesParsed );
+                parsePos.ProcessNewData( &buf[i], bytesParsed );
                 if( !ok )
                 {
-                    BFDP_RUNTIME_ERROR( "Stream parse error" );
+                    parsePos.ProcessRemainderData( &buf[i + bytesParsed], bytesLeft - bytesParsed );
+                    std::stringstream ss;
+                    ss << "Parse Error: " << parsePos.GetName() << "@"
+                        << parsePos.GetCurLineNumber() << ":" << parsePos.GetCurColNumber()
+                        << std::endl;
+
+                    if( parsePos.GetContextBeginColumn() != 0 )
+                    {
+                        ss << "...";
+                    }
+                    ss << parsePos.GetPrintableContext() << std::endl;
+                    if( parsePos.GetContextBeginColumn() != 0 )
+                    {
+                        ss << "   ";
+                    }
+                    if( parsePos.GetContextPositionOffset() > 0 )
+                    {
+                        ss << std::string( parsePos.GetContextPositionOffset() - 1, ' ' ) << "^";
+                    }
+                    std::string msg = ss.str();
+                    BFDP_RUNTIME_ERROR( msg.c_str() );
                 }
                 else if( bytesParsed == 0 )
                 {
