@@ -38,6 +38,11 @@
 #include "Bfdp/NonCopyable.hpp"
 #include "BfsdlParser/Token/ITokenObserver.hpp"
 
+// Internal Includes
+#include "Bfdp/StateMachine/Engine.hpp"
+#include "BfsdlParser/Objects/Tree.hpp"
+#include "BfsdlParser/Token/Tokenizer.hpp"
+
 namespace BfsdlParser
 {
 
@@ -53,12 +58,58 @@ namespace BfsdlParser
             , private Bfdp::NonCopyable
         {
         public:
-            Interpreter();
+            Interpreter
+                (
+                Objects::TreePtr const aDbContext
+                );
 
             //! @return whether the Interpreter initialized successfully.
             bool IsInitOk() const;
 
         private:
+            struct Header
+            {
+                enum StreamProgressType
+                {
+                    StreamBegin,
+                    StreamInProgress,
+                    StreamDone
+                };
+            };
+
+            struct In
+            {
+                enum Type
+                {
+                    Control,
+                    NumericLiteral,
+                    StringLiteral,
+                    Word,
+
+                    Count,
+                    Invalid = Count
+                };
+            };
+
+            struct InputRef
+            {
+                In::Type type;
+                union
+                {
+                    std::string const* ctrl;
+                    Objects::NumericLiteral const* num;
+                    Bfdp::Data::StringMachine const* str;
+                    std::string const* word;
+                } d;
+            };
+
+            void LogError
+                (
+                std::string const& aMessage
+                );
+
+            void LogError();
+
             BFDP_OVERRIDE( bool OnControlCharacter
                 (
                 std::string const& aControlCharacter
@@ -79,11 +130,33 @@ namespace BfsdlParser
                 std::string const& aValue
                 ) );
 
+            // States
+            void StateHeaderBeginEntry();
+            void StateHeaderBeginEvaluate();
+            void StateHeaderIdentifierEvaluate();
+            void StateHeaderEqualsEvaluate();
+            void StateHeaderParameterEvaluate();
+            void StateStatementBeginEvaluate();
+
+            Objects::TreePtr mDb;
+
+            // Header tracking variables
+            Header::StreamProgressType mHeaderStreamProgress;
+
+            // An identifier (relevancy depends on the context of the current state)
+            std::string mIdentifier;
+
             //! Whether the interpreter has been initialized
             bool mInitOk;
 
+            //! Provides access to the input data
+            InputRef mInput;
+
             //! Whether a parsing error occurred
             bool mParseError;
+
+            //! State machine engine to use for algorithm control
+            Bfdp::StateMachine::Engine mStateMachine;
         };
 
     } // namespace Token

@@ -37,10 +37,15 @@
 
 // External Includes
 #include <fstream>
+#include <memory>
 
 // Internal Includes
 #include "App/Common.hpp"
 #include "Bfdp/ErrorReporter/Functions.hpp"
+#include "BfsdlParser/Objects/Database.hpp"
+#include "BfsdlParser/Objects/IObject.hpp"
+#include "BfsdlParser/Objects/StringProperty.hpp"
+#include "BfsdlParser/Objects/Tree.hpp"
 #include "BfsdlParser/StreamParser.hpp"
 
 using Bfdp::Console::ArgParser;
@@ -49,6 +54,145 @@ using Bfdp::Console::Param;
 
 namespace App
 {
+
+    using BfsdlParser::Objects::BfsdlVersionType;
+    using BfsdlParser::Objects::Database;
+    using BfsdlParser::Objects::DatabasePtr;
+    using BfsdlParser::Objects::Endianness;
+    using BfsdlParser::Objects::Field;
+    using BfsdlParser::Objects::FieldPtr;
+    using BfsdlParser::Objects::IObjectPtr;
+    using BfsdlParser::Objects::ObjectType;
+    using BfsdlParser::Objects::Property;
+    using BfsdlParser::Objects::PropertyPtr;
+    using BfsdlParser::Objects::Tree;
+    using BfsdlParser::Objects::TreePtr;
+    using BfsdlParser::Objects::StringProperty;
+    using BfsdlParser::Objects::StringPropertyPtr;
+
+    namespace CmdValidateSpecInternal
+    {
+        static void DumpField
+            (
+            Context& aContext,
+            FieldPtr const aField
+            );
+
+        static void DumpObject
+            (
+            IObjectPtr const aObject,
+            void* const aArg
+            );
+
+        static void DumpProperty
+            (
+            Context& aContext,
+            PropertyPtr const aProperty
+            );
+
+        static bool gIsTestMode = false;
+
+        static void DumpField
+            (
+            Context& aContext,
+            FieldPtr const aField
+            )
+        {
+            std::stringstream ss;
+            ss << "FIELD " << aField->GetName();
+            aContext.Log( stdout, Msg( ss.str() ), Context::LogLevel::Info );
+        }
+
+        static void DumpObject
+            (
+            IObjectPtr const aObject,
+            void* const aArg
+            )
+        {
+            Context* context = reinterpret_cast< Context* >( aArg );
+
+            switch( aObject->GetType() )
+            {
+            case ObjectType::Property:
+                DumpProperty( *context, Property::StaticCast( aObject ) );
+                break;
+
+            case ObjectType::Field:
+                DumpField( *context, Field::StaticCast( aObject ) );
+                break;
+
+            case ObjectType::Tree:
+            case ObjectType::Count:
+            default:
+                break;
+            }
+        }
+
+        static void DumpProperty
+            (
+            Context& aContext,
+            PropertyPtr const aProperty
+            )
+        {
+            std::stringstream ss;
+
+            ss << "PROP " << aProperty->GetName() << "=";
+
+            if( aProperty->GetName() == "Version" )
+            {
+                BfsdlVersionType version = 0;
+                if( aProperty->GetNumericValue( version ) )
+                {
+                    ss << version;
+                }
+                else
+                {
+                    ss << "<invalid>";
+                }
+            }
+            else if(
+                ( aProperty->GetName() == "DefaultByteOrder" ) ||
+                ( aProperty->GetName() == "DefaultByteOrder" ) )
+            {
+                Endianness::Type endianness = Endianness::Default;
+                if( aProperty->GetNumericValue( endianness ) )
+                {
+                    if( endianness == Endianness::Little )
+                    {
+                        ss << "LE";
+                    }
+                    else if( endianness == Endianness::Big )
+                    {
+                        ss << "BE";
+                    }
+                    else
+                    {
+                        ss << "<invalid> (" << endianness << ")";
+                    }
+                }
+                else
+                {
+                    ss << "<invalid>";
+                }
+            }
+            else if( aProperty->GetName() == "Filename" )
+            {
+                StringPropertyPtr spp = StringProperty::StaticCast( aProperty );
+                if( gIsTestMode )
+                {
+                    ss << "<valid>";
+                }
+                else
+                {
+                    ss << spp->GetValue();
+                }
+            }
+
+            aContext.Log( stdout, Msg( ss.str() ), Context::LogLevel::Info );
+        }
+
+    }
+    using namespace CmdValidateSpecInternal;
 
     int CmdValidateSpec
         (
@@ -70,6 +214,28 @@ namespace App
                     .SetValueName( "filename" )
                     .SetCallback( SaveToParamMap )
                     .SetUserdataPtr( &args )
+                )
+            .Add
+                (
+                Param::CreateLong( "testing", 't' )
+                    .SetDescription( "Format output for system tests" )
+                    .SetOptional()
+                    .SetCallback
+                        ( // Lambda
+                        [] (
+                            ArgParser const& aParser,
+                            Param const& aParam,
+                            std::string const& aValue,
+                            uintptr_t const aUserdata
+                            )
+                        {
+                            BFDP_UNUSED_PARAMETER( aParser );
+                            BFDP_UNUSED_PARAMETER( aParam );
+                            BFDP_UNUSED_PARAMETER( aValue );
+                            BFDP_UNUSED_PARAMETER( aUserdata );
+                            gIsTestMode = true;
+                            return 0;
+                        } )
                 );
 
         int ret = parser.Parse( aArgV, aArgC );
@@ -81,7 +247,30 @@ namespace App
         }
 
         std::string specFile = args["file"];
-        aContext.Log( stdout, Msg( "File: " ) << specFile, Context::LogLevel::Info );
+        if( !gIsTestMode )
+        {
+            aContext.Log( stdout, Msg( "File: " ) << specFile, Context::LogLevel::Info );
+        }
+
+        // Create a database to receive objects discovered from the stream
+        DatabasePtr db = Database::Create();
+        if( !db )
+        {
+            BFDP_RUNTIME_ERROR( "Failed to create Database" );
+            return -1;
+        }
+
+        // Set Filename property for future reference
+        StringPropertyPtr fileNameProp = StringProperty::StaticCast
+            (
+            db->GetRoot()->Add( std::make_shared< StringProperty >( "Filename" ) )
+            );
+        if( !fileNameProp ||
+            !fileNameProp->SetValueUtf8( specFile ) )
+        {
+            BFDP_RUNTIME_ERROR( "Failed to set Filename property" );
+            return -1;
+        }
 
         std::fstream fs( specFile.c_str(), std::ios::in | std::ios::binary );
         if( !fs.is_open() )
@@ -91,9 +280,11 @@ namespace App
         }
         else
         {
-            ret = BfsdlParser::ParseStream( specFile, fs, 4096 );
+            ret = BfsdlParser::ParseStream( db->GetRoot(), fs, 4096 );
             fs.close();
         }
+
+        db->Iterate( DumpObject, &aContext );
 
         return ret;
     }

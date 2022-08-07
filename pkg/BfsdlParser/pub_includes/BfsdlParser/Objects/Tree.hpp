@@ -84,6 +84,16 @@ namespace BfsdlParser
                 std::string const& aName
                 );
 
+            //! @return The result of FindProperty, cast as a pointer to a specific type of property
+            template< class T >
+            std::shared_ptr< T > FindPropertyT
+                (
+                std::string const& aName
+                )
+            {
+                return typename T::StaticCast( FindProperty( aName ) );
+            }
+
             void IterateFields
                 (
                 ObjectCb const aFunc,

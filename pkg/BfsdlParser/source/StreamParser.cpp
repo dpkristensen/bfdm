@@ -44,6 +44,7 @@
 #include "Bfdp/ErrorReporter/Functions.hpp"
 #include "Bfdp/Lexer/Symbolizer.hpp"
 #include "BfsdlParser/ParsePosition.hpp"
+#include "BfsdlParser/Objects/StringProperty.hpp"
 #include "BfsdlParser/Token/Interpreter.hpp"
 #include "BfsdlParser/Token/Tokenizer.hpp"
 
@@ -65,12 +66,12 @@ namespace BfsdlParser
     //! @return 0 on success, 1 otherwise.
     int ParseStream
         (
-        std::string const& aName,
+        Objects::TreePtr const aDbContext,
         std::istream& aIn,
         size_t const aChunkSize
         )
     {
-        Token::Interpreter interpreter;
+        Token::Interpreter interpreter( aDbContext );
         BFDP_RETURNIF_VE( !interpreter.IsInitOk(), 1, "Failed to init Interpreter" );
         Token::Tokenizer tokenizer( interpreter );
         BFDP_RETURNIF_VE( !tokenizer.IsInitOk(), 1, "Failed to init Tokenizer" );
@@ -79,7 +80,14 @@ namespace BfsdlParser
         BFDP_RETURNIF_VE( !buf.Allocate( aChunkSize ), 1, "Failed to allocate read buffer" );
         buf.Clear();
 
-        ParsePosition parsePos(aName, 10, 6);
+        // Get the filename associated with this stream
+        std::string fileName;
+        auto fileNameProp = aDbContext->FindPropertyT< Objects::StringProperty >( "Filename" );
+        if( fileNameProp )
+        {
+            fileName = fileNameProp->GetValue();
+        }
+        ParsePosition parsePos( fileName, 10, 6 );
 
         bool ok = true;
         size_t dataStart = 0;

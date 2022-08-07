@@ -1,0 +1,8 @@
+:BFSDL_HEADER
+:Version=#1#
+:END_HEADER
+
+/*
+    Test Minimal definition of a header
+    (All defaults should be generated)
+*/

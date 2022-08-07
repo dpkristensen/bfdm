@@ -92,6 +92,37 @@ namespace BfsdlParser
                 size_t const aSize
                 );
 
+            //! Helper function to set a numeric value
+            //!
+            //! @return Whether the value was set successfully
+            template< typename T >
+            bool SetNumericValue
+                (
+                typename T const& aValue
+                )
+            {
+                typename T value = aValue;
+                return SetData( reinterpret_cast< Bfdp::Byte const* >( &value ), sizeof( value ) );
+            }
+
+            //! Helper function to get a numeric value
+            //!
+            //! @return Value, or 0 on error
+            template< typename T >
+            bool GetNumericValue
+                (
+                typename T& aValue
+                ) const
+            {
+                if( mData.GetSize() != sizeof( aValue ) )
+                {
+                    return false;
+                }
+
+                std::memcpy( &aValue, mData.GetConstPtr(), sizeof( aValue ) );
+                return true;
+            }
+
             //! @return Access to the data buffer containing the value
             Bfdp::Data::ByteBuffer const& GetData() const;
 

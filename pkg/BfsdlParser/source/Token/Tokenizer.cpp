@@ -60,7 +60,7 @@ namespace BfsdlParser
 
             static Lexer::RangeSymbolCategory CatAsterisk( Category::Asterisk, 42, false );
             static Lexer::RangeSymbolCategory CatBackslash( Category::Backslash, 92, false );
-            static Lexer::StringSymbolCategory CatControl( Category::Control, "[];:", false );
+            static Lexer::StringSymbolCategory CatControl( Category::Control, "[];:=", false );
             static Lexer::RangeSymbolCategory CatDecimalDigits( Category::DecimalDigits, 48, 57, true ); // 0-9
             static Lexer::RangeSymbolCategory CatDoubleQuotes( Category::DoubleQuotes, 34, false ); // Double Quotes
             static Lexer::StringSymbolCategory CatEndOfLine( Category::EndOfLine, "\r\n", true );
@@ -405,7 +405,7 @@ namespace BfsdlParser
             switch( mState.symbols.category )
             {
             case Category::Control:
-                mObserver.OnControlCharacter( mState.symbols.str );
+                mState.keepParsing = mObserver.OnControlCharacter( mState.symbols.str );
                 break;
 
             case Category::DoubleQuotes:
@@ -495,7 +495,7 @@ namespace BfsdlParser
                     break;
 
                 case ParseResult::Complete:
-                    mObserver.OnNumericLiteral( mNumericLiteralParser.GetParsedObject() );
+                    mState.keepParsing = mObserver.OnNumericLiteral( mNumericLiteralParser.GetParsedObject() );
                     mStateMachine.Transition( ParseState::MainSequence );
                     break;
 
@@ -527,7 +527,7 @@ namespace BfsdlParser
                     break;
 
                 case ParseResult::Complete:
-                    mObserver.OnStringLiteral( mStringLiteralParser.GetParsedObject() );
+                    mState.keepParsing = mObserver.OnStringLiteral( mStringLiteralParser.GetParsedObject() );
                     mStateMachine.Transition( ParseState::MainSequence );
                     break;
 

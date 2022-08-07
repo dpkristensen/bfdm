@@ -44,20 +44,20 @@ namespace App
 
     int SaveToParamMap
         (
-            Bfdp::Console::ArgParser const& aParser,
-            Bfdp::Console::Param const& aParam,
-            std::string const& aValue,
-            uintptr_t const aUserdata
-            )
-        {
-            BFDP_UNUSED_PARAMETER( aParser );
-            BFDP_UNUSED_PARAMETER( aUserdata );
+        Bfdp::Console::ArgParser const& aParser,
+        Bfdp::Console::Param const& aParam,
+        std::string const& aValue,
+        uintptr_t const aUserdata
+        )
+    {
+        BFDP_UNUSED_PARAMETER( aParser );
+        BFDP_UNUSED_PARAMETER( aUserdata );
 
-            SavedParamMap* pmap = aParam.GetUserdataPtr< SavedParamMap >();
-            BFDP_RETURNIF_VA( pmap == nullptr, 1, "No map to save parameter")
+        SavedParamMap* pmap = aParam.GetUserdataPtr< SavedParamMap >();
+        BFDP_RETURNIF_VA( pmap == nullptr, 1, "No map to save parameter")
 
-            (*pmap)[aParam.GetName()] = aValue;
-            return 0;
-        }
+        (*pmap)[aParam.GetName()] = aValue;
+        return 0;
+    }
 
 }

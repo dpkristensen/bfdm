@@ -33,6 +33,9 @@
 #ifndef BfsdlParser_Objects_Common
 #define BfsdlParser_Objects_Common
 
+// External Includes
+#include <cstdint>
+
 // Internal Includes
 #include "Bfdp/Macros.hpp"
 
@@ -65,6 +68,17 @@ namespace BfsdlParser
                 Bit = 1,
 
                 Default = Byte
+            };
+        };
+
+        struct Endianness
+        {
+            enum Type
+            {
+                Little = 0,
+                Big = 1,
+
+                Default = Little
             };
         };
 
@@ -105,6 +119,8 @@ namespace BfsdlParser
             size_t mIntegralBits;
             size_t mFractionalBits;
         };
+
+        typedef uint16_t BfsdlVersionType;
 
     } // namespace Objects
 

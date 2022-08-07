@@ -32,22 +32,106 @@
 """
 
 import os
+import subprocess
 
-PLATFORMS = ["win32", "win64"]
+TOP_DIR = os.path.dirname(os.path.realpath(__file__))
+
+if os.name == "nt":
+    PLATFORMS = ["win32", "win64"]
+    WAF_EXE = "waf.bat"
+    BFSDL_TESTS_EXE = "BfsdlTests.exe"
+    BFDP_EXE = "bfdp.exe"
+else:
+    raise Exception("OS {} not supported yet".format(os.name))
+
 MODES = ["development", "release"]
 
 def check_cmd(cmdline):
-    rc = os.system(cmdline)
-    if rc != 0:
+    proc = subprocess.Popen(cmdline)
+    proc.communicate();
+    if proc.returncode != 0:
         print("FAILED on {}".format(cmdline))
-        exit(rc)
+        exit(proc.returncode)
+
+def compare_files(file1, file2):
+    line_num = 1
+    with open(file1, "r", encoding="UTF-8") as f1, open(file2, "r", encoding="UTF-8") as f2:
+        while(True):
+            f1_line = f1.readline()
+            f2_line = f2.readline()
+            if not f1_line and not f2_line:
+                # end of files, both matched
+                return True
+            elif f1_line == f2_line:
+                # match; keep looking
+                line_num = line_num + 1
+                continue
+
+            f1_line = f1_line.strip()
+            f2_line = f2_line.strip()
+            print("FAILED: Mismatch at line {}".format(line_num))
+            f1_name = os.path.basename(file1)
+            f2_name = os.path.basename(file2)
+            if len(f1_name) < len(f2_name):
+                f1_name = " " * (len(f2_name) - len(f1_name)) + f1_name
+            elif len(f1_name) > len(f2_name):
+                f2_name = " " * (len(f1_name) - len(f2_name)) + f2_name
+            print("{}: {}".format(f1_name, f1_line))
+            print("{}: {}".format(f2_name, f2_line))
+            return False
+
+def run_test_suites(out_path):
+    bfdp_path = os.path.join(out_path, BFDP_EXE)
+    test_path = os.path.join(TOP_DIR, "test")
+    test_specs_path = os.path.join(test_path, "specs")
+    test_baseline_path = os.path.join(test_path, "baseline")
+    out_result_path = os.path.join(out_path, "test_results")
+    os.makedirs(out_result_path, exist_ok = True)
+    for spec_filename in os.listdir(test_specs_path):
+        if not spec_filename.endswith(".bfsdl"):
+            # Only process .bfsdl filenames
+            continue
+
+        spec_file_path = os.path.join(test_specs_path, spec_filename)
+        spec_name = spec_filename[:-6]
+        out_file_basename = spec_name + "_out.txt"
+        err_file_basename = spec_name + "_err.txt"
+        out_file_destpath = os.path.join(out_result_path, out_file_basename)
+        err_file_destpath = os.path.join(out_result_path, err_file_basename )
+        out_file_baseline = os.path.join(test_baseline_path, out_file_basename)
+        err_file_baseline = os.path.join(test_baseline_path, err_file_basename)
+        cmdline = [bfdp_path, "-v", "validate-spec", "--file", spec_file_path, "--testing"]
+        if spec_filename.startswith("valid_"):
+            # This one should succeed
+
+            print("Testing {}...".format(spec_name), end="")
+            proc = None
+            with open(out_file_destpath, "wb") as f_out, open(err_file_destpath, "wb") as f_err:
+                proc = subprocess.Popen(cmdline, stdout=f_out, stderr=f_err)
+                proc.communicate();
+
+            if proc.returncode != 0:
+                print("FAILED ({}) on {}".format(proc.returncode, cmdline))
+                with open(err_file_destpath, "r", encoding="UTF-8") as f_err:
+                    for line in f_err:
+                        print(line.strip())
+                exit(proc.returncode)
+            elif not compare_files(out_file_baseline, out_file_destpath):
+                exit(1)
+            elif not compare_files(err_file_baseline, err_file_destpath):
+                exit(1)
+            else:
+                print("SUCCESS")
+
 
 def run_cmd():
     for p in PLATFORMS:
         for m in MODES:
-            check_cmd("waf build -p {} -m {}".format(p, m))
-            check_cmd(os.path.join("_out", "{}_{}".format(p, m), "BfsdlTests"))
-            check_cmd(os.path.join("_out", "{}_{}".format(p, m), "bfdp -vv tests"))
+            check_cmd([os.path.join(TOP_DIR, WAF_EXE), "build", "-p", p, "-m", m])
+            print(p, m)
+            out_path = os.path.join(TOP_DIR, "_out", "{}_{}".format(p, m))
+            check_cmd([os.path.join(out_path, BFSDL_TESTS_EXE)])
+            run_test_suites(out_path)
 
     return 0
 

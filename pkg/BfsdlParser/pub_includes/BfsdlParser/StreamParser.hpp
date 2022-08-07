@@ -40,6 +40,9 @@
 // External includes
 #include <istream>
 
+// Internal Includes
+#include "BfsdlParser/Objects/Tree.hpp"
+
 namespace BfsdlParser
 {
 
@@ -48,7 +51,7 @@ namespace BfsdlParser
     //! @return 0 on success, false otherwise.
     int ParseStream
         (
-        std::string const& aName,
+        Objects::TreePtr const aDbContext,
         std::istream& aIn,
         size_t const aChunkSize
         );
