@@ -41,7 +41,7 @@ namespace BfsdlParser
 
         /* static */ FieldPtr Field::StaticCast
             (
-            IObjectPtr& aObject
+            IObjectPtr const aObject
             )
         {
             return ( ObjectType::Field == aObject->GetType() )

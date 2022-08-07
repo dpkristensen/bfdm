@@ -58,7 +58,7 @@ namespace BfsdlParser
         public:
             static NumericFieldPtr StaticCast
                 (
-                IObjectPtr& aObject
+                IObjectPtr const aObject
                 );
 
             NumericField

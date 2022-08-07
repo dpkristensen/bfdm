@@ -33,6 +33,13 @@
 #ifndef BfsdlParser_Objects_Database
 #define BfsdlParser_Objects_Database
 
+// Base Includes
+#include "Bfdp/NonAssignable.hpp"
+#include "Bfdp/NonCopyable.hpp"
+
+// External Includes
+#include <memory>
+
 // Internal Includes
 #include "Bfdp/Common.hpp"
 #include "Bfdp/Macros.hpp"
@@ -45,36 +52,21 @@ namespace BfsdlParser
     namespace Objects
     {
 
+        class Database;
+
+        typedef std::shared_ptr< Database > DatabasePtr;
+
         //! Object Database
         //!
         //! Keeps track of objects parsed from a BFSDL stream.
         class Database BFDP_FINAL
+            : public Bfdp::NonCopyable
+            , public Bfdp::NonAssignable
         {
         public:
-            //! Opaque handle type to protect the database
-            typedef void* Handle;
+            static DatabasePtr Create();
 
-            static Handle BFDP_CONSTEXPR InvalidHandle = NULL;
-
-            Database();
-
-            ~Database();
-
-            //! Add object
-            //!
-            //! Add aObject to the database as a child of aParent (or the root node if invalid).
-            //!
-            //! If aOutHandle is not NULL, then the output is set on success as follows:
-            //! * If aObject is of type Tree, then aOutHandle is the new handle of the tree.
-            //! * NULL otherwise
-            bool Add
-                (
-                IObjectPtr& aObject,
-                Handle const aParent,
-                Handle* const aOutHandle = NULL
-                );
-
-            Handle GetRoot();
+            TreePtr& GetRoot();
 
             void Iterate
                 (
@@ -82,8 +74,11 @@ namespace BfsdlParser
                 void* const aArg
                 );
 
+        protected:
+            Database();
+
         private:
-            Tree mRoot;
+            Objects::TreePtr mRoot;
         };
 
     } // namespace Objects

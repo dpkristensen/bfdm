@@ -59,7 +59,7 @@ namespace BfsdlParser
         public:
             static StringFieldPtr StaticCast
                 (
-                IObjectPtr& aObject
+                IObjectPtr const aObject
                 );
 
             StringField

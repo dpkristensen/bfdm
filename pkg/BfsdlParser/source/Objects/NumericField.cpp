@@ -44,7 +44,7 @@ namespace BfsdlParser
 
         /* static */ NumericFieldPtr NumericField::StaticCast
             (
-            IObjectPtr& aObject
+            IObjectPtr const aObject
             )
         {
             FieldPtr basePtr = Field::StaticCast( aObject );

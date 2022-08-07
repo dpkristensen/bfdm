@@ -39,6 +39,7 @@
 // External includes
 #include <list>
 #include <map>
+#include <memory>
 #include <string>
 
 // Internal includes
@@ -54,6 +55,10 @@ namespace BfsdlParser
 
     namespace Objects
     {
+
+        class Tree;
+
+        typedef std::shared_ptr< Tree > TreePtr;
 
         //! Object Tree Container
         //!

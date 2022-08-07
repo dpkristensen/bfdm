@@ -76,7 +76,7 @@ namespace BfsdlParser
 
         typedef void (*ObjectCb)
             (
-            IObjectPtr& aObject,
+            IObjectPtr const aObject,
             void* const aArg
             );
 

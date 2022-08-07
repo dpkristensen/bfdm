@@ -47,6 +47,7 @@ namespace BfsdlTests
 {
 
     using BfsdlParser::Objects::Database;
+    using BfsdlParser::Objects::DatabasePtr;
     using BfsdlParser::Objects::Field;
     using BfsdlParser::Objects::FieldPtr;
     using BfsdlParser::Objects::IObject;
@@ -73,7 +74,7 @@ namespace BfsdlTests
 
         void TestCb
             (
-            IObjectPtr& aObject,
+            IObjectPtr const aObject,
             void* const aArg
             )
         {
@@ -98,7 +99,7 @@ namespace BfsdlTests
     }
     using namespace BfsdlTestsInternal;
 
-    TEST_F( ObjectDatabaseTest, Add )
+    TEST_F( ObjectDatabaseTest, Iterate )
     {
         char const* ExpectedData[] =
         {
@@ -107,24 +108,22 @@ namespace BfsdlTests
             "f2:s8.8"
         };
 
-        Database db;
-        Database::Handle hOut = Database::InvalidHandle;
+        DatabasePtr db = Database::Create();
+        ASSERT_TRUE( db != NULL );
 
         IObjectPtr fp = std::make_shared< NumericField >( "f1", NumericFieldProperties( false, 8, 0 ) );
-        ASSERT_TRUE( db.Add( fp, db.GetRoot(), &hOut ) );
-        ASSERT_EQ( Database::InvalidHandle, hOut );
+        ASSERT_TRUE( db->GetRoot()->Add( fp ) );
 
         fp = std::make_shared< NumericField >( "f2", NumericFieldProperties( true, 8, 8 ) );
-        ASSERT_TRUE( db.Add( fp, db.GetRoot() ) );
+        ASSERT_TRUE( db->GetRoot()->Add( fp ) );
 
         IObjectPtr pp = std::make_shared< StringProperty >( "p1" );
         ASSERT_TRUE( pp != NULL );
         StringProperty::StaticCast( pp )->SetValueUtf8( "abc" );
-        ASSERT_TRUE( db.Add( pp, db.GetRoot(), &hOut ) );
-        ASSERT_EQ( Database::InvalidHandle, hOut );
+        ASSERT_TRUE( db->GetRoot()->Add( pp ) );
 
         TestItemList out;
-        db.Iterate( TestCb, &out );
+        db->Iterate( TestCb, &out );
         out.sort();
 
         ASSERT_TRUE( StrListsMatch( ExpectedData, out ) );

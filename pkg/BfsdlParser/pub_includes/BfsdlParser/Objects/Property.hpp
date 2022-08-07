@@ -73,7 +73,7 @@ namespace BfsdlParser
             //! @return Pointer to Property object if aObject is a Property, otherwise NULL.
             static PropertyPtr StaticCast
                 (
-                IObjectPtr& aObject
+                IObjectPtr const aObject
                 );
 
             Property

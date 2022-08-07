@@ -65,7 +65,7 @@ namespace BfsdlParser
             //! @return Pointer to Field object if aObject is a Field, otherwise NULL.
             static FieldPtr StaticCast
                 (
-                IObjectPtr& aObject
+                IObjectPtr const aObject
                 );
 
             virtual ~Field();

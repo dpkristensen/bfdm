@@ -41,7 +41,7 @@ namespace BfsdlParser
 
         /* static */ StringPropertyPtr StringProperty::StaticCast
             (
-            IObjectPtr& aObject
+            IObjectPtr const aObject
             )
         {
             return ( ObjectType::Property == aObject->GetType() )

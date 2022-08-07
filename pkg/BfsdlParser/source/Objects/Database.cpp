@@ -33,48 +33,34 @@
 // Base includes
 #include "BfsdlParser/Objects/Database.hpp"
 
+// Internal Includes
+#include <new>
+
 namespace BfsdlParser
 {
 
     namespace Objects
     {
 
-        Database::Database()
+        /* static */ DatabasePtr Database::Create()
         {
-        }
-
-        Database::~Database()
-        {
-        }
-
-        bool Database::Add
-            (
-            IObjectPtr& aObject,
-            Handle const aParent,
-            Handle* const aOutHandle
-            )
-        {
-            Tree* tree = ( aParent == InvalidHandle )
-                ? &mRoot
-                : reinterpret_cast< Tree* >( aParent );
-
-            IObjectPtr newNode = tree->Add( aObject );
-
-            BFDP_RETURNIF_V( newNode == NULL, false );
-
-            if( aOutHandle != NULL )
+            DatabasePtr db = std::shared_ptr< Database >( new(std::nothrow) Database() );
+            if( db )
             {
-                *aOutHandle = ( newNode->GetType() == ObjectType::Tree )
-                    ? newNode.get()
-                    : NULL;
+                db->mRoot = std::make_shared< Tree >();
             }
 
-            return true;
+            if( !db || !db->mRoot )
+            {
+                return NULL;
+            }
+
+            return db;
         }
 
-        Database::Handle Database::GetRoot()
+        Objects::TreePtr& Database::GetRoot()
         {
-            return &mRoot;
+            return mRoot;
         }
 
         void Database::Iterate
@@ -83,8 +69,12 @@ namespace BfsdlParser
             void* const aArg
             )
         {
-            mRoot.IterateProperties( aFunc, aArg );
-            mRoot.IterateFields( aFunc, aArg );
+            mRoot->IterateProperties( aFunc, aArg );
+            mRoot->IterateFields( aFunc, aArg );
+        }
+
+        Database::Database()
+        {
         }
 
     } // namespace Objects
