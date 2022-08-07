@@ -113,7 +113,7 @@ namespace Bfdp
         std::string ByteBuffer::GetString
             (
             size_t const aBytes
-            )
+            ) const
         {
             BFDP_RETURNIF_V( mSize == 0, std::string() );
 

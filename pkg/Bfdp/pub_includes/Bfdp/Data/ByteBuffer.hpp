@@ -103,7 +103,7 @@ namespace Bfdp
             std::string GetString
                 (
                 size_t const aBytes = 0
-                );
+                ) const;
 
             //! Set all values of the buffer to the given value
             void MemSet
