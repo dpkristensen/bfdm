@@ -1,7 +1,7 @@
 /**
-    BFSDL Parser Common Object Declarations
+    BFSDL Parser String Property Definition
 
-    Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2022, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -30,11 +30,8 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef BfsdlParser_Objects_Common
-#define BfsdlParser_Objects_Common
-
-// Internal Includes
-#include "Bfdp/Macros.hpp"
+// Base includes
+#include "BfsdlParser/Objects/StringProperty.hpp"
 
 namespace BfsdlParser
 {
@@ -42,72 +39,41 @@ namespace BfsdlParser
     namespace Objects
     {
 
-        static size_t BFDP_CONSTEXPR MAX_NUMERIC_FIELD_BITS = 64U;
-
-        struct AttributeParseResult
+        /* static */ StringPropertyPtr StringProperty::StaticCast
+            (
+            IObjectPtr& aObject
+            )
         {
-            enum Type
-            {
-                Success,
-                Unsupported,
-                InvalidArgument,
-                Redefinition,
+            return ( ObjectType::Property == aObject->GetType() )
+                ? std::static_pointer_cast< StringProperty >( aObject )
+                : NULL;
+        }
 
-                Unknown
-            };
-        };
-
-        struct BitBase
+        StringProperty::StringProperty
+            (
+            std::string const& aName
+            )
+            : Property( aName )
         {
-            enum Type
-            {
-                Byte = 8,
-                Bit = 1,
+        }
 
-                Default = Byte
-            };
-        };
-
-        struct ObjectType
+        StringProperty::~StringProperty()
         {
-            enum Id
-            {
-                Field,      //!< Field
-                Tree,       //!< Root node that contains other objects
-                Property,   //!< Property
+        }
 
-                Count
-            };
-        };
-
-        struct FieldType
+        std::string StringProperty::GetValue() const
         {
-            enum Id
-            {
-                Numeric,
-                String,
+            return mData.GetString();
+        }
 
-                Count,
-                Unknown = Count
-            };
-        };
-
-        struct NumericFieldProperties
+        bool StringProperty::SetValueUtf8
+            (
+            std::string const& aValue
+            )
         {
-            NumericFieldProperties
-                (
-                bool aSigned,
-                size_t aIntegralBits,
-                size_t aFractionalBits
-                );
-
-            bool mSigned;
-            size_t mIntegralBits;
-            size_t mFractionalBits;
-        };
+            return SetData( Bfdp::Char( aValue.c_str() ), aValue.length() );
+        }
 
     } // namespace Objects
 
 } // namespace BfsdlParser
-
-#endif // BfsdlParser_Objects_Common

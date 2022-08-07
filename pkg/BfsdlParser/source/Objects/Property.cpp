@@ -1,7 +1,7 @@
 /**
-    BFSDL Parser Common Object Declarations
+    BFSDL Parser Property Definition
 
-    Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2022, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -30,11 +30,8 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef BfsdlParser_Objects_Common
-#define BfsdlParser_Objects_Common
-
-// Internal Includes
-#include "Bfdp/Macros.hpp"
+// Base includes
+#include "BfsdlParser/Objects/Property.hpp"
 
 namespace BfsdlParser
 {
@@ -42,72 +39,47 @@ namespace BfsdlParser
     namespace Objects
     {
 
-        static size_t BFDP_CONSTEXPR MAX_NUMERIC_FIELD_BITS = 64U;
-
-        struct AttributeParseResult
+        /* static */ PropertyPtr Property::StaticCast
+            (
+            IObjectPtr& aObject
+            )
         {
-            enum Type
+            return ( ObjectType::Property == aObject->GetType() )
+                ? std::static_pointer_cast< Property >( aObject )
+                : NULL;
+        }
+
+        Property::~Property()
+        {
+        }
+
+        Property::Property
+            (
+            std::string const& aName
+            )
+            : ObjectBase( aName, ObjectType::Property )
+        {
+        }
+
+        bool Property::SetData
+            (
+            Bfdp::Byte const* const aData,
+            size_t const aSize
+            )
+        {
+            if( !mData.Allocate( aSize ) )
             {
-                Success,
-                Unsupported,
-                InvalidArgument,
-                Redefinition,
+                return false;
+            }
+            mData.CopyFrom( aData, aSize );
+            return true;
+        }
 
-                Unknown
-            };
-        };
-
-        struct BitBase
+        Bfdp::Data::ByteBuffer const& Property::GetData() const
         {
-            enum Type
-            {
-                Byte = 8,
-                Bit = 1,
-
-                Default = Byte
-            };
-        };
-
-        struct ObjectType
-        {
-            enum Id
-            {
-                Field,      //!< Field
-                Tree,       //!< Root node that contains other objects
-                Property,   //!< Property
-
-                Count
-            };
-        };
-
-        struct FieldType
-        {
-            enum Id
-            {
-                Numeric,
-                String,
-
-                Count,
-                Unknown = Count
-            };
-        };
-
-        struct NumericFieldProperties
-        {
-            NumericFieldProperties
-                (
-                bool aSigned,
-                size_t aIntegralBits,
-                size_t aFractionalBits
-                );
-
-            bool mSigned;
-            size_t mIntegralBits;
-            size_t mFractionalBits;
-        };
+            return mData;
+        }
 
     } // namespace Objects
 
 } // namespace BfsdlParser
-
-#endif // BfsdlParser_Objects_Common

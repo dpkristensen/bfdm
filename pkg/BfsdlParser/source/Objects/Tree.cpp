@@ -35,6 +35,9 @@
 
 // Internal Includes
 #include "Bfdp/Macros.hpp"
+#include "Bfdp/ErrorReporter/Functions.hpp"
+
+#define BFDP_MODULE "Objects::Tree"
 
 namespace BfsdlParser
 {
@@ -42,28 +45,63 @@ namespace BfsdlParser
     namespace Objects
     {
 
+        Tree::Tree()
+            : ObjectBase( std::string(), ObjectType::Tree )
+        {
+        }
+
         Tree::~Tree()
         {
         }
 
         IObjectPtr Tree::Add
             (
-            IObjectPtr aNode
+            IObjectPtr const aNode
             )
         {
             BFDP_RETURNIF_V( aNode == NULL, NULL );
-            BFDP_RETURNIF_V( Find( aNode->GetName() ) != NULL, NULL );
 
-            NodeMap::iterator iter = mMap.insert
-                (
-                std::make_pair( aNode->GetId(), aNode )
-                );
-            BFDP_RETURNIF_V( iter == mMap.end(), NULL );
+            IObjectPtr result;
+            switch( aNode->GetType() )
+            {
+            case ObjectType::Property:
+                {
+                    BFDP_RETURNIF_V( FindProperty( aNode->GetName() ) != NULL, NULL );
+                    NodeMap::iterator iter = mPropertyMap.insert
+                        (
+                        std::make_pair( aNode->GetId(), aNode )
+                        );
+                    if( iter != mPropertyMap.end() )
+                    {
+                        result = iter->second;
+                    }
+                }
+                break;
 
-            return iter->second;
+            case ObjectType::Field:
+                {
+                    NodeList::iterator iter = mFieldList.insert( mFieldList.end(), aNode );
+                    if( iter != mFieldList.end() )
+                    {
+                        result = *iter;
+                    }
+                }
+                break;
+
+            case ObjectType::Tree:
+                // Will likely be some use case for this later when supporting classes,
+                // enum values, sub-streams, etc...  For now, do not add.
+                break;
+
+            case ObjectType::Count:
+            default:
+                break;
+            }
+
+            return result;
         }
 
-        IObjectPtr Tree::Find
+        PropertyPtr Tree::FindProperty
             (
             std::string const& aName
             )
@@ -71,27 +109,34 @@ namespace BfsdlParser
             using Bfdp::Algorithm::HashedString;
 
             HashedString hs = HashedString( aName );
-            NodeMap::iterator iter = mMap.find( hs );
-            BFDP_RETURNIF_V( iter == mMap.end(), NULL );
+            NodeMap::iterator iter = mPropertyMap.find( hs );
+            BFDP_RETURNIF_V( iter == mPropertyMap.end(), NULL );
 
-            return iter->second;
+            return Property::StaticCast( iter->second );
         }
 
-        void Tree::Iterate
+        void Tree::IterateFields
             (
             ObjectCb const aFunc,
             void* const aArg
             )
         {
-            for( NodeMap::iterator iter = mMap.begin(); iter != mMap.end(); ++iter )
+            for( NodeList::iterator iter = mFieldList.begin(); iter != mFieldList.end(); ++iter )
             {
-                aFunc( iter->second, aArg );
+                aFunc( *iter, aArg );
             }
         }
 
-        Tree::Tree()
-            : ObjectBase( std::string(), ObjectType::Tree )
+        void Tree::IterateProperties
+            (
+            ObjectCb const aFunc,
+            void* const aArg
+            )
         {
+            for( NodeMap::iterator iter = mPropertyMap.begin(); iter != mPropertyMap.end(); ++iter )
+            {
+                aFunc( iter->second, aArg );
+            }
         }
 
     } // namespace Objects

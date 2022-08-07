@@ -40,6 +40,7 @@
 // Internal Includes
 #include "BfsdlParser/Objects/Database.hpp"
 #include "BfsdlParser/Objects/NumericField.hpp"
+#include "BfsdlParser/Objects/StringProperty.hpp"
 #include "BfsdlTests/TestUtil.hpp"
 
 namespace BfsdlTests
@@ -48,11 +49,13 @@ namespace BfsdlTests
     using BfsdlParser::Objects::Database;
     using BfsdlParser::Objects::Field;
     using BfsdlParser::Objects::FieldPtr;
+    using BfsdlParser::Objects::IObject;
+    using BfsdlParser::Objects::IObjectPtr;
     using BfsdlParser::Objects::NumericField;
     using BfsdlParser::Objects::NumericFieldProperties;
     using BfsdlParser::Objects::NumericFieldPtr;
-    using BfsdlParser::Objects::IObject;
-    using BfsdlParser::Objects::IObjectPtr;
+    using BfsdlParser::Objects::StringProperty;
+    using BfsdlParser::Objects::StringPropertyPtr;
 
     class ObjectDatabaseTest
         : public ::testing::Test
@@ -76,16 +79,21 @@ namespace BfsdlTests
         {
             TestItemList* list = reinterpret_cast< TestItemList* >( aArg );
             FieldPtr fp = Field::StaticCast( aObject );
+            StringPropertyPtr pp = StringProperty::StaticCast( aObject );
+            std::stringstream ss;
             if( fp != NULL )
             {
-                std::stringstream ss;
                 ss << fp->GetName() << ":" << fp->GetTypeStr();
-                list->push_back( ss.str() );
+            }
+            else if( pp != NULL )
+            {
+                ss << "." << pp->GetName() << "=" << pp->GetValue();
             }
             else
             {
-                list->push_back( aObject->GetName() );
+                ss << aObject->GetName();
             }
+            list->push_back( ss.str() );
         }
     }
     using namespace BfsdlTestsInternal;
@@ -94,6 +102,7 @@ namespace BfsdlTests
     {
         char const* ExpectedData[] =
         {
+            ".p1=abc",
             "f1:u8",
             "f2:s8.8"
         };
@@ -107,6 +116,12 @@ namespace BfsdlTests
 
         fp = std::make_shared< NumericField >( "f2", NumericFieldProperties( true, 8, 8 ) );
         ASSERT_TRUE( db.Add( fp, db.GetRoot() ) );
+
+        IObjectPtr pp = std::make_shared< StringProperty >( "p1" );
+        ASSERT_TRUE( pp != NULL );
+        StringProperty::StaticCast( pp )->SetValueUtf8( "abc" );
+        ASSERT_TRUE( db.Add( pp, db.GetRoot(), &hOut ) );
+        ASSERT_EQ( Database::InvalidHandle, hOut );
 
         TestItemList out;
         db.Iterate( TestCb, &out );

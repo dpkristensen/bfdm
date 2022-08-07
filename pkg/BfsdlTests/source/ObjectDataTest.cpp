@@ -34,8 +34,10 @@
 
 #include "BfsdlParser/Objects/FStringField.hpp"
 #include "BfsdlParser/Objects/NumericField.hpp"
+#include "BfsdlParser/Objects/Property.hpp"
 #include "BfsdlParser/Objects/PStringField.hpp"
 #include "BfsdlParser/Objects/StringField.hpp"
+#include "BfsdlParser/Objects/StringProperty.hpp"
 #include "BfsdlParser/Objects/Tree.hpp"
 #include "BfsdlTests/TestUtil.hpp"
 
@@ -54,9 +56,13 @@ namespace BfsdlTests
     using BfsdlParser::Objects::NumericFieldProperties;
     using BfsdlParser::Objects::NumericFieldPtr;
     using BfsdlParser::Objects::ObjectType;
+    using BfsdlParser::Objects::Property;
+    using BfsdlParser::Objects::PropertyPtr;
     using BfsdlParser::Objects::PStringField;
     using BfsdlParser::Objects::StringField;
     using BfsdlParser::Objects::StringFieldPtr;
+    using BfsdlParser::Objects::StringProperty;
+    using BfsdlParser::Objects::StringPropertyPtr;
     using BfsdlParser::Objects::Tree;
 
     class ObjectDataTest
@@ -103,6 +109,8 @@ namespace BfsdlTests
         ASSERT_STREQ( "test", op->GetName().c_str() );
         ASSERT_STREQ( "test", op->GetId().GetStr().c_str() );
 
+        ASSERT_TRUE( Property::StaticCast( op ) == NULL );
+
         FieldPtr fp = Field::StaticCast( op );
         ASSERT_TRUE( fp != NULL );
         ASSERT_STREQ( "test", fp->GetName().c_str() );
@@ -118,6 +126,30 @@ namespace BfsdlTests
         NumericFieldPtr fp2 = std::make_shared< NumericField >( "abc", sNumericProps2 );
         ASSERT_STREQ( "abc", fp2->GetName().c_str() );
         ASSERT_STREQ( "u16", fp2->GetTypeStr().c_str() );
+    }
+
+    TEST_F( ObjectDataTest, Property )
+    {
+        IObjectPtr op = std::make_shared< Property >( "test" );
+
+        ASSERT_TRUE( op != NULL );
+        ASSERT_EQ( ObjectType::Property, op->GetType() );
+        ASSERT_STREQ( "test", op->GetName().c_str() );
+        ASSERT_STREQ( "test", op->GetId().GetStr().c_str() );
+
+        ASSERT_TRUE( Field::StaticCast( op ) == NULL );
+
+        PropertyPtr pp = Property::StaticCast( op );
+        ASSERT_TRUE( pp != NULL );
+        ASSERT_STREQ( "test", pp->GetName().c_str() );
+        ASSERT_EQ( 0U, pp->GetData().GetSize() );
+
+        Bfdp::Byte propData[] = { 12, 34, 56 };
+        ASSERT_TRUE( pp->SetData( propData, BFDP_COUNT_OF_ARRAY( propData ) ) );
+        ASSERT_EQ( 3U, pp->GetData().GetSize() );
+        ASSERT_EQ( 12U, pp->GetData()[0] );
+        ASSERT_EQ( 34U, pp->GetData()[1] );
+        ASSERT_EQ( 56U, pp->GetData()[2] );
     }
 
     TEST_F( ObjectDataTest, PStringField )
@@ -164,6 +196,41 @@ namespace BfsdlTests
         ASSERT_EQ( FieldType::String, sfp->GetFieldType() );
     }
 
+    TEST_F( ObjectDataTest, StringProperty )
+    {
+        IObjectPtr op = std::make_shared< StringProperty >( "test" );
+
+        ASSERT_TRUE( op != NULL );
+        ASSERT_EQ( ObjectType::Property, op->GetType() );
+        ASSERT_STREQ( "test", op->GetName().c_str() );
+        ASSERT_STREQ( "test", op->GetId().GetStr().c_str() );
+
+        PropertyPtr pp = Property::StaticCast( op );
+        ASSERT_TRUE( pp != NULL );
+        ASSERT_STREQ( "test", pp->GetName().c_str() );
+        ASSERT_EQ( 0U, pp->GetData().GetSize() );
+
+        StringPropertyPtr spp = StringProperty::StaticCast( op );
+        ASSERT_TRUE( spp != NULL );
+        ASSERT_STREQ( "test", spp->GetName().c_str() );
+        ASSERT_EQ( 0U, spp->GetData().GetSize() );
+
+        ASSERT_TRUE( spp->SetValueUtf8( "ABCDE" ) );
+
+        // Underlying buffer does not store null terminator
+        ASSERT_EQ( 5U, pp->GetData().GetSize() );
+        ASSERT_EQ( 0x41, pp->GetData()[0] );
+        ASSERT_EQ( 0x42, pp->GetData()[1] );
+        ASSERT_EQ( 0x43, pp->GetData()[2] );
+        ASSERT_EQ( 0x44, pp->GetData()[3] );
+        ASSERT_EQ( 0x45, pp->GetData()[4] );
+
+        ASSERT_EQ( 5U, spp->GetData().GetSize() );
+        std::string sppValue = spp->GetValue();
+        ASSERT_EQ( 5U, sppValue.length() );
+        ASSERT_STREQ( "ABCDE", sppValue.c_str() );
+    }
+
     TEST_F( ObjectDataTest, Tree )
     {
         static NumericFieldProperties const sNumericProps = { false, 16, 0 };
@@ -172,28 +239,47 @@ namespace BfsdlTests
         ASSERT_EQ( ObjectType::Tree, tree.GetType() );
         ASSERT_STREQ( "", tree.GetName().c_str() );
 
-        IObjectPtr op = tree.Add( std::make_shared< NumericField >( "One", sNumericProps ) );
+        // Add a field
+        IObjectPtr op = tree.Add( std::make_shared< NumericField >( "FieldOne", sNumericProps ) );
         ASSERT_TRUE( op != NULL );
-        ASSERT_STREQ( "One", op->GetName().c_str() );
+        ASSERT_STREQ( "FieldOne", op->GetName().c_str() );
 
-        op = tree.Add( std::make_shared< NumericField >( "Two", sNumericProps ) );
+        // Add another field
+        op = tree.Add( std::make_shared< NumericField >( "FieldTwo", sNumericProps ) );
         ASSERT_TRUE( op != NULL );
-        ASSERT_STREQ( "Two", op->GetName().c_str() );
+        ASSERT_STREQ( "FieldTwo", op->GetName().c_str() );
 
-        op = tree.Find( "doesNotExist" );
+        // Add a Property
+        op = tree.Add( std::make_shared< Property >( "PropOne" ) );
+        ASSERT_TRUE( op != NULL );
+        ASSERT_STREQ( "PropOne", op->GetName().c_str() );
+
+        // Add another Property
+        op = tree.Add( std::make_shared< StringProperty >( "PropTwo" ) );
+        ASSERT_TRUE( op != NULL );
+        ASSERT_STREQ( "PropTwo", op->GetName().c_str() );
+
+        // Fields are not returned from FindProperty
+        op = tree.FindProperty( "FieldOne" );
         ASSERT_TRUE( op == NULL );
 
-        op = tree.Find( "Two" );
-        ASSERT_TRUE( op != NULL );
-        ASSERT_STREQ( "Two", op->GetName().c_str() );
+        // FindProperty returns NULL for a non-existent property
+        op = tree.FindProperty( "doesNotExist" );
+        ASSERT_TRUE( op == NULL );
 
-        op = tree.Find( "One" );
+        // Find a property
+        op = tree.FindProperty( "PropTwo" );
         ASSERT_TRUE( op != NULL );
-        ASSERT_STREQ( "One", op->GetName().c_str() );
+        ASSERT_STREQ( "PropTwo", op->GetName().c_str() );
+        ASSERT_EQ( ObjectType::Property, op->GetType() );
+        ASSERT_TRUE( Property::StaticCast( op ) == op );
 
-        op = tree.Find( "Two" );
+        // Find another property
+        op = tree.FindProperty( "PropOne" );
         ASSERT_TRUE( op != NULL );
-        ASSERT_STREQ( "Two", op->GetName().c_str() );
+        ASSERT_STREQ( "PropOne", op->GetName().c_str() );
+        ASSERT_EQ( ObjectType::Property, op->GetType() );
+        ASSERT_TRUE( Property::StaticCast( op ) == op );
     }
 
 } // namespace BfsdlTests

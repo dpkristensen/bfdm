@@ -83,7 +83,8 @@ namespace BfsdlParser
             void* const aArg
             )
         {
-            mRoot.Iterate( aFunc, aArg );
+            mRoot.IterateProperties( aFunc, aArg );
+            mRoot.IterateFields( aFunc, aArg );
         }
 
     } // namespace Objects

@@ -1,7 +1,7 @@
 /**
-    BFSDL Parser Object Tree Container
+    BFSDL Parser String Property Declaration
 
-    Copyright 2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2022, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -30,24 +30,18 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef BfsdlParser_Objects_Tree
-#define BfsdlParser_Objects_Tree
+#ifndef BfsdlParser_Objects_StringProperty
+#define BfsdlParser_Objects_StringProperty
 
-// Base includes
-#include "BfsdlParser/Objects/ObjectBase.hpp"
+// Base Includes
+#include "BfsdlParser/Objects/Property.hpp"
 
-// External includes
-#include <list>
-#include <map>
+// External Includes
+#include <memory>
 #include <string>
 
-// Internal includes
-#include "Bfdp/Algorithm/Calc.hpp"
-#include "Bfdp/Algorithm/HashedString.hpp"
+// Internal Includes
 #include "Bfdp/Macros.hpp"
-#include "BfsdlParser/Objects/IObject.hpp"
-#include "BfsdlParser/Objects/Field.hpp"
-#include "BfsdlParser/Objects/Property.hpp"
 
 namespace BfsdlParser
 {
@@ -55,61 +49,45 @@ namespace BfsdlParser
     namespace Objects
     {
 
-        //! Object Tree Container
+        class StringProperty;
+
+        typedef std::shared_ptr< StringProperty > StringPropertyPtr;
+
+        //! String Property
         //!
-        //! Encapsulates a collection of objects
-        class Tree
-            : public ObjectBase
+        //! Specialization of Property to store UTF-8 string values.
+        class StringProperty
+            : public Property
         {
         public:
-            Tree();
-
-            virtual ~Tree();
-
-            //! @return Pointer to the object if added to the tree, NULL otherwise.
-            IObjectPtr Add
+            //! @pre Caller must know if this property should be interpreted as a string based on the name.
+            //! @return Pointer to StringProperty object if aObject is a Property, otherwise NULL.
+            static StringPropertyPtr StaticCast
                 (
-                IObjectPtr const aNode
+                IObjectPtr& aObject
                 );
 
-            //! @note This does NOT do a recursive lookup.
-            //! @return Pointer to the property object if found in the tree, NULL otherwise.
-            PropertyPtr FindProperty
+            StringProperty
                 (
                 std::string const& aName
                 );
 
-            void IterateFields
+            virtual ~StringProperty();
+
+            //! @return Value of the string (canonical)
+            std::string GetValue() const;
+
+            //! Set the value as a UTF-8 string
+            //!
+            //! @return Whether the value was set successfully
+            bool SetValueUtf8
                 (
-                ObjectCb const aFunc,
-                void* const aArg
+                std::string const& aValue
                 );
-
-            void IterateProperties
-                (
-                ObjectCb const aFunc,
-                void* const aArg
-                );
-
-        private:
-            typedef std::multimap
-                <
-                Bfdp::Algorithm::HashedString,
-                IObjectPtr,
-                Bfdp::Algorithm::HashedString::StrictWeakCompare
-                > NodeMap;
-
-            typedef std::list< IObjectPtr > NodeList;
-
-            //! Fields are sequential data elements; so this must be ordered and can be duplicated.
-            NodeList mFieldList;
-
-            //! Properties are metadata about the scope of this tree; un-ordered and unique.
-            NodeMap mPropertyMap;
         };
 
     } // namespace Objects
 
 } // namespace BfsdlParser
 
-#endif // BfsdlParser_Objects_Tree
+#endif // BfsdlParser_Objects_Property
