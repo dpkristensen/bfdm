@@ -1,0 +1,7 @@
+PROP Filename=<valid>
+PROP DefaultStringTerm=0
+PROP DefaultBitOrder=BE
+PROP DefaultByteOrder=BE
+PROP BitBase=1
+PROP DefaultStringCode=ASCII
+PROP Version=0

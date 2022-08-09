@@ -1,0 +1,16 @@
+:BFSDL_HEADER
+:Version=#0#
+:DefaultByteOrder="BE"
+:DefaultBitOrder="BE"
+:BitBase="Bit"
+// String encoding customizations not yet supported
+// :DefaultStringCode="MS-1252"
+// :DefaultStringTerm=#32#
+// Floating point not yet supported
+// :IEEE754Version=#2008#
+// :DefaultFloatFormat="binary64"
+:END_HEADER
+
+/*
+    Test example definition of a header with non-default values
+*/
