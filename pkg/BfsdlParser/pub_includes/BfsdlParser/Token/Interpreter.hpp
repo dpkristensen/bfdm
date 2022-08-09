@@ -130,10 +130,28 @@ namespace BfsdlParser
                 std::string const& aValue
                 ) );
 
+
+            template< typename T >
+            void SetNumericPropertyDefault
+                (
+                std::string const& aName,
+                typename T const aValue
+                )
+            {
+                if( mDb->FindProperty( aName ) == NULL )
+                {
+                    if( !SetNumericProperty( mDb, aName, aValue ) )
+                    {
+                        LogError( Bfdp::Console::Msg( "Failed to set default for " ) << aName );
+                    }
+                }
+            }
+
             // States
             void StateHeaderBeginEntry();
             void StateHeaderBeginEvaluate();
             void StateHeaderIdentifierEvaluate();
+            void StateHeaderIdentifierExit();
             void StateHeaderEqualsEvaluate();
             void StateHeaderParameterEvaluate();
             void StateStatementBeginEvaluate();

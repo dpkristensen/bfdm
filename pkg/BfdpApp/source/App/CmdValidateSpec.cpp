@@ -55,6 +55,7 @@ using Bfdp::Console::Param;
 namespace App
 {
 
+    using BfsdlParser::Objects::BitBase;
     using BfsdlParser::Objects::BfsdlVersionType;
     using BfsdlParser::Objects::Database;
     using BfsdlParser::Objects::DatabasePtr;
@@ -151,7 +152,7 @@ namespace App
                 }
             }
             else if(
-                ( aProperty->GetName() == "DefaultByteOrder" ) ||
+                ( aProperty->GetName() == "DefaultBitOrder" ) ||
                 ( aProperty->GetName() == "DefaultByteOrder" ) )
             {
                 Endianness::Type endianness = Endianness::Default;
@@ -169,6 +170,18 @@ namespace App
                     {
                         ss << "<invalid> (" << endianness << ")";
                     }
+                }
+                else
+                {
+                    ss << "<invalid>";
+                }
+            }
+            else if( aProperty->GetName() == "BitBase" )
+            {
+                BitBase::Type bitBase = BitBase::Default;
+                if( aProperty->GetNumericValue( bitBase ) )
+                {
+                    ss << bitBase;
                 }
                 else
                 {

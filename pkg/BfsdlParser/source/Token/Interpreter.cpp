@@ -38,6 +38,7 @@
 
 // Internal Includes
 #include "Bfdp/BitManip/Conversion.hpp"
+#include "Bfdp/Console/Msg.hpp"
 #include "Bfdp/StateMachine/Actions.hpp"
 #include "Bfdp/Unicode/AsciiConverter.hpp"
 #include "BfsdlParser/Objects/StringProperty.hpp"
@@ -118,6 +119,7 @@ namespace BfsdlParser
             BFDP_STATE_ACTION( ParseState::HeaderBegin, Entry, CallMethod( *this, &Interpreter::StateHeaderBeginEntry ) );
             BFDP_STATE_ACTION( ParseState::HeaderBegin, Evaluate, CallMethod( *this, &Interpreter::StateHeaderBeginEvaluate ) );
             BFDP_STATE_ACTION( ParseState::HeaderIdentifier, Evaluate, CallMethod( *this, &Interpreter::StateHeaderIdentifierEvaluate ) );
+            BFDP_STATE_ACTION( ParseState::HeaderIdentifier, Exit, CallMethod( *this, &Interpreter::StateHeaderIdentifierExit ) );
             BFDP_STATE_ACTION( ParseState::HeaderEquals, Evaluate, CallMethod( *this, &Interpreter::StateHeaderEqualsEvaluate ) );
             BFDP_STATE_ACTION( ParseState::HeaderParameter, Evaluate, CallMethod( *this, &Interpreter::StateHeaderParameterEvaluate ) );
             BFDP_STATE_ACTION( ParseState::StatementBegin, Evaluate, CallMethod( *this, &Interpreter::StateStatementBeginEvaluate ) );
@@ -297,6 +299,16 @@ namespace BfsdlParser
             else
             {
                 mStateMachine.Transition( ParseState::HeaderEquals );
+            }
+        }
+
+        void Interpreter::StateHeaderIdentifierExit()
+        {
+            if( mHeaderStreamProgress == Header::StreamDone )
+            {
+                SetNumericPropertyDefault( "BitBase", BitBase::Default );
+                SetNumericPropertyDefault( "DefaultByteOrder", Endianness::Default );
+                SetNumericPropertyDefault( "DefaultBitOrder", Endianness::Default );
             }
         }
 
