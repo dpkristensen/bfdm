@@ -344,6 +344,7 @@ namespace BfsdlParser
                 SetNumericPropertyDefault( "DefaultBitOrder", Endianness::Default );
                 SetStringPropertyDefault( "DefaultStringCode", "ASCII" );
                 SetNumericPropertyDefault< Bfdp::Unicode::CodePoint >( "DefaultStringTerm", 0U );
+                SetNumericPropertyDefault< Objects::BfsdlVersionType >( "Version", 1U );
             }
         }
 
