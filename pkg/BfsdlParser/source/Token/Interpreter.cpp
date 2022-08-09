@@ -41,6 +41,8 @@
 #include "Bfdp/Console/Msg.hpp"
 #include "Bfdp/StateMachine/Actions.hpp"
 #include "Bfdp/Unicode/AsciiConverter.hpp"
+#include "Bfdp/Unicode/CodingMap.hpp"
+#include "Bfdp/Unicode/Common.hpp"
 #include "BfsdlParser/Objects/Property.hpp"
 
 #define BFDP_MODULE "Token::Interpreter"
@@ -90,7 +92,23 @@ namespace BfsdlParser
                 PropertyPtr pp = std::make_shared< Property >( aName );
                 BFDP_RETURNIF_V( !pp, false );
 
-                pp->SetNumericValue( aValue );
+                BFDP_RETURNIF_V( !pp->SetNumericValue( aValue ), false );
+                BFDP_RETURNIF_V( !aTree->Add( pp ), false );
+
+                return true;
+            }
+
+            static bool SetStringProperty
+                (
+                TreePtr& aTree,
+                std::string const& aName,
+                std::string const& aValue
+                )
+            {
+                PropertyPtr pp = std::make_shared< Property >( aName );
+                BFDP_RETURNIF_V( !pp, false );
+
+                BFDP_RETURNIF_V( !pp->SetString( aValue ), false );
                 BFDP_RETURNIF_V( !aTree->Add( pp ), false );
 
                 return true;
@@ -246,6 +264,21 @@ namespace BfsdlParser
             return !mParseError;
         }
 
+        void Interpreter::SetStringPropertyDefault
+            (
+            std::string const& aName,
+            std::string const& aValue
+            )
+        {
+            if( mDb->FindProperty( aName ) == NULL )
+            {
+                if( !SetStringProperty( mDb, aName, aValue ) )
+                {
+                    LogError( Bfdp::Console::Msg( "Failed to set default for " ) << aName );
+                }
+            }
+        }
+
         void Interpreter::StateHeaderBeginEntry()
         {
             mIdentifier.clear();
@@ -309,6 +342,8 @@ namespace BfsdlParser
                 SetNumericPropertyDefault( "BitBase", BitBase::Default );
                 SetNumericPropertyDefault( "DefaultByteOrder", Endianness::Default );
                 SetNumericPropertyDefault( "DefaultBitOrder", Endianness::Default );
+                SetStringPropertyDefault( "DefaultStringCode", "ASCII" );
+                SetNumericPropertyDefault< Bfdp::Unicode::CodePoint >( "DefaultStringTerm", 0U );
             }
         }
 
@@ -356,7 +391,6 @@ namespace BfsdlParser
 
                 if( ( errCode == ErrNone ) && !SetNumericProperty( mDb, mIdentifier, version ) )
                 {
-                    BFDP_RUNTIME_ERROR( "Failed to set Version property" );
                     errCode = ErrRuntime;
                 }
             }
@@ -386,7 +420,6 @@ namespace BfsdlParser
 
                 if( ( errCode == ErrNone ) && !SetNumericProperty( mDb, mIdentifier, bitBase ) )
                 {
-                    BFDP_RUNTIME_ERROR( "Failed to set BitBase property" );
                     errCode = ErrRuntime;
                 }
             }
@@ -412,7 +445,6 @@ namespace BfsdlParser
 
                 if( ( errCode == ErrNone ) && !SetNumericProperty( mDb, mIdentifier, defaultByteOrder ) )
                 {
-                    BFDP_RUNTIME_ERROR( "Failed to set DefaultByteOrder property" );
                     errCode = ErrRuntime;
                 }
             }
@@ -438,7 +470,6 @@ namespace BfsdlParser
 
                 if( ( errCode == ErrNone ) && !SetNumericProperty( mDb, mIdentifier, defaultBitOrder ) )
                 {
-                    BFDP_RUNTIME_ERROR( "Failed to set DefaultByteOrder property" );
                     errCode = ErrRuntime;
                 }
             }
@@ -460,22 +491,48 @@ namespace BfsdlParser
                 {
                     errCode = ErrTypeStr;
                 }
-                else
+                else if( !mInput.d.str->IsDefined() )
                 {
-                    // TODO: Parse
+                    errCode = ErrInvalid;
+                }
+                else if( !Bfdp::Unicode::IsValidCoding( mInput.d.str->GetUtf8String() ) )
+                {
+                    errCode = ErrInvalid;
+                }
+                else if( mInput.d.str->GetUtf8String() != "ASCII" )
+                {
+                    // TODO: Add support for non-ASCII encoding in BFSDL stream
+                    // Probably need to look up and replace the factory, in which case
+                    // the IsValidCoding() call above will be obviated.
                     errCode = ErrUnsupported;
+                }
+                else if( !SetStringProperty( mDb, mIdentifier, mInput.d.str->GetUtf8String() ) )
+                {
+                    errCode = ErrRuntime;
                 }
             }
             else if( mIdentifier == "DefaultStringTerm" )
             {
                 if( mInput.type != In::NumericLiteral )
                 {
-                    errCode = ErrTypeStr;
+                    errCode = ErrTypeNum;
                 }
                 else
                 {
-                    // TODO: Parse
-                    errCode = ErrUnsupported;
+                    Bfdp::Unicode::CodePoint stringTerm = 0U;
+                    if( !mInput.d.num->GetUint( stringTerm, Bfdp::BitManip::BytesToBits( sizeof( stringTerm ) ) ) )
+                    {
+                        errCode = ErrTypeNum;
+                    }
+                    else if( stringTerm != 0U )
+                    {
+                        // TODO: Add support to change string termination
+                        errCode = ErrUnsupported;
+                    }
+                    else if( !SetNumericProperty( mDb, mIdentifier, stringTerm ) )
+                    {
+                        errCode = ErrRuntime;
+                    }
                 }
             }
             else if( mIdentifier == "CustomExtension" )
@@ -522,7 +579,7 @@ namespace BfsdlParser
             else if( errCode == ErrRuntime )
             {
                 std::stringstream ss;
-                ss << "Runtime failure while parsing " << mIdentifier << " with parameter";
+                ss << "Failed to set " << mIdentifier << " to parameter";
                 LogError( ss.str() );
             }
             else if( errCode == ErrRedefinition )

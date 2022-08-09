@@ -147,6 +147,12 @@ namespace BfsdlParser
                 }
             }
 
+            void SetStringPropertyDefault
+                (
+                std::string const& aName,
+                std::string const& aValue
+                );
+
             // States
             void StateHeaderBeginEntry();
             void StateHeaderBeginEvaluate();

@@ -1,5 +1,7 @@
 PROP Filename=<valid>
+PROP DefaultStringTerm=0
 PROP DefaultBitOrder=LE
 PROP DefaultByteOrder=LE
 PROP BitBase=8
+PROP DefaultStringCode=ASCII
 PROP Version=1

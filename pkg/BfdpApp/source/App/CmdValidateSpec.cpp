@@ -42,6 +42,7 @@
 // Internal Includes
 #include "App/Common.hpp"
 #include "Bfdp/ErrorReporter/Functions.hpp"
+#include "Bfdp/Unicode/Common.hpp"
 #include "BfsdlParser/Objects/Database.hpp"
 #include "BfsdlParser/Objects/IObject.hpp"
 #include "BfsdlParser/Objects/Property.hpp"
@@ -186,6 +187,22 @@ namespace App
                     ss << "<invalid>";
                 }
             }
+            else if( aProperty->GetName() == "DefaultStringTerm" )
+            {
+                Bfdp::Unicode::CodePoint stringTerm = 0U;
+                if( aProperty->GetNumericValue( stringTerm ) )
+                {
+                    ss << stringTerm;
+                }
+                else
+                {
+                    ss << "<invalid>";
+                }
+            }
+            else if( aProperty->GetName() == "DefaultStringCode" )
+            {
+                ss << aProperty->GetString();
+            }
             else if( aProperty->GetName() == "Filename" )
             {
                 if( gIsTestMode )
@@ -196,6 +213,10 @@ namespace App
                 {
                     ss << aProperty->GetString();
                 }
+            }
+            else
+            {
+                ss << "<unknown> (" << aProperty->GetData().GetSize() << " B)";
             }
 
             aContext.Log( stdout, Msg( ss.str() ), Context::LogLevel::Info );
