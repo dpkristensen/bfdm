@@ -142,7 +142,7 @@ namespace Bfdp
             std::string const& aCoding
             )
         {
-            return FindFactory( aCoding );
+            return reinterpret_cast< uintptr_t >( FindFactory( aCoding ) );
         }
 
         bool IsValidCoding

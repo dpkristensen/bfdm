@@ -49,7 +49,7 @@ namespace Bfdp
         //! Unique ID for supported codecs
         //!
         //! @see GetCodingId()
-        typedef void* CodingId;
+        typedef uintptr_t CodingId;
 
         static CodingId BFDP_CONSTEXPR InvalidCodingId = NULL;
 

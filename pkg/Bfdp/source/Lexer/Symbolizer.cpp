@@ -57,7 +57,7 @@ namespace Bfdp
             (
             ISymbolObserver& aObserver,
             ISymbolBuffer& aSymbolBuffer,
-            Unicode::IConverter& aByteConverter
+            Unicode::IConverterPtr const aByteConverter
             )
             : mObserver( aObserver )
             , mSymbolBuffer( aSymbolBuffer )
@@ -116,6 +116,11 @@ namespace Bfdp
             size_t& aBytesRead
             )
         {
+            if( !mByteConverter )
+            {
+                return false;
+            }
+
             aBytesRead = 0;
 
             if( ( aBytes == NULL ) ||
@@ -131,8 +136,8 @@ namespace Bfdp
                 /* Treat bytes as a multi-byte sequence and convert to a symbol */
 
                 Unicode::CodePoint symbol;
-                size_t const bytesToConvert = std::min< size_t >( ( aNumBytes - curPos ), mByteConverter.GetMaxBytes() );
-                size_t bytesRead = mByteConverter.ConvertBytes( &aBytes[curPos], bytesToConvert, symbol );
+                size_t const bytesToConvert = std::min< size_t >( ( aNumBytes - curPos ), mByteConverter->GetMaxBytes() );
+                size_t bytesRead = mByteConverter->ConvertBytes( &aBytes[curPos], bytesToConvert, symbol );
 
                 if( bytesRead == -2 ) // TODO: Magic number
                 {

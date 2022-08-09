@@ -43,6 +43,7 @@
 #include "Bfdp/Lexer/StringSymbolCategory.hpp"
 #include "Bfdp/Macros.hpp"
 #include "Bfdp/StateMachine/Actions.hpp"
+#include "Bfdp/Unicode/CodingMap.hpp"
 #include "BfsdlParser/Token/Category.hpp"
 
 #define BFDP_MODULE "Token::Tokenizer"
@@ -103,7 +104,7 @@ namespace BfsdlParser
             , mObserver( aObserver )
             , mParseError( false )
             , mStringLiteralParser( aObserver )
-            , mSymbolizer( *this, mSymbolBuffer, mAsciiConverter )
+            , mSymbolizer( *this, mSymbolBuffer, Unicode::GetCodec( Unicode::GetCodingId( "ASCII" ) ) )
         {
             bool ok = true;
             ok = ok && mSymbolizer.AddCategory( &CatAsterisk );

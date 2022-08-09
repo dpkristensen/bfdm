@@ -162,9 +162,6 @@ namespace BfsdlParser
             void StateWordEntry();
             void StateWordEvaluate();
 
-            //! Converter for ASCII (initial format)
-            Bfdp::Unicode::AsciiConverter mAsciiConverter;
-
             //! Whether initialization was performed successfully
             bool mInitOk;
 

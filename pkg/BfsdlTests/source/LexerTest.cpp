@@ -39,8 +39,7 @@
 #include "Bfdp/Lexer/StaticSymbolBuffer.hpp"
 #include "Bfdp/Lexer/StringSymbolCategory.hpp"
 #include "Bfdp/Lexer/Symbolizer.hpp"
-#include "Bfdp/Unicode/Ms1252Converter.hpp"
-#include "Bfdp/Unicode/Utf8Converter.hpp"
+#include "Bfdp/Unicode/CodingMap.hpp"
 #include "BfsdlTests/MockSymbolObserver.hpp"
 #include "BfsdlTests/TestUtil.hpp"
 
@@ -48,6 +47,7 @@ namespace BfsdlTests
 {
 
     using namespace Bfdp;
+    using Bfdp::Unicode::GetCodec;
 
     class LexerTest
         : public ::testing::Test
@@ -75,16 +75,21 @@ namespace BfsdlTests
         void SetUp()
         {
             SetDefaultErrorHandlers();
+
+            mCodingIdMs1252 = Unicode::GetCodingId( "MS-1252" );
+            mCodingIdUtf8 = Unicode::GetCodingId( "UTF8" );
         }
+
+        Unicode::CodingId mCodingIdMs1252;
+        Unicode::CodingId mCodingIdUtf8;
     };
 
     TEST_F( LexerTest, NoCategories )
     {
         Lexer::StaticSymbolBuffer< 3 > buffer;
         MockSymbolObserver observer;
-        Unicode::Ms1252Converter converter;
 
-        Lexer::Symbolizer lexer( observer, buffer, converter );
+        Lexer::Symbolizer lexer( observer, buffer, GetCodec( mCodingIdMs1252 ) );
 
         static Byte const testBytes[] = "abc123xyz"; // implicit NULL at end
 
@@ -104,9 +109,8 @@ namespace BfsdlTests
     {
         Lexer::StaticSymbolBuffer< 3 > buffer;
         MockSymbolObserver observer;
-        Unicode::Ms1252Converter converter;
 
-        Lexer::Symbolizer lexer( observer, buffer, converter );
+        Lexer::Symbolizer lexer( observer, buffer, GetCodec( mCodingIdMs1252 ) );
 
         size_t bytesRead = 0U;
         ASSERT_TRUE( lexer.Parse( Char( "X" ), 1, bytesRead ) );
@@ -121,9 +125,8 @@ namespace BfsdlTests
     {
         Lexer::StaticSymbolBuffer< 3 > buffer;
         MockSymbolObserver observer;
-        Unicode::Ms1252Converter converter;
 
-        Lexer::Symbolizer lexer( observer, buffer, converter );
+        Lexer::Symbolizer lexer( observer, buffer, GetCodec( mCodingIdMs1252 ) );
 
         size_t bytesRead = 0U;
         ASSERT_TRUE( lexer.Parse( Char( "XXX" ), 3, bytesRead ) );
@@ -138,9 +141,8 @@ namespace BfsdlTests
     {
         Lexer::StaticSymbolBuffer< 5 > buffer;
         MockSymbolObserver observer;
-        Unicode::Ms1252Converter converter;
 
-        Lexer::Symbolizer lexer( observer, buffer, converter );
+        Lexer::Symbolizer lexer( observer, buffer, GetCodec( mCodingIdMs1252 ) );
 
         // Add the category; byte order in category does not matter
         Lexer::StringSymbolCategory category5( 5, std::string( "A" ), true );
@@ -159,9 +161,9 @@ namespace BfsdlTests
     {
         Lexer::StaticSymbolBuffer< 1 > buffer;
         MockSymbolObserver observer;
-        Unicode::Ms1252Converter converter; // NOTE: Input is in Code Page 1252
 
-        Lexer::Symbolizer lexer( observer, buffer, converter );
+        // Input is in Code Page 1252
+        Lexer::Symbolizer lexer( observer, buffer, GetCodec( mCodingIdMs1252 ) );
 
         std::string const LEFT_SINGLE_QUOTATION_MARK = "\xE2\x80\x98"; // In UTF-8
 
@@ -180,9 +182,8 @@ namespace BfsdlTests
     {
         Lexer::StaticSymbolBuffer< 1 > buffer;
         MockSymbolObserver observer;
-        Unicode::Utf8Converter converter;
 
-        Lexer::Symbolizer lexer( observer, buffer, converter );
+        Lexer::Symbolizer lexer( observer, buffer, GetCodec( mCodingIdUtf8 ) );
 
         std::string const NERD_FACE = "\xF0\x9F\xA4\x93"; // Unicode 0x1f913 in UTF-8
 
@@ -201,9 +202,8 @@ namespace BfsdlTests
     {
         Lexer::StaticSymbolBuffer< 5 > buffer; // Larger than the chunks being read
         MockSymbolObserver observer;
-        Unicode::Ms1252Converter converter;
 
-        Lexer::Symbolizer lexer( observer, buffer, converter );
+        Lexer::Symbolizer lexer( observer, buffer, GetCodec( mCodingIdMs1252 ) );
 
         static Byte const * testBytes = Char( "abc123xyz" );
         size_t chunks[] = { 3, 3, 3 };
@@ -224,9 +224,8 @@ namespace BfsdlTests
     {
         Lexer::StaticSymbolBuffer< 5 > buffer; // Larger than the chunks being read
         MockSymbolObserver observer;
-        Unicode::Ms1252Converter converter;
 
-        Lexer::Symbolizer lexer( observer, buffer, converter );
+        Lexer::Symbolizer lexer( observer, buffer, GetCodec( mCodingIdMs1252 ) );
 
         // Add the category; byte order in category does not matter
         Lexer::StringSymbolCategory category42( 42, std::string( "321" ), true );
@@ -251,9 +250,8 @@ namespace BfsdlTests
     {
         Lexer::StaticSymbolBuffer< 5 > buffer; // Larger than the chunks being read
         MockSymbolObserver observer;
-        Unicode::Ms1252Converter converter;
 
-        Lexer::Symbolizer lexer( observer, buffer, converter );
+        Lexer::Symbolizer lexer( observer, buffer, GetCodec( mCodingIdMs1252 ) );
 
         // Add the categories; byte order in category does not matter
         Lexer::StringSymbolCategory category1( 1, std::string( "cba" ), true );
@@ -283,9 +281,8 @@ namespace BfsdlTests
     {
         Lexer::StaticSymbolBuffer< 5 > buffer; // Larger than the chunks being read
         MockSymbolObserver observer;
-        Unicode::Ms1252Converter converter;
 
-        Lexer::Symbolizer lexer( observer, buffer, converter );
+        Lexer::Symbolizer lexer( observer, buffer, GetCodec( mCodingIdMs1252 ) );
 
         // Add the category; byte order in category does not matter
         Lexer::StringSymbolCategory category1( 1, std::string( "abc" ), true );
@@ -312,9 +309,8 @@ namespace BfsdlTests
     {
         Lexer::StaticSymbolBuffer< 5 > buffer; // Larger than the chunks being read
         MockSymbolObserver observer;
-        Unicode::Ms1252Converter converter;
 
-        Lexer::Symbolizer lexer( observer, buffer, converter );
+        Lexer::Symbolizer lexer( observer, buffer, GetCodec( mCodingIdMs1252 ) );
 
         // Add the category; byte order in category does not matter
         Lexer::StringSymbolCategory category1( 1, std::string( "abc" ), false );

@@ -104,7 +104,7 @@ namespace Bfdp
                 (
                 ISymbolObserver& aObserver, //!< Observer to report findings to
                 ISymbolBuffer& aSymbolBuffer, //!< Buffer which holds symbol data
-                Unicode::IConverter& aByteConverter //!< Converter for bytes
+                Unicode::IConverterPtr const aByteConverter //!< Converter for bytes
                 );
 
             //! Add Category
@@ -178,7 +178,7 @@ namespace Bfdp
             int mSavedCategory;
 
             //! Used to convert bytes to Unicode symbols
-            Unicode::IConverter& mByteConverter;
+            Unicode::IConverterPtr mByteConverter;
 
             //! Map of symbols to categories
             SymbolCategoryMap mSymbolMap;
