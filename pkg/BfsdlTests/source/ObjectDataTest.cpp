@@ -37,7 +37,6 @@
 #include "BfsdlParser/Objects/Property.hpp"
 #include "BfsdlParser/Objects/PStringField.hpp"
 #include "BfsdlParser/Objects/StringField.hpp"
-#include "BfsdlParser/Objects/StringProperty.hpp"
 #include "BfsdlParser/Objects/Tree.hpp"
 #include "BfsdlTests/TestUtil.hpp"
 
@@ -61,8 +60,6 @@ namespace BfsdlTests
     using BfsdlParser::Objects::PStringField;
     using BfsdlParser::Objects::StringField;
     using BfsdlParser::Objects::StringFieldPtr;
-    using BfsdlParser::Objects::StringProperty;
-    using BfsdlParser::Objects::StringPropertyPtr;
     using BfsdlParser::Objects::Tree;
 
     class ObjectDataTest
@@ -198,7 +195,7 @@ namespace BfsdlTests
 
     TEST_F( ObjectDataTest, StringProperty )
     {
-        IObjectPtr op = std::make_shared< StringProperty >( "test" );
+        IObjectPtr op = std::make_shared< Property >( "test" );
 
         ASSERT_TRUE( op != NULL );
         ASSERT_EQ( ObjectType::Property, op->GetType() );
@@ -210,12 +207,7 @@ namespace BfsdlTests
         ASSERT_STREQ( "test", pp->GetName().c_str() );
         ASSERT_EQ( 0U, pp->GetData().GetSize() );
 
-        StringPropertyPtr spp = StringProperty::StaticCast( op );
-        ASSERT_TRUE( spp != NULL );
-        ASSERT_STREQ( "test", spp->GetName().c_str() );
-        ASSERT_EQ( 0U, spp->GetData().GetSize() );
-
-        ASSERT_TRUE( spp->SetValueUtf8( "ABCDE" ) );
+        ASSERT_TRUE( pp->SetString( "ABCDE" ) );
 
         // Underlying buffer does not store null terminator
         ASSERT_EQ( 5U, pp->GetData().GetSize() );
@@ -225,10 +217,9 @@ namespace BfsdlTests
         ASSERT_EQ( 0x44, pp->GetData()[3] );
         ASSERT_EQ( 0x45, pp->GetData()[4] );
 
-        ASSERT_EQ( 5U, spp->GetData().GetSize() );
-        std::string sppValue = spp->GetValue();
-        ASSERT_EQ( 5U, sppValue.length() );
-        ASSERT_STREQ( "ABCDE", sppValue.c_str() );
+        std::string ppValue = pp->GetString();
+        ASSERT_EQ( 5U, ppValue.length() );
+        ASSERT_STREQ( "ABCDE", ppValue.c_str() );
     }
 
     TEST_F( ObjectDataTest, Tree )
@@ -255,7 +246,7 @@ namespace BfsdlTests
         ASSERT_STREQ( "PropOne", op->GetName().c_str() );
 
         // Add another Property
-        op = tree.Add( std::make_shared< StringProperty >( "PropTwo" ) );
+        op = tree.Add( std::make_shared< Property >( "PropTwo" ) );
         ASSERT_TRUE( op != NULL );
         ASSERT_STREQ( "PropTwo", op->GetName().c_str() );
 

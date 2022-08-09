@@ -44,7 +44,7 @@
 #include "Bfdp/ErrorReporter/Functions.hpp"
 #include "Bfdp/Lexer/Symbolizer.hpp"
 #include "BfsdlParser/ParsePosition.hpp"
-#include "BfsdlParser/Objects/StringProperty.hpp"
+#include "BfsdlParser/Objects/Property.hpp"
 #include "BfsdlParser/Token/Interpreter.hpp"
 #include "BfsdlParser/Token/Tokenizer.hpp"
 
@@ -82,10 +82,10 @@ namespace BfsdlParser
 
         // Get the filename associated with this stream
         std::string fileName;
-        auto fileNameProp = aDbContext->FindPropertyT< Objects::StringProperty >( "Filename" );
+        auto fileNameProp = aDbContext->FindPropertyT< Objects::Property >( "Filename" );
         if( fileNameProp )
         {
-            fileName = fileNameProp->GetValue();
+            fileName = fileNameProp->GetString();
         }
         ParsePosition parsePos( fileName, 10, 6 );
 

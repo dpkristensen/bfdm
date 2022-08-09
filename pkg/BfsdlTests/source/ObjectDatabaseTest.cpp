@@ -40,7 +40,7 @@
 // Internal Includes
 #include "BfsdlParser/Objects/Database.hpp"
 #include "BfsdlParser/Objects/NumericField.hpp"
-#include "BfsdlParser/Objects/StringProperty.hpp"
+#include "BfsdlParser/Objects/Property.hpp"
 #include "BfsdlTests/TestUtil.hpp"
 
 namespace BfsdlTests
@@ -55,8 +55,8 @@ namespace BfsdlTests
     using BfsdlParser::Objects::NumericField;
     using BfsdlParser::Objects::NumericFieldProperties;
     using BfsdlParser::Objects::NumericFieldPtr;
-    using BfsdlParser::Objects::StringProperty;
-    using BfsdlParser::Objects::StringPropertyPtr;
+    using BfsdlParser::Objects::Property;
+    using BfsdlParser::Objects::PropertyPtr;
 
     class ObjectDatabaseTest
         : public ::testing::Test
@@ -80,7 +80,7 @@ namespace BfsdlTests
         {
             TestItemList* list = reinterpret_cast< TestItemList* >( aArg );
             FieldPtr fp = Field::StaticCast( aObject );
-            StringPropertyPtr pp = StringProperty::StaticCast( aObject );
+            PropertyPtr pp = Property::StaticCast( aObject );
             std::stringstream ss;
             if( fp != NULL )
             {
@@ -88,7 +88,7 @@ namespace BfsdlTests
             }
             else if( pp != NULL )
             {
-                ss << "." << pp->GetName() << "=" << pp->GetValue();
+                ss << "." << pp->GetName() << "=" << pp->GetString();
             }
             else
             {
@@ -117,9 +117,9 @@ namespace BfsdlTests
         fp = std::make_shared< NumericField >( "f2", NumericFieldProperties( true, 8, 8 ) );
         ASSERT_TRUE( db->GetRoot()->Add( fp ) );
 
-        IObjectPtr pp = std::make_shared< StringProperty >( "p1" );
+        IObjectPtr pp = std::make_shared< Property >( "p1" );
         ASSERT_TRUE( pp != NULL );
-        StringProperty::StaticCast( pp )->SetValueUtf8( "abc" );
+        Property::StaticCast( pp )->SetString( "abc" );
         ASSERT_TRUE( db->GetRoot()->Add( pp ) );
 
         TestItemList out;

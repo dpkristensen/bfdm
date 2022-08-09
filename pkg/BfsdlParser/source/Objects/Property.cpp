@@ -61,6 +61,16 @@ namespace BfsdlParser
         {
         }
 
+        Bfdp::Data::ByteBuffer const& Property::GetData() const
+        {
+            return mData;
+        }
+
+        std::string Property::GetString() const
+        {
+            return mData.GetString();
+        }
+
         bool Property::SetData
             (
             Bfdp::Byte const* const aData,
@@ -75,9 +85,12 @@ namespace BfsdlParser
             return true;
         }
 
-        Bfdp::Data::ByteBuffer const& Property::GetData() const
+        bool Property::SetString
+            (
+            std::string const& aValue
+            )
         {
-            return mData;
+            return SetData( Bfdp::Char( aValue.c_str() ), aValue.length() );
         }
 
     } // namespace Objects

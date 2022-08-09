@@ -44,7 +44,7 @@
 #include "Bfdp/ErrorReporter/Functions.hpp"
 #include "BfsdlParser/Objects/Database.hpp"
 #include "BfsdlParser/Objects/IObject.hpp"
-#include "BfsdlParser/Objects/StringProperty.hpp"
+#include "BfsdlParser/Objects/Property.hpp"
 #include "BfsdlParser/Objects/Tree.hpp"
 #include "BfsdlParser/StreamParser.hpp"
 
@@ -68,8 +68,6 @@ namespace App
     using BfsdlParser::Objects::PropertyPtr;
     using BfsdlParser::Objects::Tree;
     using BfsdlParser::Objects::TreePtr;
-    using BfsdlParser::Objects::StringProperty;
-    using BfsdlParser::Objects::StringPropertyPtr;
 
     namespace CmdValidateSpecInternal
     {
@@ -190,14 +188,13 @@ namespace App
             }
             else if( aProperty->GetName() == "Filename" )
             {
-                StringPropertyPtr spp = StringProperty::StaticCast( aProperty );
                 if( gIsTestMode )
                 {
                     ss << "<valid>";
                 }
                 else
                 {
-                    ss << spp->GetValue();
+                    ss << aProperty->GetString();
                 }
             }
 
@@ -274,12 +271,12 @@ namespace App
         }
 
         // Set Filename property for future reference
-        StringPropertyPtr fileNameProp = StringProperty::StaticCast
+        PropertyPtr fileNameProp = Property::StaticCast
             (
-            db->GetRoot()->Add( std::make_shared< StringProperty >( "Filename" ) )
+            db->GetRoot()->Add( std::make_shared< Property >( "Filename" ) )
             );
         if( !fileNameProp ||
-            !fileNameProp->SetValueUtf8( specFile ) )
+            !fileNameProp->SetString( specFile ) )
         {
             BFDP_RUNTIME_ERROR( "Failed to set Filename property" );
             return -1;

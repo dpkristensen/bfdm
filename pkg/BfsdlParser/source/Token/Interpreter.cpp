@@ -41,7 +41,7 @@
 #include "Bfdp/Console/Msg.hpp"
 #include "Bfdp/StateMachine/Actions.hpp"
 #include "Bfdp/Unicode/AsciiConverter.hpp"
-#include "BfsdlParser/Objects/StringProperty.hpp"
+#include "BfsdlParser/Objects/Property.hpp"
 
 #define BFDP_MODULE "Token::Interpreter"
 

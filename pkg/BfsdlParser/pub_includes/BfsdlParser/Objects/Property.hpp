@@ -83,6 +83,31 @@ namespace BfsdlParser
 
             virtual ~Property();
 
+            //! @return Access to the data buffer containing the value
+            Bfdp::Data::ByteBuffer const& GetData() const;
+
+            //! Helper function to get a numeric value
+            //!
+            //! @return Value, or 0 on error
+            template< typename T >
+            bool GetNumericValue
+                (
+                typename T& aValue
+                ) const
+            {
+                if( mData.GetSize() != sizeof( aValue ) )
+                {
+                    return false;
+                }
+
+                std::memcpy( &aValue, mData.GetConstPtr(), sizeof( aValue ) );
+                return true;
+            }
+
+            //! @note Encoding is unspecified
+            //! @return The property data as a string
+            std::string GetString() const;
+
             //! Set the value as a raw byte buffer
             //!
             //! @return Whether the value was set successfully
@@ -105,26 +130,14 @@ namespace BfsdlParser
                 return SetData( reinterpret_cast< Bfdp::Byte const* >( &value ), sizeof( value ) );
             }
 
-            //! Helper function to get a numeric value
+            //! Set the property's value from a string
             //!
-            //! @return Value, or 0 on error
-            template< typename T >
-            bool GetNumericValue
+            //! @note Encoding is unspecified
+            //! @return Whether the value was set successfully.
+            bool Property::SetString
                 (
-                typename T& aValue
-                ) const
-            {
-                if( mData.GetSize() != sizeof( aValue ) )
-                {
-                    return false;
-                }
-
-                std::memcpy( &aValue, mData.GetConstPtr(), sizeof( aValue ) );
-                return true;
-            }
-
-            //! @return Access to the data buffer containing the value
-            Bfdp::Data::ByteBuffer const& GetData() const;
+                std::string const& aValue
+                );
 
         protected:
             Bfdp::Data::ByteBuffer mData;
