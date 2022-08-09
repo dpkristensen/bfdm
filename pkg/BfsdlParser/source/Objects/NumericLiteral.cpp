@@ -90,6 +90,7 @@ namespace BfsdlParser
 
         void NumericLiteral::Reset()
         {
+            mRadix = Data::InvalidRadix;
             mNumber.Reset();
         }
 

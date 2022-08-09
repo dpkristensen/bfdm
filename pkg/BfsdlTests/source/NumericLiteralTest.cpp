@@ -244,6 +244,7 @@ namespace BfsdlTests
 
         literal.SetSignificandSign( Data::Sign::Positive );
         literal.SetRadix( 8 );
+        ASSERT_TRUE( literal.HasRadix() );
         ASSERT_TRUE( literal.SetSignificandIntegralDigits( "123" ) );
         ASSERT_TRUE( literal.SetSignificandFractionalDigits( "456" ) );
         ASSERT_TRUE( literal.SetDefaultBase() );
@@ -254,6 +255,7 @@ namespace BfsdlTests
         ASSERT_STREQ( "+123.456 x +2 ^ -70", literal.GetStr( true ).c_str() );
 
         literal.Reset();
+        ASSERT_FALSE( literal.HasRadix() );
         ASSERT_FALSE( literal.IsDefined() );
         ASSERT_STREQ( "", literal.GetStr( true ).c_str() );
     }
