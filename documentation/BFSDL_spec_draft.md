@@ -419,7 +419,7 @@ It is possible to build a string literal across multiple lines using Concatenati
 
 #### 3.2.1 Escape Sequences
 
-Escape sequences may be used with `<string-literal-value>` to store characters in a string literal that are otherwise difficult to represent.
+Escape sequences may be used with `<string-literal-value>` to store characters in a string literal that are otherwise difficult to represent.  A basic set of escape sequences are provided to use common pre-defined code points.
 
     back-slash := '\'
     escape-sequence := <back-slash><double-quote>               // Ex: \" = Unicode 34
@@ -427,57 +427,83 @@ Escape sequences may be used with `<string-literal-value>` to store characters i
                        <back-slash>'t'                          // Ex: \t = Unicode 8
                        <back-slash>'r'                          // Ex: \r = Unicode 13
                        <back-slash>'n'                          // Ex: \n = Unicode 10
-                       <back-slash>'a'(<radix-16-digits>...2)   // Ex: \a38 = ASCII 56
-                       <back-slash>'w'(<radix-16-digits>...2)   // Ex: \w7f = MS-1252 127
 
-Some escape sequences allow a variable number of digits to follow:
+Escape sequences that are followed by digits are used to express arbitrary code points.  The length of the digits required to represent the code point can also sometimes be specified ahead of time, with limits specified by the escape character that follows (note that this is always in base 10):
 
     escape-digits := <radix-10-digits>...
-    escape-sequence += <back-slash>[<escape-digits>]'x'(<radix-16-digits>...<escape-digits>)
-        // Default for <escape-digits> = 2
-        // Smallest supported range of <escape-digits> is 1-8
+
+The supported escape characters are `(a|b|u|w|x)`:
+
+    // ASCII code point
+    escape-sequence += <back-slash>[<escape-digits>]'a'(<radix-16-digits>...<escape-digits>)
+        // <escape-digits>: must ALWAYS be 2 digits
+        // Base: 16
+        // Coding: ASCII
         // Examples:
-        //   \x34 = String code 52
-        //   \4x1234 = String code 4660
+        //   \a34 = ASCII code point 52
+        //   \a80 = Invalid ASCII code point; will cause an error!
+        //   \2a7f = ASCII code point 127 (specification of <escape-digits>=2 is allowed)
+        //   \4a007f = Invalid sequence (<escape-digits>!=2)
+
+    // Binary code point
     escape-sequence += <back-slash>[<escape-digits>]'b'(<radix-2-digits>...<escape-digits>)
-        // Default for <escape-digits> = 8
-        // Smallest supported range of <escape-digits> is 1-32
+        // <escape-digits>: default=8, smallest supported range is 1-32 digits
+        // Base: 2
+        // Coding: Unicode
         // Examples:
-        //   \b00110001 = String code 49
-        //   \4b0001 = String code 1
-        //   \16b0001001100110111 = String code 4919
+        //   \b00110001 = Unicode code point 49
+        //   \4b0001 = Unicode code point 1
+        //   \16b0001001100110111 = Unicode code point 4919
+
+    // Unicode code point
     escape-sequence += <back-slash>[<escape-digits>]'u'(<radix-16-digits>...<escape-digits>)
-        // Default for <escape-digits> = 4
-        // Smallest supported range of <escape-digits> is 1-8
+        // <escape-digits>: default=4, smallest supported range is 1-8 digits
+        // Base: 16
+        // Coding: Unicode
         // Examples:
         //   \u1234 = Unicode 4660
         //   \6u10FFFF = Unicode 1114111
 
-Note that the numeric value of escape sequences corresponds to the *code point*, whose interpretation is dependent upon the encoding of the string.
+    // Windows code point
+    escape-sequence += <back-slash>[<escape-digits>]'w'(<radix-16-digits>...<escape-digits>)
+        // <escape-digits>: must ALWAYS be 2 digits
+        // Base: 16
+        // Coding: MS-1252
+        // Examples:
+        //   \w34 = MS-1252 code point 52
+        //   \w7f = Invalid MS-1252 code point; will cause an error!
+        //   \2wff = MS-1252 code point 255
+        //   \3w07e = Invalid sequence (<escape-digits>!=2)
+
+    // Hexadecimal code point
+    escape-sequence += <back-slash>[<escape-digits>]'x'(<radix-16-digits>...<escape-digits>)
+        // <escape-digits>: default=2, smallest supported range is 1-8 digits
+        // Base 16
+        // Coding: Unicode
+        // Examples:
+        //   \x34 = Unicode code point 52
+        //   \4x1234 = Unicode code point 4660
+
+Note that the numeric value of escape sequences corresponds to the *code point* of the encoding associated with the escape sequence.  Literals may be represented internally as UTF8, so defining `\x` in terms of Unicode code points allows for equivalent numeric translation.
+
+* `\w9e` is MS-1252 code point 158, which will be represented internally as Unicode 382
+* `\x9e` is Unicode code point 158, which will be represented internally as Unicode 158
+
+Since there is no supported encoding that supports only Unicode values 0-255 (e.g., a `BYTE` encoding), using strings to generically represent raw bytes is discouraged because it does not realistically represent the format of the underlying data (i.e., it is actually non-string data); the real interpretation of such strings is ambiguous (see Appendix E "Prohibited Specifications").
 
 #### 3.2.2 String Encoding
 
-String Literals must always use a defined coding:
+String Literals are a collection of Unicode code points, and do not intrinsically have a specified bit format.  The literal will be converted into an encoding at the point where it is converted to a specific `string` format.
 
     string-code := <word>
 
-`<word>` could be any coding definedin Appendix D for the code() attribute, or by a supported extension (provided the usage is allowed by the extension according to the rules and constraints defined by the extension).
-
-A String Literal may use the default code, or use `<string-code-attribute>` (attributes are listed in Appendix D) to specify the code:
-
-    string-literal := <string-literal-value>
-                      <string-literal-value>'.code("'<string-code>'")'
-
-The value of `<string-code>` is used for any raw characters, as well as escape codes which do not have an implicit code (`\x`, `\b`, and `\u`).
-
-The implicit code of escape sequences `\a` and `u` always override `<string-code>` for that symbol.
+`<word>` could be any coding defined in Appendix D for the code() attribute, or by a supported extension (provided the usage is allowed by the extension according to the rules and constraints defined by the extension).
 
 #### 3.2.3 Concatenation of String Literals
 
 Multiple occurrences of String Literals in a single statement may be concatenated into a single String Literal:
 
-    string-literal-element := (<string-literal-value>|<string-literal-with-code>)
-    string-literal += [(<string-literal-element>'+')...]<string-literal-element>
+    string-literal += [(<string-literal>'+')...]<string-literal>
 
 #### 3.2.4 Bitwise Representation of String Literals
 
@@ -554,14 +580,12 @@ Each configuration value must be specified exactly once per header section, unle
 * DefaultFloatFormat - Takes a String Literal value specifying the default floating point format
     * No default; if undefined, then all floating point bit formats must specify the format.
     * See Appendix C for allowed values.
-* DefaultStringCode = Takes a String Literal value specifying the default value of `<string-code>` code for interpreting other String Literals found in the BFSDL Stream.
+* DefaultStringCode = Takes a String Literal value specifying the default value of `<string-code>` code to use for encoding when converting a String Literal into a defined bit format.
     * Default value = `ASCII`
-    * NOTE: Before this configuration is parsed completely, the default value is used.  So any String Literals which require a different encoding must appear after this setting.
     * NOTE: Normal parsing rules for String Literals apply here, including escape sequences and attributes.  Examples of valid values ways to specify the UTF8 code:
         * `"UTF8"`
         * `"UTF\u0038"`
-        * `"UTF\x38"` (`\x38` is interpreted as an ASCII code point, since the new default value has not taken effect)
-        * `"UTF\x38".code("MS-1252")` ("code" is an attribute, see appendix D)
+        * `"UTF\x38"`
 * DefaultStringTerm - Takes a Numeric Literal value specifying the code to use for termination when converting a String Literal into a defined bit format.
     * Default Value = `#0#`
 * CustomExtension - Takes a String Literal value specifying a custom extension which must be supported by the parser to interpret the BFSDL Stream correctly.
@@ -668,7 +692,9 @@ Strings are character-oriented vectors whose length may be set dynamically.
 
     string-bit-format := 'string'
 
-This format may be modified by Attributes (see Appendix D).
+This format may be modified by Attributes (see Appendix D).  The base `string` format should mostly be used when explicitly specifying length and termination parameters; in other cases it will be better to use a more explicit string type that more clearly defines the format at the point of declaration.
+
+For example, string formats may explicitly override the default encoding by specifying the `<string-code>` via the `code()` Attribute (see Appendix D).
 
 ##### 5.2.3.1 C-Style Strings
 
