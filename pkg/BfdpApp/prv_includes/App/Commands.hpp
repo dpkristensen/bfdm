@@ -37,11 +37,20 @@
 #include "App/Context.hpp"
 
 #define APP_NAME "bfdp"
+#define APP_CMD_PARSE_NAME "parse"
+#define APP_CMD_PARSE_DESC "Parse a data stream"
 #define APP_CMD_VALIDATE_SPEC_NAME "validate-spec"
 #define APP_CMD_VALIDATE_SPEC_DESC "Validate a BFSDL specification"
 
 namespace App
 {
+
+    int CmdParse
+        (
+        Context& aContext,
+        int const aArgC,
+        char const* const* const aArgV
+        );
 
     int CmdValidateSpec
         (
