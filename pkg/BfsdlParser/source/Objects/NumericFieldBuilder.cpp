@@ -66,6 +66,11 @@ namespace BfsdlParser
             return std::make_shared< NumericField >( aName, mProps );
         }
 
+        bool NumericFieldBuilder::IsComplete() const
+        {
+            return mComplete;
+        }
+
         bool NumericFieldBuilder::ParseIdentifier
             (
             std::string const& aText

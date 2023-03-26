@@ -60,6 +60,9 @@ namespace BfsdlParser
                 std::string const& aName
                 ) const;
 
+            //! @return true if the suffix was supplied, false otherwise.
+            bool IsComplete() const;
+
             //! Parse the identifier
             //!
             //! This will be the text before a space or dot, consisting of numbers and/or letters.

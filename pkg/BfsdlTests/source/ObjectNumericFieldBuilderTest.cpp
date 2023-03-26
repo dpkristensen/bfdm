@@ -78,6 +78,8 @@ namespace BfsdlTests
                 // Reset between iterations
                 builder.Reset();
 
+                ASSERT_FALSE(builder.IsComplete());
+
                 builder.SetBitBase( aBase );
                 bool expectedResult = ( aTestData[i].outStr != NULL );
 
@@ -89,6 +91,8 @@ namespace BfsdlTests
                     ASSERT_TRUE( result );
                 }
 
+                ASSERT_FALSE(builder.IsComplete());
+
                 if( result )
                 {
                     result = builder.ParseSuffix( aTestData[i].inStr2 );
@@ -97,6 +101,7 @@ namespace BfsdlTests
 
                 if( expectedResult )
                 {
+                    ASSERT_TRUE(builder.IsComplete());
                     NumericFieldPtr f = builder.GetField( "test" );
                     ASSERT_TRUE( NULL != f );
                     ASSERT_STREQ( "test", f->GetName().c_str() );
@@ -104,6 +109,7 @@ namespace BfsdlTests
                 }
                 else
                 {
+                    ASSERT_FALSE(builder.IsComplete());
                     ASSERT_TRUE( NULL == builder.GetField( "test" ) );
                 }
             }
