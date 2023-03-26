@@ -36,6 +36,7 @@
 // Internal includes
 #include "Bfdp/ErrorReporter/Functions.hpp"
 #include "Bfdp/BitManip/Mask.hpp"
+#include "Bfdp/Unicode/Functions.hpp"
 
 #define BFDP_MODULE "Unicode::Utf8Converter"
 
@@ -172,8 +173,9 @@ namespace Bfdp
                 return 0;
             }
 
-            if( TheoreticalMaxUnicodePoint < aSymbolIn )
+            if( !IsValidCodePoint(aSymbolIn) )
             {
+                // Ignore all invalid code points (Private Use and Non-Character values are accepted)
                 return 0;
             }
 

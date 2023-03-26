@@ -1,7 +1,7 @@
 /**
-    BFDP Unicode Common Declarations
+    BFDP Unicode Common Definitions
 
-    Copyright 2016-2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2023, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -30,11 +30,9 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef Bfdp_Unicode_Common
-#define Bfdp_Unicode_Common
-
-// Internal includes
+// Base includes
 #include "Bfdp/Common.hpp"
+#include "Bfdp/Unicode/Functions.hpp"
 
 namespace Bfdp
 {
@@ -42,25 +40,25 @@ namespace Bfdp
     namespace Unicode
     {
 
-        typedef uint32_t CodePoint;
+        bool IsCharacter(CodePoint const aCodePoint)
+        {
+            if(!IsValidCodePoint(aCodePoint)) {
+                return false;
+            } else if(IsWithinRange<CodePoint>(0xFDD0, aCodePoint, 0xFDEF)) {
+                // Contiguous range of 32 non-characters characters in the BMP
+                return false;
+            } else if((aCodePoint & 0xFFFE) == 0xFFFE) {
+                // Last two code points of the BMP and each of the 16 supplementary planes are noncharacters
+                return (aCodePoint & 0x7FFFF0000) > 0x100000;
+            }
+            return true;
+        }
 
-        static CodePoint const InvalidCodePoint = 0xFFFF;
-        static CodePoint const NullCodePoint = 0U;
-
-        //! Maximum number of bytes any converter may require for Unicode conversion of one symbol
-        static size_t const MaxBytesForConversion = 4;
-
-        static CodePoint const TheoreticalMaxUnicodePoint = 0x7FFFFFFF;
-
-        //! @return true if aCodePoint is a valid code point and not a Non-Character
-        bool IsCharacter(CodePoint const aCodePoint);
-
-        //! @return true if aCodePoint is within the range of theoretical Unicode code point values
-        //!     including Private Use Characters and Non-Characters.
-        bool IsValidCodePoint(CodePoint const aCodePoint);
+        bool IsValidCodePoint(CodePoint const aCodePoint)
+        {
+            return aCodePoint <= TheoreticalMaxUnicodePoint;
+        }
 
     } // namespace Unicode
 
 } // namespace Bfdp
-
-#endif // Bfdp_Unicode_Common

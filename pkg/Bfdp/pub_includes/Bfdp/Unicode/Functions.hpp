@@ -1,7 +1,7 @@
 /**
-    BFDP Unicode Common Declarations
+    BFDP Unicode Function Declarations
 
-    Copyright 2016-2018, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2023, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -30,27 +30,17 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef Bfdp_Unicode_Common
-#define Bfdp_Unicode_Common
+#ifndef Bfdp_Unicode_Functions
+#define Bfdp_Unicode_Functions
 
 // Internal includes
-#include "Bfdp/Common.hpp"
+#include "Bfdp/Unicode/Common.hpp"
 
 namespace Bfdp
 {
 
     namespace Unicode
     {
-
-        typedef uint32_t CodePoint;
-
-        static CodePoint const InvalidCodePoint = 0xFFFF;
-        static CodePoint const NullCodePoint = 0U;
-
-        //! Maximum number of bytes any converter may require for Unicode conversion of one symbol
-        static size_t const MaxBytesForConversion = 4;
-
-        static CodePoint const TheoreticalMaxUnicodePoint = 0x7FFFFFFF;
 
         //! @return true if aCodePoint is a valid code point and not a Non-Character
         bool IsCharacter(CodePoint const aCodePoint);
@@ -63,4 +53,4 @@ namespace Bfdp
 
 } // namespace Bfdp
 
-#endif // Bfdp_Unicode_Common
+#endif // Bfdp_Unicode_Functions
