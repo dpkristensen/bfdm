@@ -1,5 +1,5 @@
 PROP Filename=<valid>
-PROP DefaultStringTerm=0
+PROP DefaultStringTerm=32
 PROP DefaultBitOrder=BE
 PROP DefaultByteOrder=BE
 PROP BitBase=1

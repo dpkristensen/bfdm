@@ -3,8 +3,7 @@
 :DefaultByteOrder="BE"
 :DefaultBitOrder="BE"
 :BitBase="Bit"
-// String terminator customization not yet supported
-// :DefaultStringTerm=#32#
+:DefaultStringTerm=#32#
 :DefaultStringCode="MS-1252"
 // IEEE-754 not yet supported
 // :IEEE754Version=#2008#

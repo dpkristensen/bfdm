@@ -43,6 +43,7 @@
 #include "Bfdp/Unicode/AsciiConverter.hpp"
 #include "Bfdp/Unicode/CodingMap.hpp"
 #include "Bfdp/Unicode/Common.hpp"
+#include "Bfdp/Unicode/Functions.hpp"
 #include "BfsdlParser/Objects/Property.hpp"
 
 #define BFDP_MODULE "Token::Interpreter"
@@ -518,9 +519,9 @@ namespace BfsdlParser
                     {
                         errCode = ErrTypeNum;
                     }
-                    else if( stringTerm != 0U )
+                    else if( !Bfdp::Unicode::IsCharacter(stringTerm) )
                     {
-                        // TODO: Add support to change string termination
+                        // Only valid characters are supported as terminators
                         errCode = ErrUnsupported;
                     }
                     else if( !SetNumericProperty( mDb, mIdentifier, stringTerm ) )
