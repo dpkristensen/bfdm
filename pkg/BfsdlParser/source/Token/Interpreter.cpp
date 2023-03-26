@@ -500,13 +500,6 @@ namespace BfsdlParser
                 {
                     errCode = ErrInvalid;
                 }
-                else if( mInput.d.str->GetUtf8String() != "ASCII" )
-                {
-                    // TODO: Add support for non-ASCII encoding in BFSDL stream
-                    // Probably need to look up and replace the factory, in which case
-                    // the IsValidCoding() call above will be obviated.
-                    errCode = ErrUnsupported;
-                }
                 else if( !SetStringProperty( mDb, mIdentifier, mInput.d.str->GetUtf8String() ) )
                 {
                     errCode = ErrRuntime;

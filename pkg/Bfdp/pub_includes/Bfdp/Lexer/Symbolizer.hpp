@@ -139,12 +139,6 @@ namespace Bfdp
             //! Can be used to reset the Symbolizer after a failed parsing operation
             void Reset();
 
-            //! Change the byte converter to the given converter
-            void SetByteConverter
-                (
-                Unicode::IConverter& aByteConverter
-                );
-
         private:
             //! Lookup information about the category
             //!

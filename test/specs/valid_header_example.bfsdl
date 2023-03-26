@@ -3,11 +3,12 @@
 :DefaultByteOrder="BE"
 :DefaultBitOrder="BE"
 :BitBase="Bit"
-// String encoding customizations not yet supported
-// :DefaultStringCode="MS-1252"
+// String terminator customization not yet supported
 // :DefaultStringTerm=#32#
-// Floating point not yet supported
+:DefaultStringCode="MS-1252"
+// IEEE-754 not yet supported
 // :IEEE754Version=#2008#
+// Floating point not yet supported
 // :DefaultFloatFormat="binary64"
 :END_HEADER
 

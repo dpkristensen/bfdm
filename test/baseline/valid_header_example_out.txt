@@ -3,5 +3,5 @@ PROP DefaultStringTerm=0
 PROP DefaultBitOrder=BE
 PROP DefaultByteOrder=BE
 PROP BitBase=1
-PROP DefaultStringCode=ASCII
+PROP DefaultStringCode=MS-1252
 PROP Version=0
