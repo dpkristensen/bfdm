@@ -297,7 +297,7 @@ namespace Bfdp
             std::string value;
             if( aParam.HasValue() )
             {
-                if( aArgC <= 1 )
+                if( aArgC < 1 )
                 {
                     std::string msg = ( Msg( "Argument " ) << aParam.GetName() << " requires <" << aParam.GetValueName() << ">!" ).Get();
                     BFDP_RUNTIME_ERROR( msg.c_str() );

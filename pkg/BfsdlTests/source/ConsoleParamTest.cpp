@@ -35,6 +35,7 @@
 #include "Bfdp/Console/Param.hpp"
 
 #include "Bfdp/Macros.hpp"
+#include "BfsdlTests/MockErrorHandler.hpp"
 #include "BfsdlTests/TestUtil.hpp"
 
 namespace BfsdlTests
@@ -46,6 +47,10 @@ namespace BfsdlTests
     class ConsoleParamTest
         : public ::testing::Test
     {
+        void SetUp()
+        {
+            SetDefaultErrorHandlers();
+        }
     };
 
     TEST_F( ConsoleParamTest, ConstructCommand )
@@ -178,6 +183,37 @@ namespace BfsdlTests
         ASSERT_EQ( 0U, p.GetUserdata() );
         ASSERT_TRUE( p.HasValue() );
         ASSERT_TRUE( StrEq( "herp", p.GetDefaultValue() ) );
+        ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
+        ASSERT_FALSE( p.IsCounter() );
+        ASSERT_TRUE( p.IsOptional() );
+        ASSERT_FALSE( p.IsPositional() );
+        ASSERT_FALSE( p.IsTerminator() );
+    }
+
+    TEST_F( ConsoleParamTest, SetDefaultCounter )
+    {
+        SetMockErrorHandlers();
+        MockErrorHandler::Workspace errWksp;
+
+        // SetDefault() incompatible with SetCounter()
+        errWksp.ExpectMisuseError();
+        Param p = Param::CreateLong( "test", 't' )
+            .SetCounter()
+            .SetDefault( "value" );
+
+        ASSERT_TRUE( p.IsCounter() );
+        ASSERT_TRUE( p.IsOptional() );
+    }
+
+    TEST_F( ConsoleParamTest, SetDefaultValueEmpty )
+    {
+        Param p = Param::CreateLong( "test", 't' )
+            .SetDefault( "" );
+
+        ASSERT_TRUE( StrEq( "", p.GetDescription() ) );
+        ASSERT_EQ( 0U, p.GetUserdata() );
+        ASSERT_TRUE( p.HasValue() );
+        ASSERT_TRUE( StrEq( "", p.GetDefaultValue() ) );
         ASSERT_TRUE( StrEq( "value", p.GetValueName() ) );
         ASSERT_FALSE( p.IsCounter() );
         ASSERT_TRUE( p.IsOptional() );

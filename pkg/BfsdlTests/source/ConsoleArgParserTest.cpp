@@ -275,6 +275,22 @@ namespace BfsdlTests
         ASSERT_EQ( 1, parser.Parse( testArgs6, 1 ) );
     }
 
+    TEST_F( ConsoleArgParserTest, ParseDefaultEmpty )
+    {
+        ArgParser parser = ArgParser()
+            .Add( Param::CreateLong( "data", 'd' )
+                .SetDefault( "", "test_data" )
+            );
+
+        ASSERT_TRUE( ParseWithCallbacks( 0, parser, { "cmd_value", "--data", "value" } ) );
+        ASSERT_TRUE( VerifyCallback( "parser.cmd_value[1]:data <test_data>=value" ) );
+        ASSERT_TRUE( VerifyNoMoreCallbacks() );
+
+        ASSERT_TRUE( ParseWithCallbacks( 0, parser, { "cmd_default" } ) );
+        ASSERT_TRUE( VerifyCallback( "parser.cmd_default[1]:data <test_data>=" ) );
+        ASSERT_TRUE( VerifyNoMoreCallbacks() );
+    }
+
     TEST_F( ConsoleArgParserTest, SetNameAfterParse )
     {
         ArgParser parser;
