@@ -1,0 +1,25 @@
+:BFSDL_HEADER
+:Version=#1#
+:DefaultByteOrder="LE"
+:BitBase="Byte"
+:END_HEADER
+
+// Test basic bytewise data parsing with little endianness
+
+// Unsigned values conditions
+u1 u8;
+u3 u24;
+u8 u64;
+
+// Signed values
+s1 s8;
+s4 s32;
+s8 s64;
+
+// Fixed-point integer values
+u1.0 u1_0;
+u7.1 u56_8;
+u1.7 u8_56;
+u0.8 u0_64;
+s7.1 s56_8;
+s1.7 s8_56;

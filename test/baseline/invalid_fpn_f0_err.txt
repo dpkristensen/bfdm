@@ -1,0 +1,1 @@
+Invalid fractional bit width

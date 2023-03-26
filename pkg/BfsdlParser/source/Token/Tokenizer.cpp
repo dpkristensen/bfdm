@@ -406,6 +406,7 @@ namespace BfsdlParser
             switch( mState.symbols.category )
             {
             case Category::Control:
+            case Category::Period:
                 mState.keepParsing = mObserver.OnControlCharacter( mState.symbols.str );
                 break;
 

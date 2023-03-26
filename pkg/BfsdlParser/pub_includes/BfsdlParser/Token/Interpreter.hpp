@@ -40,6 +40,7 @@
 
 // Internal Includes
 #include "Bfdp/StateMachine/Engine.hpp"
+#include "BfsdlParser/Objects/NumericFieldBuilder.hpp"
 #include "BfsdlParser/Objects/Tree.hpp"
 #include "BfsdlParser/Token/Tokenizer.hpp"
 
@@ -130,6 +131,23 @@ namespace BfsdlParser
                 std::string const& aValue
                 ) );
 
+            template< typename T >
+            void GetNumericProperty
+                (
+                std::string const& aName,
+                typename T& aOutValue
+                )
+            {
+                PropertyPtr pp = mDb->FindProperty( aName );
+                if( pp == NULL )
+                {
+                    LogError( Bfdp::Console::Msg( "Cannot retrieve property " ) << aName );
+                }
+                else if( !pp->GetNumericValue( aOutValue ) )
+                {
+                    LogError( Bfdp::Console::Msg( "Invalid property " ) << aName );
+                }
+            }
 
             template< typename T >
             void SetNumericPropertyDefault
@@ -161,6 +179,11 @@ namespace BfsdlParser
             void StateHeaderEqualsEvaluate();
             void StateHeaderParameterEvaluate();
             void StateStatementBeginEvaluate();
+            void StateStatementFixedPointNumericIdEvaluate();
+            void StateStatementFixedPointNumericSuffixEvaluate();
+            void StateStatementEndEvaluate();
+
+            Objects::BitBase::Type mCurBitBase;
 
             Objects::TreePtr mDb;
 
@@ -175,6 +198,9 @@ namespace BfsdlParser
 
             //! Provides access to the input data
             InputRef mInput;
+
+            // Statement tracking variables
+            Objects::NumericFieldBuilder mNumericFieldBuilder;
 
             //! Whether a parsing error occurred
             bool mParseError;

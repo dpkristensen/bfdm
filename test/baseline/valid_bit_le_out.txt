@@ -1,0 +1,20 @@
+PROP Filename=<valid>
+PROP DefaultStringTerm=0
+PROP DefaultBitOrder=LE
+PROP DefaultByteOrder=LE
+PROP BitBase=1
+PROP DefaultStringCode=ASCII
+PROP Version=1
+FIELD u1 : u1
+FIELD u8 : u8
+FIELD u24 : u24
+FIELD u64 : u64
+FIELD s2 : s2
+FIELD s30 : s30
+FIELD s63 : s63
+FIELD u1_0 : u1
+FIELD u63_1 : u63.1
+FIELD u1_63 : u1.63
+FIELD u0_64 : u0.64
+FIELD s63_1 : s63.1
+FIELD s1_63 : s1.63

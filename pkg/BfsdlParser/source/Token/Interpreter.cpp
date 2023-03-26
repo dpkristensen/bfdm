@@ -40,10 +40,13 @@
 #include "Bfdp/BitManip/Conversion.hpp"
 #include "Bfdp/Console/Msg.hpp"
 #include "Bfdp/StateMachine/Actions.hpp"
+#include "Bfdp/String.hpp"
 #include "Bfdp/Unicode/AsciiConverter.hpp"
 #include "Bfdp/Unicode/CodingMap.hpp"
 #include "Bfdp/Unicode/Common.hpp"
 #include "Bfdp/Unicode/Functions.hpp"
+#include "BfsdlParser/Objects/NumericField.hpp"
+#include "BfsdlParser/Objects/NumericFieldBuilder.hpp"
 #include "BfsdlParser/Objects/Property.hpp"
 
 #define BFDP_MODULE "Token::Interpreter"
@@ -77,6 +80,9 @@ namespace BfsdlParser
 
                     // Stream Data Definition states
                     StatementBegin,
+                    StatementFixedPointNumericId,
+                    StatementFixedPointNumericSuffix,
+                    StatementEnd,
 
                     Count
                 };
@@ -115,6 +121,24 @@ namespace BfsdlParser
                 return true;
             }
 
+            static bool IsEndOfLine(std::string const& aValue)
+            {
+                return ( ( aValue == ";" ) ||
+                    ( aValue == "\n" ) ||
+                    ( aValue == "\r" ) );
+            }
+
+            //! @return Whether the beginning of the statement could be a numeric field
+            static bool IsNumericField
+                (
+                std::string const& aStatement
+                )
+            {
+                return (aStatement.length() >= 2) &&
+                    ((aStatement[0] == 's') || (aStatement[0] == 'u')) &&
+                    IsWithinRange< char >('0', aStatement[1], '9');
+            }
+
         };
         using namespace InternalInterpreter;
 
@@ -122,7 +146,8 @@ namespace BfsdlParser
             (
             Objects::TreePtr const aDbContext
             )
-            : mDb( aDbContext )
+            : mCurBitBase( Objects::BitBase::Default )
+            , mDb( aDbContext )
             , mHeaderStreamProgress( Header::StreamBegin )
             , mInitOk( false )
             , mParseError( false )
@@ -142,6 +167,9 @@ namespace BfsdlParser
             BFDP_STATE_ACTION( ParseState::HeaderEquals, Evaluate, CallMethod( *this, &Interpreter::StateHeaderEqualsEvaluate ) );
             BFDP_STATE_ACTION( ParseState::HeaderParameter, Evaluate, CallMethod( *this, &Interpreter::StateHeaderParameterEvaluate ) );
             BFDP_STATE_ACTION( ParseState::StatementBegin, Evaluate, CallMethod( *this, &Interpreter::StateStatementBeginEvaluate ) );
+            BFDP_STATE_ACTION( ParseState::StatementFixedPointNumericId, Evaluate, CallMethod( *this, &Interpreter::StateStatementFixedPointNumericIdEvaluate ) );
+            BFDP_STATE_ACTION( ParseState::StatementFixedPointNumericSuffix, Evaluate, CallMethod( *this, &Interpreter::StateStatementFixedPointNumericSuffixEvaluate ) );
+            BFDP_STATE_ACTION( ParseState::StatementEnd, Evaluate, CallMethod( *this, &Interpreter::StateStatementEndEvaluate ) );
 
             BFDP_STATE_MAP_END();
 
@@ -177,7 +205,7 @@ namespace BfsdlParser
             switch( mInput.type )
             {
                 case In::Control:
-                    ss << "control character(s) '" << *(mInput.d.ctrl) << "'";
+                    ss << "'" << *(mInput.d.ctrl) << "'";
                     break;
 
                 case In::NumericLiteral:
@@ -198,7 +226,7 @@ namespace BfsdlParser
                     break;
 
                 case In::Word:
-                    ss << "identifier '" << *(mInput.d.word) << "'";
+                    ss << "'" << *(mInput.d.word) << "'";
                     break;
 
                 case In::Invalid:
@@ -275,7 +303,7 @@ namespace BfsdlParser
             {
                 if( !SetStringProperty( mDb, aName, aValue ) )
                 {
-                    LogError( Bfdp::Console::Msg( "Failed to set default for " ) << aName );
+                    LogError( Bfdp::Console::Msg( "Failed to set default for" ) << aName );
                 }
             }
         }
@@ -346,6 +374,8 @@ namespace BfsdlParser
                 SetStringPropertyDefault( "DefaultStringCode", "ASCII" );
                 SetNumericPropertyDefault< Bfdp::Unicode::CodePoint >( "DefaultStringTerm", 0U );
                 SetNumericPropertyDefault< Objects::BfsdlVersionType >( "Version", 1U );
+
+                GetNumericProperty("BitBase", mCurBitBase);
             }
         }
 
@@ -597,7 +627,98 @@ namespace BfsdlParser
 
         void Interpreter::StateStatementBeginEvaluate()
         {
-            LogError( "Unexpected " );
+            if( ( mInput.type == In::Control ) && ( IsEndOfLine( *mInput.d.ctrl ) ) )
+            {
+                // Ignore empty statement
+                return;
+            }
+            if( mInput.type != In::Word )
+            {
+                LogError( "Unexpected" );
+                return;
+            }
+
+            // Reset statement context before parsing a new statement
+            mIdentifier.clear();
+            mNumericFieldBuilder.Reset();
+            mNumericFieldBuilder.SetBitBase( mCurBitBase );
+
+            // Parse keywords and bit format types in order of ambiguity
+            // The functions will return true if they have "handled" the data, either by error or transition.
+            if( IsNumericField(*mInput.d.word) )
+            {
+                if( !mNumericFieldBuilder.ParseIdentifier( *mInput.d.word ) ) {
+                    LogError( "Invalid numeric field" );
+                    return;
+                }
+                mStateMachine.Transition( ParseState::StatementFixedPointNumericId );
+            } else {
+                LogError( "Unexpected" );
+            }
+        }
+
+        void Interpreter::StateStatementFixedPointNumericIdEvaluate()
+        {
+            if( ( mInput.type == In::Control ) && ( *mInput.d.ctrl == "." ) && !mNumericFieldBuilder.IsComplete() )
+            {
+                // Period with an incomplete ID means we expect a suffix to follow
+                mStateMachine.Transition( ParseState::StatementFixedPointNumericSuffix );
+                return;
+            }
+            if( mInput.type != In::Word )
+            {
+                LogError( "Unexpected" );
+                return;
+            }
+
+            if(!mNumericFieldBuilder.IsComplete())
+            {
+                // No suffix was supplied, so complete the build
+                if( !mNumericFieldBuilder.ParseSuffix( std::string() ) )
+                {
+                    LogError( "Invalid numeric field" );
+                    return;
+                }
+            }
+
+            mIdentifier = *mInput.d.word;
+
+            Objects::NumericFieldPtr field = mNumericFieldBuilder.GetField( mIdentifier );
+
+            if( ( !field ) || ( !mDb->Add( field ) ) )
+            {
+                LogError( "Failed to add numeric field" );
+                return;
+            }
+
+            mStateMachine.Transition( ParseState::StatementEnd );
+        }
+
+        void Interpreter::StateStatementFixedPointNumericSuffixEvaluate()
+        {
+            if( mInput.type != In::Word )
+            {
+                LogError( "Unexpected" );
+                return;
+            }
+
+            if( !mNumericFieldBuilder.ParseSuffix(*mInput.d.word) )
+            {
+                LogError( "Invalid fractional bit width" );
+                return;
+            }
+            // Now go back and get the ID
+            mStateMachine.Transition( ParseState::StatementFixedPointNumericId );
+        }
+
+        void Interpreter::StateStatementEndEvaluate()
+        {
+            if( ( mInput.type == In::Control ) && ( IsEndOfLine( *mInput.d.ctrl ) ) )
+            {
+                mStateMachine.Transition( ParseState::StatementBegin );
+                return;
+            }
+            LogError( "Expected end of statement; got" );
         }
 
     } // namespace Token

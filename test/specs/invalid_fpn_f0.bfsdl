@@ -1,0 +1,5 @@
+:BFSDL_HEADER
+:END_HEADER
+
+// Invalid Fixed Point Numeric with 0 fractional width
+u0.0 u0_0;

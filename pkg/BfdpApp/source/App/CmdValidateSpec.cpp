@@ -99,7 +99,7 @@ namespace App
             )
         {
             std::stringstream ss;
-            ss << "FIELD " << aField->GetName();
+            ss << "FIELD " << aField->GetName() << " : " << aField->GetTypeStr();
             aContext.Log( stdout, Msg( ss.str() ), Context::LogLevel::Info );
         }
 
