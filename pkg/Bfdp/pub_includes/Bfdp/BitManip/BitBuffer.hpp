@@ -48,6 +48,30 @@ namespace Bfdp
         //! BitBuffer
         //!
         //! Encapsulates a bit-oriented buffer of data
+        //!
+        //! The capacity always reflects the physical memory dimensions of the
+        //! buffer, where the "data size" reflects changes made by resizing or
+        //! or setting the data size directly.  In simpler terms, the following
+        //! will always be true:
+        //!
+        //! * Capacity Bits = Capacity Bytes * 8
+        //! * Data Bits <= Capacity Bits
+        //! * Data Bytes <= Capacity Bytes
+        //! * Data Bits <= (Data Bytes * 8) (within -8)
+        //! * Data Bytes >= (Data Bits / 8) (within +1)
+        //!
+        //! The intended use of this buffer is that the same Bit or Byte family
+        //! of functions is used when changing the data size of the buffer and
+        //! subsequently checking it.
+        //!
+        //! Because the size is stored as bits, the upper limit on number of bits
+        //! that can be represented is (SIZE_MAX/8); using a size or capacity
+        //! greater than or equal to (SIZE_MAX/8) will result in Undefined
+        //! Behavior (probably an overflow in the bits size)!
+        //!
+        //! This class does NOT provide any concept of "current position" in
+        //! the buffer; see GenericBitStream for use cases when the buffer
+        //! needs to be read or written.
         class BitBuffer BFDP_FINAL
         {
         public:
@@ -82,19 +106,48 @@ namespace Bfdp
                 BitBuffer const& aOther
                 );
 
+            //! Get capacity in bits
+            //!
+            //! If the buffer is initialized or resized to a capacity including
+            //! a partial byte, it will have rounded UP to a whole number of
+            //! bytes since partial bytes cannot exist in memory.
+            //!
+            //! @returns The number of bits in the backing memory buffer.
             size_t GetCapacityBits() const;
 
+            //! Get capacity in bytes
+            //!
+            //! @note See GetCapacityBits() about alignment
+            //! @returns The number of bytes in the backing memory buffer.
             size_t GetCapacityBytes() const;
 
+            //! Get number of data bits
+            //!
+            //! This will always be less than or equal to GetCapacityBits().
+            //! Unlike GetCapacityBits(), this value can represent a partial
+            //! number of bytes.
+            //!
+            //! @return The number of bits used in the last successful bit-
+            //!     oriented size change operation.
             size_t GetDataBits() const;
 
+            //! Get number of data bytes
+            //!
+            //! This will always be less than or equal to GetCapacityBytes().
+            //!
+            //! @return The number of bytes used in the last successful byte-
+            //!     oriented size change operation.
             size_t GetDataBytes() const;
 
+            //! Get pointer to the data buffer
+            //!
+            //! @note This address may change on resize or copy operations.
+            //! @return Pointer to the beginning of the data buffer.
             Byte* GetDataPtr();
 
             //! @note Memory may still be allocated
             //! @return Whether the number of data bits is 0
-            bool BitBuffer::IsEmpty() const;
+            bool IsEmpty() const;
 
             //! Set all bytes of the buffer to the given value
             //!
@@ -131,6 +184,38 @@ namespace Bfdp
                 (
                 size_t const aNumBits,
                 Byte const aNewByteValue
+                );
+
+            //! Set the data size to the specified number of bits
+            //!
+            //! This sets the number of data bits to the given size regardless
+            //! of the old size, so long as aNumBits <= GetCapacityBits().
+            //!
+            //! Unlike the Resize* family of functions, this is guaranteed to
+            //! both preserve the original data AND never perform any memory
+            //! allocate/free/copy operations.
+            //!
+            //! @post On success, GetDataBits() will return aNumBits
+            //! @return true if successful, false otherwise.
+            bool BitBuffer::SetDataBits
+                (
+                size_t const aNumBits
+                );
+
+            //! Set the data size to the specified number of bytes
+            //!
+            //! This sets the number of data bytes to the given size regardless
+            //! of the old size, so long as aNumBytes <= GetCapacityBytes().
+            //!
+            //! Unlike the Resize* family of functions, this is guaranteed to
+            //! both preserve the original data AND never perform any memory
+            //! allocate/free/copy operations.
+            //!
+            //! @post On success, GetDataBytes() will return aNumBytes
+            //! @return true if successful, false otherwise.
+            bool BitBuffer::SetDataBytes
+                (
+                size_t const aNumBytes
                 );
 
         private:

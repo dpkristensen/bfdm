@@ -209,6 +209,34 @@ namespace Bfdp
             return true;
         }
 
+        bool BitBuffer::SetDataBits
+            (
+            size_t const aNumBits
+            )
+        {
+            if( aNumBits <= mCapacityBits )
+            {
+                mDataBits = aNumBits;
+                return true;
+            }
+
+            return false;
+        }
+
+        bool BitBuffer::SetDataBytes
+            (
+            size_t const aNumBytes
+            )
+        {
+            if( aNumBytes <= GetCapacityBytes() )
+            {
+                mDataBits = BytesToBits( aNumBytes );
+                return true;
+            }
+
+            return false;
+        }
+
         bool BitBuffer::AllocateBits
             (
             size_t const aNumBits,
