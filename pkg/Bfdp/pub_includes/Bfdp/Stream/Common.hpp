@@ -1,7 +1,7 @@
 /**
-    BFDP Mock Observer Base Definition
+    BFDP Stream Common Declarations
 
-    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2023, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -30,54 +30,28 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// Base Includes
-#include "BfsdlTests/MockObserverBase.hpp"
+#ifndef Bfdp_Stream_Common
+#define Bfdp_Stream_Common
 
-// External Includes
-#include <sstream>
-
-namespace BfsdlTests
+namespace Bfdp
 {
 
-    ::testing::AssertionResult MockObserverBase::VerifyNext
-        (
-        std::string const& aNextValue
-        )
+    namespace Stream
     {
-        if( mValues.empty() )
+
+        struct Control
         {
-            return ::testing::AssertionFailure() << "Missing expected value: " << aNextValue;
-        }
-        else if( mValues.front() != aNextValue )
-        {
-            return ::testing::AssertionFailure() << "Symbol mismatch:" << std::endl
-                << "    Actual: " << mValues.front() << std::endl
-                << "  Expected: " << aNextValue;
-        }
+            enum Type
+            {
+                Continue, //!< Continue reading from the stream
+                NoData, //!< The buffer provided does not contain enough processable data; read more and then continue.
+                Stop, //!< Stop reading from the stream (leave current value of HasError() unchanged)
+                Error //!< Stop reading from the stream (indicate error via HasError())
+            };
+        };
 
-        mValues.pop_front();
-        return ::testing::AssertionSuccess();
-    }
+    } // namespace Stream
 
-    ::testing::AssertionResult MockObserverBase::VerifyNone()
-    {
-        if( !mValues.empty() )
-        {
-            return ::testing::AssertionFailure() << "Unexpected " << mValues.front();
-        }
-        return ::testing::AssertionSuccess();
-    }
+} // namespace Bfdp
 
-    /* virtual */ MockObserverBase::~MockObserverBase()
-    {
-        EXPECT_TRUE( VerifyNone() );
-    }
-
-    void MockObserverBase::RecordEvent
-        (
-        std::string const& aEvent
-        )
-    {
-        mValues.push_back( aEvent );
-    }
-} // namespace BfsdlTests
+#endif // Bfdp_Stream_Common

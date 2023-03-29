@@ -1,0 +1,7 @@
+:BFSDL_HEADER
+:Version=#1#
+:DefaultByteOrder="LE"
+:BitBase="Bit"
+:END_HEADER
+
+u8 data_u8;

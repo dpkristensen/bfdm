@@ -58,10 +58,10 @@ namespace BfsdlTests
             std::string const& aNextValue
             );
 
-        ::testing::AssertionResult VerifyNone();
+        virtual ::testing::AssertionResult VerifyNone();
 
     protected:
-        ~MockObserverBase();
+        virtual ~MockObserverBase();
 
         void RecordEvent
             (

@@ -1,7 +1,7 @@
 /**
-    BFDP Mock Observer Base Definition
+    BFDP Raw Stream Declarations
 
-    Copyright 2016-2019, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
+    Copyright 2023, Daniel Kristensen, Garmin Ltd, or its subsidiaries.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -30,54 +30,43 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// Base Includes
-#include "BfsdlTests/MockObserverBase.hpp"
+#ifndef Bfdp_Stream_RawStream
+#define Bfdp_Stream_RawStream
 
 // External Includes
-#include <sstream>
+#include <iostream>
 
-namespace BfsdlTests
+// Internal Includes
+#include "Bfdp/Stream/StreamBase.hpp"
+
+namespace Bfdp
 {
 
-    ::testing::AssertionResult MockObserverBase::VerifyNext
-        (
-        std::string const& aNextValue
-        )
+    namespace Stream
     {
-        if( mValues.empty() )
+
+        //! WYSIWYG implementation of StreamBase
+        //!
+        //! Does not perform any conversion of incoming bytes from the stream.
+        class RawStream
+            : public StreamBase
         {
-            return ::testing::AssertionFailure() << "Missing expected value: " << aNextValue;
-        }
-        else if( mValues.front() != aNextValue )
-        {
-            return ::testing::AssertionFailure() << "Symbol mismatch:" << std::endl
-                << "    Actual: " << mValues.front() << std::endl
-                << "  Expected: " << aNextValue;
-        }
+        public:
+            RawStream
+                (
+                std::string const& aName,
+                std::istream& aIn,
+                IStreamObserver& aObserver
+                );
 
-        mValues.pop_front();
-        return ::testing::AssertionSuccess();
-    }
+            virtual ~RawStream();
 
-    ::testing::AssertionResult MockObserverBase::VerifyNone()
-    {
-        if( !mValues.empty() )
-        {
-            return ::testing::AssertionFailure() << "Unexpected " << mValues.front();
-        }
-        return ::testing::AssertionSuccess();
-    }
+        protected:
+            BFDP_OVERRIDE( bool IsValidImpl() const );
+        };
 
-    /* virtual */ MockObserverBase::~MockObserverBase()
-    {
-        EXPECT_TRUE( VerifyNone() );
-    }
+    } // namespace Stream
 
-    void MockObserverBase::RecordEvent
-        (
-        std::string const& aEvent
-        )
-    {
-        mValues.push_back( aEvent );
-    }
-} // namespace BfsdlTests
+} // namespace Bfdp
+
+#endif // Bfdp_Stream_RawStream

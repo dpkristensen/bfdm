@@ -36,12 +36,16 @@
 #include "App/Commands.hpp"
 
 // External Includes
+#include <cstdio>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
 #include <memory>
 
 // Internal Includes
 #include "App/Common.hpp"
 #include "Bfdp/ErrorReporter/Functions.hpp"
+#include "Bfdp/Stream/RawStream.hpp"
 #include "Bfdp/Unicode/Common.hpp"
 #include "BfsdlParser/Objects/Database.hpp"
 #include "BfsdlParser/Objects/IObject.hpp"
@@ -75,6 +79,28 @@ namespace App
 
     }
     using namespace CmdValidateSpecInternal;
+
+    class StreamDataObserver
+        : public Bfdp::Stream::IStreamObserver
+    {
+        BFDP_OVERRIDE( Bfdp::Stream::Control::Type OnStreamData
+            (
+            Bfdp::BitManip::GenericBitStream& aInBitStream
+            ) )
+        {
+            // TODO: Parse the fields instead of just dumping the bytes to stdout
+            while( aInBitStream.GetBitsTillEnd() )
+            {
+                uint8_t value;
+                if( !aInBitStream.ReadBits(&value, 8) )
+                {
+                    return Bfdp::Stream::Control::Error;
+                }
+                std::cout << "0x" << std::hex << std::setw(2) << std::setfill( '0' ) << (uint32_t)value << std::dec << std::endl;
+            }
+            return Bfdp::Stream::Control::Continue;
+        }
+    };
 
     int CmdParse
         (
@@ -116,24 +142,49 @@ namespace App
             return ret;
         }
 
-        std::string specFile = args["spec"];
-        aContext.Log( stdout, Msg( "Specification: " ) << specFile, Context::LogLevel::Info );
-
-        std::string dataFile = args["data"];
-        if( dataFile.empty() )
+        std::string specFileName = args["spec"];
+        std::string dataFileName = args["data"];
+        std::fstream dataFileStream;
+        if( dataFileName.empty() )
         {
-            aContext.Log( stdout, Msg( "Input: <stdin>" ), Context::LogLevel::Info );
+            dataFileName = "<stdin>";
+            dataFileStream = std::fstream( stdin );
         }
         else
         {
-            aContext.Log( stdout, Msg( "Input: " ) << dataFile, Context::LogLevel::Info );
+            dataFileStream.open( dataFileName, std::ios::in | std::ios::binary );
+        }
+
+        if( !dataFileStream )
+        {
+            aContext.Log( stderr, Msg( "Failed to open " ) << dataFileName, Context::LogLevel::Problem );
+            return 1;
+        }
+
+        // Validate the input format and create a data stream
+        std::string format_str = args["format"];
+        Bfdp::Stream::StreamPtr streamPtr = nullptr;
+        StreamDataObserver streamDataObserver;
+        if( format_str == "raw" )
+        {
+            streamPtr = std::make_shared< Bfdp::Stream::RawStream >( dataFileName, dataFileStream, streamDataObserver );
+        }
+        if( !streamPtr )
+        {
+            aContext.Log( stderr, Msg( "Invalid stream format '" ) << format_str << "'", Context::LogLevel::Problem );
+            return 1;
+        }
+        if( !streamPtr->IsValid() )
+        {
+            aContext.Log( stderr, Msg( "Stream format '" ) << format_str << "' setup failure", Context::LogLevel::Problem );
+            return 1;
         }
 
         // Create a database to receive objects discovered from the stream
         DatabasePtr db = Database::Create();
         if( !db )
         {
-            BFDP_RUNTIME_ERROR( "Failed to create Database" );
+            aContext.Log( stderr, Msg( "Failed to create Database" ), Context::LogLevel::Problem );
             return -1;
         }
 
@@ -143,29 +194,39 @@ namespace App
             db->GetRoot()->Add( std::make_shared< Property >( "Filename" ) )
             );
         if( !fileNameProp ||
-            !fileNameProp->SetString( specFile ) )
+            !fileNameProp->SetString( specFileName ) )
         {
-            BFDP_RUNTIME_ERROR( "Failed to set Filename property" );
+            aContext.Log( stderr, Msg( "Failed to set Filename property" ), Context::LogLevel::Problem );
             return -1;
         }
 
-        aContext.Log( stdout, Msg( "Processing BFSDL Stream..." ) << dataFile, Context::LogLevel::Debug );
-        std::fstream fs( specFile.c_str(), std::ios::in | std::ios::binary );
-        if( !fs.is_open() )
+        std::fstream specStream( specFileName.c_str(), std::ios::in | std::ios::binary );
+        if( !specStream.is_open() )
         {
-            BFDP_RUNTIME_ERROR( "Cannot open file" );
-            ret = 1;
+            aContext.Log( stderr, Msg( "Failed to open " ) << specFileName, Context::LogLevel::Problem );
+            return 1;
         }
         else
         {
-            ret = BfsdlParser::ParseStream( db->GetRoot(), fs, 4096 );
-            fs.close();
+            aContext.Log( stdout, Msg( "Processing BFSDL Stream..." ) << specFileName, Context::LogLevel::Debug );
+            ret = BfsdlParser::ParseStream( db->GetRoot(), specStream, 4096 );
+            specStream.close();
         }
 
-        std::string format_str = args["format"];
-        aContext.Log( stdout, Msg( "Processing data stream as '" ) << format_str << "'", Context::LogLevel::Debug );
+        // If the BFSDL stream is loaded, parse the data stream
+        if( ret == 0 )
+        {
+            aContext.Log( stdout, Msg( "Processing data stream " ) << dataFileName << " as '" << format_str << "'", Context::LogLevel::Debug );
+            if( !streamPtr->ReadStream() || streamPtr->HasError() )
+            {
+                aContext.Log( stderr, Msg( "Binary data stream parse failure" ), Context::LogLevel::Problem );
+                // TODO: Print parse context from Stream object
+                ret = 1;
+            }
+            aContext.Log( stdout, Msg( "Total: " ) << streamPtr->GetTotalProcessedStr(), Context::LogLevel::Info );
+        }
 
         return ret;
     }
 
-}
+} // namespace App
