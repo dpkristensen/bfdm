@@ -72,28 +72,27 @@ namespace BfsdlTests
     {
         typedef std::list< std::string > TestItemList;
 
-        void TestCb
+        void TestFieldCb
             (
-            IObjectPtr const aObject,
+            FieldPtr& aField,
             void* const aArg
             )
         {
             TestItemList* list = reinterpret_cast< TestItemList* >( aArg );
-            FieldPtr fp = Field::StaticCast( aObject );
-            PropertyPtr pp = Property::StaticCast( aObject );
             std::stringstream ss;
-            if( fp != NULL )
-            {
-                ss << fp->GetName() << ":" << fp->GetTypeStr();
-            }
-            else if( pp != NULL )
-            {
-                ss << "." << pp->GetName() << "=" << pp->GetString();
-            }
-            else
-            {
-                ss << aObject->GetName();
-            }
+            ss << aField->GetName() << ":" << aField->GetTypeStr();
+            list->push_back( ss.str() );
+        }
+
+        void TestPropertyCb
+            (
+            PropertyPtr& aProperty,
+            void* const aArg
+            )
+        {
+            TestItemList* list = reinterpret_cast< TestItemList* >( aArg );
+            std::stringstream ss;
+            ss << "." << aProperty->GetName() << "=" << aProperty->GetString();
             list->push_back( ss.str() );
         }
     }
@@ -123,7 +122,7 @@ namespace BfsdlTests
         ASSERT_TRUE( db->GetRoot()->Add( pp ) );
 
         TestItemList out;
-        db->Iterate( TestCb, &out );
+        db->Iterate( &out, TestPropertyCb, TestFieldCb );
         out.sort();
 
         ASSERT_TRUE( StrListsMatch( ExpectedData, out ) );

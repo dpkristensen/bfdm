@@ -136,15 +136,17 @@ namespace BfsdlParser
                 std::string const& aName
                 );
 
+            //! Iterate over fields and call the FieldCb for each
             void IterateFields
                 (
-                ObjectCb const aFunc,
+                FieldCb const aFunc,
                 void* const aArg
                 );
 
+            //! Iterate over properties and call the PropertyCb for each
             void IterateProperties
                 (
-                ObjectCb const aFunc,
+                PropertyCb const aFunc,
                 void* const aArg
                 );
 
@@ -152,17 +154,17 @@ namespace BfsdlParser
             typedef std::multimap
                 <
                 Bfdp::Algorithm::HashedString,
-                IObjectPtr,
+                PropertyPtr,
                 Bfdp::Algorithm::HashedString::StrictWeakCompare
-                > NodeMap;
+                > PropertyMap;
 
-            typedef std::list< IObjectPtr > NodeList;
+            typedef std::list< FieldPtr > FieldList;
 
             //! Fields are sequential data elements; so this must be ordered and can be duplicated.
-            NodeList mFieldList;
+            FieldList mFieldList;
 
             //! Properties are metadata about the scope of this tree; un-ordered and unique.
-            NodeMap mPropertyMap;
+            PropertyMap mPropertyMap;
         };
 
     } // namespace Objects

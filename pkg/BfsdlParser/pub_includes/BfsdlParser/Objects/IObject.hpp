@@ -74,12 +74,6 @@ namespace BfsdlParser
             virtual ObjectType::Id GetType() const = 0;
         };
 
-        typedef void (*ObjectCb)
-            (
-            IObjectPtr const aObject,
-            void* const aArg
-            );
-
     } // namespace Objects
 
 } // namespace BfsdlParser

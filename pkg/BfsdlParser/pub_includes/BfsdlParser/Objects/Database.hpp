@@ -70,8 +70,9 @@ namespace BfsdlParser
 
             void Iterate
                 (
-                ObjectCb const aFunc,
-                void* const aArg
+                void* const aArg,
+                PropertyCb const aPropertyFunc,
+                FieldCb const aFieldFunc
                 );
 
         protected:

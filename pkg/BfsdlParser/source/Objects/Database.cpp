@@ -65,12 +65,19 @@ namespace BfsdlParser
 
         void Database::Iterate
             (
-            ObjectCb const aFunc,
-            void* const aArg
+            void* const aArg,
+            PropertyCb const aPropertyFunc,
+            FieldCb const aFieldFunc
             )
         {
-            mRoot->IterateProperties( aFunc, aArg );
-            mRoot->IterateFields( aFunc, aArg );
+            if( aPropertyFunc )
+            {
+                mRoot->IterateProperties( aPropertyFunc, aArg );
+            }
+            if( aFieldFunc )
+            {
+                mRoot->IterateFields( aFieldFunc, aArg );
+            }
         }
 
         Database::Database()

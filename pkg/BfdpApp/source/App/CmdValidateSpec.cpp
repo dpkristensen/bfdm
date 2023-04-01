@@ -72,70 +72,30 @@ namespace App
 
     namespace CmdValidateSpecInternal
     {
-        static void DumpField
-            (
-            Context& aContext,
-            FieldPtr const aField
-            );
-
-        static void DumpObject
-            (
-            IObjectPtr const aObject,
-            void* const aArg
-            );
-
-        static void DumpProperty
-            (
-            Context& aContext,
-            PropertyPtr const aProperty
-            );
-
         static bool gIsTestMode = false;
 
         static void DumpField
             (
-            Context& aContext,
-            FieldPtr const aField
-            )
-        {
-            std::stringstream ss;
-            ss << "FIELD " << aField->GetName() << " : " << aField->GetTypeStr();
-            aContext.Log( stdout, Msg( ss.str() ), Context::LogLevel::Info );
-        }
-
-        static void DumpObject
-            (
-            IObjectPtr const aObject,
+            FieldPtr& aField,
             void* const aArg
             )
         {
             Context* context = reinterpret_cast< Context* >( aArg );
 
-            switch( aObject->GetType() )
-            {
-            case ObjectType::Property:
-                DumpProperty( *context, Property::StaticCast( aObject ) );
-                break;
-
-            case ObjectType::Field:
-                DumpField( *context, Field::StaticCast( aObject ) );
-                break;
-
-            case ObjectType::Tree:
-            case ObjectType::Count:
-            default:
-                break;
-            }
+            std::stringstream ss;
+            ss << "FIELD " << aField->GetName() << " : " << aField->GetTypeStr();
+            context->Log( stdout, Msg( ss.str() ), Context::LogLevel::Info );
         }
 
         static void DumpProperty
             (
-            Context& aContext,
-            PropertyPtr const aProperty
+            PropertyPtr& aProperty,
+            void* const aArg
             )
         {
-            std::stringstream ss;
+            Context* context = reinterpret_cast< Context* >( aArg );
 
+            std::stringstream ss;
             ss << "PROP " << aProperty->GetName() << "=";
 
             if( aProperty->GetName() == "Version" )
@@ -219,7 +179,7 @@ namespace App
                 ss << "<unknown> (" << aProperty->GetData().GetSize() << " B)";
             }
 
-            aContext.Log( stdout, Msg( ss.str() ), Context::LogLevel::Info );
+            context->Log( stdout, Msg( ss.str() ), Context::LogLevel::Info );
         }
 
     }
@@ -315,7 +275,7 @@ namespace App
             fs.close();
         }
 
-        db->Iterate( DumpObject, &aContext );
+        db->Iterate( &aContext, DumpProperty, DumpField );
 
         return ret;
     }

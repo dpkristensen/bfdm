@@ -87,6 +87,12 @@ namespace BfsdlParser
             mutable std::string mTypeStr;
         };
 
+        typedef void (*FieldCb)
+            (
+            FieldPtr& aField,
+            void* const aArg
+            );
+
     } // namespace Objects
 
 } // namespace BfsdlParser

@@ -110,7 +110,7 @@ namespace App
         }
 
     private:
-        typedef std::list< IObjectPtr > FieldList;
+        typedef std::list< FieldPtr > FieldList;
         struct Frame
         {
             Frame
@@ -131,12 +131,12 @@ namespace App
 
         static void AddFieldsToFrame
             (
-            IObjectPtr const aObject,
+            FieldPtr& aField,
             void* const aArg
             )
         {
             Frame* frame = reinterpret_cast< Frame* >( aArg );
-            frame->mFields.push_back( aObject );
+            frame->mFields.push_back( aField );
         }
 
         BFDP_OVERRIDE( Control::Type OnStreamData
@@ -178,7 +178,7 @@ namespace App
             // TODO: Parse the fields instead of just dumping the bytes to stdout
             while( aInBitStream.GetBitsTillEnd() )
             {
-                IObjectPtr curField = *curFrame.mCurFieldIter;
+                FieldPtr curField = *curFrame.mCurFieldIter;
                 uint8_t value;
                 if( !aInBitStream.ReadBits(&value, 8) )
                 {

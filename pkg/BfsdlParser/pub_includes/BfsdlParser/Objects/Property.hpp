@@ -143,6 +143,12 @@ namespace BfsdlParser
             Bfdp::Data::ByteBuffer mData;
         };
 
+        typedef void (*PropertyCb)
+            (
+            PropertyPtr& aProperty,
+            void* const aArg
+            );
+
     } // namespace Objects
 
 } // namespace BfsdlParser

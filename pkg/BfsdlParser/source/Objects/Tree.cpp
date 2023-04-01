@@ -67,9 +67,9 @@ namespace BfsdlParser
             case ObjectType::Property:
                 {
                     BFDP_RETURNIF_V( FindProperty( aNode->GetName() ) != NULL, NULL );
-                    NodeMap::iterator iter = mPropertyMap.insert
+                    PropertyMap::iterator iter = mPropertyMap.insert
                         (
-                        std::make_pair( aNode->GetId(), aNode )
+                        std::make_pair( aNode->GetId(), Property::StaticCast( aNode ) )
                         );
                     if( iter != mPropertyMap.end() )
                     {
@@ -80,7 +80,7 @@ namespace BfsdlParser
 
             case ObjectType::Field:
                 {
-                    NodeList::iterator iter = mFieldList.insert( mFieldList.end(), aNode );
+                    FieldList::iterator iter = mFieldList.insert( mFieldList.end(), Field::StaticCast( aNode ) );
                     if( iter != mFieldList.end() )
                     {
                         result = *iter;
@@ -109,7 +109,7 @@ namespace BfsdlParser
             using Bfdp::Algorithm::HashedString;
 
             HashedString hs = HashedString( aName );
-            NodeMap::iterator iter = mPropertyMap.find( hs );
+            PropertyMap::iterator iter = mPropertyMap.find( hs );
             BFDP_RETURNIF_V( iter == mPropertyMap.end(), NULL );
 
             return Property::StaticCast( iter->second );
@@ -130,11 +130,11 @@ namespace BfsdlParser
 
         void Tree::IterateFields
             (
-            ObjectCb const aFunc,
+            FieldCb const aFunc,
             void* const aArg
             )
         {
-            for( NodeList::iterator iter = mFieldList.begin(); iter != mFieldList.end(); ++iter )
+            for( FieldList::iterator iter = mFieldList.begin(); iter != mFieldList.end(); ++iter )
             {
                 aFunc( *iter, aArg );
             }
@@ -142,11 +142,11 @@ namespace BfsdlParser
 
         void Tree::IterateProperties
             (
-            ObjectCb const aFunc,
+            PropertyCb const aFunc,
             void* const aArg
             )
         {
-            for( NodeMap::iterator iter = mPropertyMap.begin(); iter != mPropertyMap.end(); ++iter )
+            for( PropertyMap::iterator iter = mPropertyMap.begin(); iter != mPropertyMap.end(); ++iter )
             {
                 aFunc( iter->second, aArg );
             }
