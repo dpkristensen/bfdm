@@ -53,22 +53,23 @@
 #include "BfsdlParser/Objects/Tree.hpp"
 #include "BfsdlParser/StreamParser.hpp"
 
-using Bfdp::Console::ArgParser;
-using Bfdp::Console::Msg;
-using Bfdp::Console::Param;
 
 namespace App
 {
 
+    using Bfdp::Console::ArgParser;
     using BfsdlParser::Objects::BitBase;
     using BfsdlParser::Objects::BfsdlVersionType;
+    using Bfdp::Stream::Control;
     using BfsdlParser::Objects::Database;
     using BfsdlParser::Objects::DatabasePtr;
     using BfsdlParser::Objects::Endianness;
     using BfsdlParser::Objects::Field;
     using BfsdlParser::Objects::FieldPtr;
     using BfsdlParser::Objects::IObjectPtr;
+    using Bfdp::Console::Msg;
     using BfsdlParser::Objects::ObjectType;
+    using Bfdp::Console::Param;
     using BfsdlParser::Objects::Property;
     using BfsdlParser::Objects::PropertyPtr;
     using BfsdlParser::Objects::Tree;
@@ -83,23 +84,119 @@ namespace App
     class StreamDataObserver
         : public Bfdp::Stream::IStreamObserver
     {
-        BFDP_OVERRIDE( Bfdp::Stream::Control::Type OnStreamData
+    public:
+        StreamDataObserver
+            (
+            Context& aContext
+            )
+            : mContext( aContext )
+        {
+        }
+
+        //! Set the pointer to the field root.
+        void SetRoot
+            (
+            TreePtr& aRoot
+            )
+        {
+            mFrameStack.clear();
+            mFrameStack.emplace_back( aRoot );
+
+            Frame& rootFrame = mFrameStack.back();
+            aRoot->IterateFields( &StreamDataObserver::AddFieldsToFrame, &rootFrame );
+            // Reset the end iterator, in case of ambiguity in C++03 and incomplete
+            // implementation of C++11 by compilers.
+            rootFrame.mCurFieldIter = rootFrame.mFields.end();
+        }
+
+    private:
+        typedef std::list< IObjectPtr > FieldList;
+        struct Frame
+        {
+            Frame
+                (
+                TreePtr& aTree
+                )
+                : mFields()
+                , mCurFieldIter( mFields.end() )
+                , mTree( aTree )
+            {
+            }
+
+            FieldList mFields;
+            FieldList::iterator mCurFieldIter;
+            TreePtr mTree;
+        };
+        typedef std::list< Frame > FrameStack;
+
+        static void AddFieldsToFrame
+            (
+            IObjectPtr const aObject,
+            void* const aArg
+            )
+        {
+            Frame* frame = reinterpret_cast< Frame* >( aArg );
+            frame->mFields.push_back( aObject );
+        }
+
+        BFDP_OVERRIDE( Control::Type OnStreamData
             (
             Bfdp::BitManip::GenericBitStream& aInBitStream
             ) )
         {
+            if( mFrameStack.empty() )
+            {
+                // Should always leave the top frame loaded to avoid churning
+                // through the database re-loading it all the time; so this
+                // likely means SetRoot() wasn't called.
+                BFDP_INTERNAL_ERROR( "Failed to get current frame" );
+                return Control::Error;
+            }
+            Frame& curFrame = mFrameStack.back();
+            // Handle end of frame
+            while( curFrame.mCurFieldIter == curFrame.mFields.end() )
+            {
+                if( mFrameStack.size() > 1 ) {
+                    // End of a non-root frame, pop the stack to the parent.
+                    mFrameStack.pop_back();
+                    curFrame = mFrameStack.back();
+                }
+                else
+                {
+                    // Root frame; just cycle back to the first field.
+                    curFrame.mCurFieldIter = curFrame.mFields.begin();
+                    if( curFrame.mCurFieldIter == curFrame.mFields.end() )
+                    {
+                        // Most likely cause is that the spec did not define any fields.
+                        // Stop with an error to avoid an infinite loop.
+                        mContext.Log( stderr, Msg( "No fields to parse" ), Context::LogLevel::Problem );
+                        return Control::Error;
+                    }
+                }
+            }
+
             // TODO: Parse the fields instead of just dumping the bytes to stdout
             while( aInBitStream.GetBitsTillEnd() )
             {
+                IObjectPtr curField = *curFrame.mCurFieldIter;
                 uint8_t value;
                 if( !aInBitStream.ReadBits(&value, 8) )
                 {
-                    return Bfdp::Stream::Control::Error;
+                    return Control::Error;
                 }
-                std::cout << "0x" << std::hex << std::setw(2) << std::setfill( '0' ) << (uint32_t)value << std::dec << std::endl;
+                // Print the field names in a loop for testing of field list iteration.
+                std::cout << curField->GetName() << "=0x" << std::hex << std::setw(2) << std::setfill( '0' ) << (uint32_t)value << std::dec << std::endl;
+                curFrame.mCurFieldIter++;
+                if( curFrame.mCurFieldIter == curFrame.mFields.end() ) {
+                    // Reached the end of the frame; continue to the next.
+                    return Control::Continue;
+                }
             }
-            return Bfdp::Stream::Control::Continue;
+            return Control::Continue;
         }
+
+        Context& mContext;
+        FrameStack mFrameStack;
     };
 
     int CmdParse
@@ -164,7 +261,7 @@ namespace App
         // Validate the input format and create a data stream
         std::string format_str = args["format"];
         Bfdp::Stream::StreamPtr streamPtr = nullptr;
-        StreamDataObserver streamDataObserver;
+        StreamDataObserver streamDataObserver( aContext );
         if( format_str == "raw" )
         {
             streamPtr = std::make_shared< Bfdp::Stream::RawStream >( dataFileName, dataFileStream, streamDataObserver );
@@ -218,6 +315,7 @@ namespace App
             }
         }
 
+        streamDataObserver.SetRoot( db->GetRoot() );
         Endianness::Type defaultBitOrder = db->GetRoot()->GetNumericPropertyWithDefault< Endianness::Type >( "DefaultBitOrder", Endianness::Default );
         Endianness::Type defaultByteOrder = db->GetRoot()->GetNumericPropertyWithDefault< Endianness::Type >( "DefaultByteOrder", Endianness::Default );
         if( Endianness::Little != defaultBitOrder )
