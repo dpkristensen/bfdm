@@ -181,8 +181,6 @@ def run_test_suites(out_path):
 
             # Use a different command line for parsing
             for input_format in ["raw", "hex"]:
-                print("Testing {}:{}...".format(spec_name, input_format), end="")
-
                 out_file_basename = "{}_{}_out.txt".format(spec_name, input_format)
                 err_file_basename = "{}_{}_err.txt".format(spec_name, input_format)
                 out_file_destpath = os.path.join(result_path, out_file_basename)
@@ -193,6 +191,9 @@ def run_test_suites(out_path):
                 in_data_file_path = os.path.join(test_specs_path, "{}_{}.bin".format(spec_name, input_format))
                 if not os.path.exists(in_data_file_path):
                     continue;
+
+                print("Testing {}:{}...".format(spec_name, input_format), end="")
+
                 cmdline = [bfdp_path, "-v", "parse", "--spec", spec_file_path,
                     "--format", input_format, "--data", in_data_file_path]
 
