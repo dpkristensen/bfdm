@@ -5,3 +5,8 @@
 :END_HEADER
 
 u8 data_u8;
+u11 data_u11;
+u7 data_u7;
+u6 data_u6;
+
+// Bin file has 40 bits, stopping at bit 32 to check data wraps around to parse first field again.

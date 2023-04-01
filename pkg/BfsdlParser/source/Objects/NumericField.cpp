@@ -71,6 +71,11 @@ namespace BfsdlParser
         {
         }
 
+        NumericFieldProperties const& NumericField::GetNumericFieldProperties() const
+        {
+            return mProps;
+        }
+
         std::string const& NumericField::GetTypeStr() const
         {
             if( mTypeStr.empty() )

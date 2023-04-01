@@ -69,6 +69,8 @@ namespace BfsdlParser
 
             virtual ~NumericField();
 
+            NumericFieldProperties const& GetNumericFieldProperties() const;
+
             BFDP_OVERRIDE( std::string const& GetTypeStr() const );
 
         private:

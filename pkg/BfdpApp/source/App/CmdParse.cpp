@@ -49,6 +49,7 @@
 #include "Bfdp/Unicode/Common.hpp"
 #include "BfsdlParser/Objects/Database.hpp"
 #include "BfsdlParser/Objects/IObject.hpp"
+#include "BfsdlParser/Objects/NumericField.hpp"
 #include "BfsdlParser/Objects/Property.hpp"
 #include "BfsdlParser/Objects/Tree.hpp"
 #include "BfsdlParser/StreamParser.hpp"
@@ -66,8 +67,13 @@ namespace App
     using BfsdlParser::Objects::Endianness;
     using BfsdlParser::Objects::Field;
     using BfsdlParser::Objects::FieldPtr;
+    using BfsdlParser::Objects::FieldType;
+    using Bfdp::BitManip::GenericBitStream;
     using BfsdlParser::Objects::IObjectPtr;
     using Bfdp::Console::Msg;
+    using BfsdlParser::Objects::NumericField;
+    using BfsdlParser::Objects::NumericFieldProperties;
+    using BfsdlParser::Objects::NumericFieldPtr;
     using BfsdlParser::Objects::ObjectType;
     using Bfdp::Console::Param;
     using BfsdlParser::Objects::Property;
@@ -90,6 +96,7 @@ namespace App
             Context& aContext
             )
             : mContext( aContext )
+            , mFieldIsComplete( false )
         {
         }
 
@@ -141,7 +148,7 @@ namespace App
 
         BFDP_OVERRIDE( Control::Type OnStreamData
             (
-            Bfdp::BitManip::GenericBitStream& aInBitStream
+            GenericBitStream& aInBitStream
             ) )
         {
             if( mFrameStack.empty() )
@@ -175,18 +182,36 @@ namespace App
                 }
             }
 
-            // TODO: Parse the fields instead of just dumping the bytes to stdout
             while( aInBitStream.GetBitsTillEnd() )
             {
                 FieldPtr curField = *curFrame.mCurFieldIter;
-                uint8_t value;
-                if( !aInBitStream.ReadBits(&value, 8) )
+                Control::Type fieldRet = Control::Continue;
+                switch( curField->GetFieldType() )
                 {
-                    return Control::Error;
+                    case FieldType::Numeric:
+                        fieldRet = Parse( *NumericField::StaticCast( curField ), aInBitStream );
+                        break;
+
+                    case FieldType::String:
+                    case FieldType::Unknown:
+                    default:
+                        mContext.Log( stderr, Msg( "Failed to parse " ) << curField->GetTypeStr() << " field " << curField->GetName(), Context::LogLevel::Problem );
+                        fieldRet = Control::Error;
+                        break;
                 }
-                // Print the field names in a loop for testing of field list iteration.
-                std::cout << curField->GetName() << "=0x" << std::hex << std::setw(2) << std::setfill( '0' ) << (uint32_t)value << std::dec << std::endl;
+                if( fieldRet != Control::Continue )
+                {
+                    return fieldRet;
+                }
+                else if( !mFieldIsComplete )
+                {
+                    break;
+                }
                 curFrame.mCurFieldIter++;
+
+                // Reset per-field parsing state
+                mFieldIsComplete = false;
+
                 if( curFrame.mCurFieldIter == curFrame.mFields.end() ) {
                     // Reached the end of the frame; continue to the next.
                     return Control::Continue;
@@ -195,7 +220,49 @@ namespace App
             return Control::Continue;
         }
 
+        Control::Type Parse
+            (
+            NumericField const& aField,
+            GenericBitStream& aInBitStream
+            )
+        {
+            NumericFieldProperties const& props = aField.GetNumericFieldProperties();
+            // TODO: Needs a numeric value builder ...
+            // Right now this assumes all bits must be available and doesn't support fractional values...
+            if( props.mFractionalBits != 0 )
+            {
+                mContext.Log( stderr, Msg( "Fixed-point number " ) << aField.GetName() << " not supported yet.", Context::LogLevel::Problem );
+                return Control::Error;
+            }
+            if( props.mSigned )
+            {
+                // Have to handle sign bit extension for this
+                mContext.Log( stderr, Msg( "Signed integer " ) << aField.GetName() << " not supported yet.", Context::LogLevel::Problem );
+                return Control::Error;
+            }
+            if( props.mIntegralBits > 64 ) // Cannot process > 64-bit integers
+            {
+                mContext.Log( stderr, Msg( aField.GetName() ) << " too big to parse", Context::LogLevel::Problem );
+                return Control::Error;
+            }
+            if( aInBitStream.GetBitsTillEnd() < props.mIntegralBits )
+            {
+                // Value is too big.
+                return Control::Continue;
+            }
+            uint64_t uintValue = 0;
+            if( !aInBitStream.ReadBits(reinterpret_cast< Bfdp::Byte* >( &uintValue ), props.mIntegralBits ) )
+            {
+                mContext.Log( stderr, Msg( "Failed to read " ) << aField.GetName(), Context::LogLevel::Problem );
+                return Control::Error;
+            }
+            std::cout << aField.GetName() << "=" << uintValue << std::endl;
+            mFieldIsComplete = true;
+            return Control::Continue;
+        }
+
         Context& mContext;
+        bool mFieldIsComplete;
         FrameStack mFrameStack;
     };
 
