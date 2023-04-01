@@ -115,6 +115,19 @@ namespace BfsdlParser
             return Property::StaticCast( iter->second );
         }
 
+        std::string Tree::GetStringProperty
+            (
+            std::string const& aName
+            )
+        {
+            PropertyPtr p = FindProperty( aName );
+            if( p )
+            {
+                return p->GetString();
+            }
+            return std::string();
+        }
+
         void Tree::IterateFields
             (
             ObjectCb const aFunc,

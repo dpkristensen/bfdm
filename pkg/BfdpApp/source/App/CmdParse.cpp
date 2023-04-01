@@ -211,20 +211,36 @@ namespace App
             aContext.Log( stdout, Msg( "Processing BFSDL Stream..." ) << specFileName, Context::LogLevel::Debug );
             ret = BfsdlParser::ParseStream( db->GetRoot(), specStream, 4096 );
             specStream.close();
+            if( ret != 0 )
+            {
+                // If the BFSDL stream is not loaded, stop early
+                return ret;
+            }
         }
 
-        // If the BFSDL stream is loaded, parse the data stream
-        if( ret == 0 )
+        Endianness::Type defaultBitOrder = db->GetRoot()->GetNumericPropertyWithDefault< Endianness::Type >( "DefaultBitOrder", Endianness::Default );
+        Endianness::Type defaultByteOrder = db->GetRoot()->GetNumericPropertyWithDefault< Endianness::Type >( "DefaultByteOrder", Endianness::Default );
+        if( Endianness::Little != defaultBitOrder )
         {
-            aContext.Log( stdout, Msg( "Processing data stream " ) << dataFileName << " as '" << format_str << "'", Context::LogLevel::Debug );
-            if( !streamPtr->ReadStream() || streamPtr->HasError() )
-            {
-                aContext.Log( stderr, Msg( "Binary data stream parse failure" ), Context::LogLevel::Problem );
-                // TODO: Print parse context from Stream object
-                ret = 1;
-            }
-            aContext.Log( stdout, Msg( "Total: " ) << streamPtr->GetTotalProcessedStr(), Context::LogLevel::Info );
+            aContext.Log( stderr, Msg( "Unsupported DefaultBitOrder" ), Context::LogLevel::Problem );
+            // TODO: Add support in Stream (hint: probably need to use something other than GenericBitStream... )
+            return 1;
         }
+        if( Endianness::Little != defaultByteOrder )
+        {
+            aContext.Log( stderr, Msg( "Unsupported DefaultByteOrder" ), Context::LogLevel::Problem );
+            // TODO: Add support in Stream (hint: probably need to use something other than GenericBitStream... )
+            return 1;
+        }
+
+        aContext.Log( stdout, Msg( "Processing data stream " ) << dataFileName << " as '" << format_str << "'", Context::LogLevel::Debug );
+        if( !streamPtr->ReadStream() || streamPtr->HasError() )
+        {
+            aContext.Log( stderr, Msg( "Binary data stream parse failure" ), Context::LogLevel::Problem );
+            // TODO: Print parse context from Stream object
+            ret = 1;
+        }
+        aContext.Log( stdout, Msg( "Total: " ) << streamPtr->GetTotalProcessedStr(), Context::LogLevel::Info );
 
         return ret;
     }

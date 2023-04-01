@@ -94,6 +94,48 @@ namespace BfsdlParser
                 return typename T::StaticCast( FindProperty( aName ) );
             }
 
+            //! Convenience function to get the value of a numeric property
+            //!
+            //! @post aValue is undefined on failure.
+            //! @return Whether the value was obtained.
+            template< typename T >
+            bool Tree::GetNumericProperty
+                (
+                std::string const& aName,
+                typename T& aValue
+                )
+            {
+                PropertyPtr p = FindProperty( aName );
+                return ( p ) && ( p->GetNumericValue< T >( aValue ) );
+            }
+
+            //! Convenience function to get the value of a numeric property with a default
+            //!
+            //! @return The value if found, or aDefault on error.
+            template< typename T >
+            typename T Tree::GetNumericPropertyWithDefault
+                (
+                std::string const& aName,
+                typename T const aDefault
+                )
+            {
+                typename T value;
+                return GetNumericProperty< T >( aName, value )
+                    ? value
+                    : aDefault;
+            }
+
+            //! Convenience function to get the value of a string property
+            //!
+            //! If you need to distinguish between the absence of a property vs empty
+            //! string, use FindProperty() directly.
+            //!
+            //! @return The string value of a property, or empty string if not found.
+            std::string GetStringProperty
+                (
+                std::string const& aName
+                );
+
             void IterateFields
                 (
                 ObjectCb const aFunc,
