@@ -62,7 +62,7 @@ namespace BfsdlTests
     using BfsdlParser::Objects::StringFieldPtr;
     using BfsdlParser::Objects::Tree;
 
-    class ObjectDataTest
+    class ObjectsDataTest
         : public ::testing::Test
     {
     public:
@@ -72,7 +72,7 @@ namespace BfsdlTests
         }
     };
 
-    TEST_F( ObjectDataTest, FStringField )
+    TEST_F( ObjectsDataTest, FStringField )
     {
         IObjectPtr op = std::make_shared< FStringField >( "test", 0U, false, GetCodingId( "UTF8" ), 30U );
 
@@ -94,7 +94,7 @@ namespace BfsdlTests
         ASSERT_EQ( FieldType::String, sfp->GetFieldType() );
     }
 
-    TEST_F( ObjectDataTest, NumericField )
+    TEST_F( ObjectsDataTest, NumericField )
     {
         static NumericFieldProperties const sNumericProps1 = { true, 24, 8 };
         static NumericFieldProperties const sNumericProps2 = { false, 16, 0 };
@@ -125,7 +125,7 @@ namespace BfsdlTests
         ASSERT_STREQ( "u16", fp2->GetTypeStr().c_str() );
     }
 
-    TEST_F( ObjectDataTest, Property )
+    TEST_F( ObjectsDataTest, Property )
     {
         IObjectPtr op = std::make_shared< Property >( "test" );
 
@@ -149,7 +149,7 @@ namespace BfsdlTests
         ASSERT_EQ( 56U, pp->GetData()[2] );
     }
 
-    TEST_F( ObjectDataTest, PStringField )
+    TEST_F( ObjectsDataTest, PStringField )
     {
         IObjectPtr op = std::make_shared< PStringField >( "test", 0U, true, GetCodingId( "MS-1252" ), 8U );
 
@@ -171,7 +171,7 @@ namespace BfsdlTests
         ASSERT_EQ( FieldType::String, sfp->GetFieldType() );
     }
 
-    TEST_F( ObjectDataTest, StringField )
+    TEST_F( ObjectsDataTest, StringField )
     {
         IObjectPtr op = std::make_shared< StringField >( "test", 0U, false, GetCodingId( "ASCII" ) );
 
@@ -193,7 +193,7 @@ namespace BfsdlTests
         ASSERT_EQ( FieldType::String, sfp->GetFieldType() );
     }
 
-    TEST_F( ObjectDataTest, StringProperty )
+    TEST_F( ObjectsDataTest, StringProperty )
     {
         IObjectPtr op = std::make_shared< Property >( "test" );
 
@@ -222,7 +222,7 @@ namespace BfsdlTests
         ASSERT_STREQ( "ABCDE", ppValue.c_str() );
     }
 
-    TEST_F( ObjectDataTest, Tree )
+    TEST_F( ObjectsDataTest, Tree )
     {
         static NumericFieldProperties const sNumericProps = { false, 16, 0 };
 

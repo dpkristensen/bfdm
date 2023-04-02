@@ -44,7 +44,7 @@ namespace BfsdlTests
     using BfsdlParser::Objects::NumericFieldBuilder;
     using BfsdlParser::Objects::NumericFieldPtr;
 
-    class ObjectNumericFieldBuilderTest
+    class ObjectsNumericFieldBuilderTest
         : public ::testing::Test
     {
     public:
@@ -116,7 +116,7 @@ namespace BfsdlTests
         }
     };
 
-    TEST_F( ObjectNumericFieldBuilderTest, ParseB1U )
+    TEST_F( ObjectsNumericFieldBuilderTest, ParseB1U )
     {
         // Bit-base unsigned types without fractional
         static TestDataType const sTestData[] =
@@ -133,7 +133,7 @@ namespace BfsdlTests
         RunTest( sTestData, BFDP_COUNT_OF_ARRAY( sTestData ), BitBase::Bit );
     }
 
-    TEST_F( ObjectNumericFieldBuilderTest, ParseB1UF )
+    TEST_F( ObjectsNumericFieldBuilderTest, ParseB1UF )
     {
         // Bit-base unsigned types with fractional
         static TestDataType const sTestData[] =
@@ -156,7 +156,7 @@ namespace BfsdlTests
         RunTest( sTestData, BFDP_COUNT_OF_ARRAY( sTestData ), BitBase::Bit );
     }
 
-    TEST_F( ObjectNumericFieldBuilderTest, ParseB1S )
+    TEST_F( ObjectsNumericFieldBuilderTest, ParseB1S )
     {
         // Bit-base signed types without fractional
         static TestDataType const sTestData[] =
@@ -173,7 +173,7 @@ namespace BfsdlTests
         RunTest( sTestData, BFDP_COUNT_OF_ARRAY( sTestData ), BitBase::Bit );
     }
 
-    TEST_F( ObjectNumericFieldBuilderTest, ParseB1SF )
+    TEST_F( ObjectsNumericFieldBuilderTest, ParseB1SF )
     {
         // Bit-base signed types with fractional
         static TestDataType const sTestData[] =
@@ -196,7 +196,7 @@ namespace BfsdlTests
         RunTest( sTestData, BFDP_COUNT_OF_ARRAY( sTestData ), BitBase::Bit );
     }
 
-    TEST_F( ObjectNumericFieldBuilderTest, ParseB8U )
+    TEST_F( ObjectsNumericFieldBuilderTest, ParseB8U )
     {
         // Byte-base unsigned types without fractional
         static TestDataType const sTestData[] =
@@ -213,7 +213,7 @@ namespace BfsdlTests
         RunTest( sTestData, BFDP_COUNT_OF_ARRAY( sTestData ), BitBase::Byte );
     }
 
-    TEST_F( ObjectNumericFieldBuilderTest, ParseB8UF )
+    TEST_F( ObjectsNumericFieldBuilderTest, ParseB8UF )
     {
         // Byte-base unsigned types with fractional
         static TestDataType const sTestData[] =
@@ -236,7 +236,7 @@ namespace BfsdlTests
         RunTest( sTestData, BFDP_COUNT_OF_ARRAY( sTestData ), BitBase::Byte );
     }
 
-    TEST_F( ObjectNumericFieldBuilderTest, ParseB8S )
+    TEST_F( ObjectsNumericFieldBuilderTest, ParseB8S )
     {
         // Byte-base signed types without fractional
         static TestDataType const sTestData[] =
@@ -253,7 +253,7 @@ namespace BfsdlTests
         RunTest( sTestData, BFDP_COUNT_OF_ARRAY( sTestData ), BitBase::Byte );
     }
 
-    TEST_F( ObjectNumericFieldBuilderTest, ParseB8SF )
+    TEST_F( ObjectsNumericFieldBuilderTest, ParseB8SF )
     {
         // Byte-base signed types with fractional
         static TestDataType const sTestData[] =
@@ -276,7 +276,7 @@ namespace BfsdlTests
         RunTest( sTestData, BFDP_COUNT_OF_ARRAY( sTestData ), BitBase::Byte );
     }
 
-    TEST_F( ObjectNumericFieldBuilderTest, ParseInvalidSequences )
+    TEST_F( ObjectsNumericFieldBuilderTest, ParseInvalidSequences )
     {
         static TestDataType const sTestData[] =
         {

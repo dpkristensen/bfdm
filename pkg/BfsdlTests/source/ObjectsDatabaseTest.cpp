@@ -58,7 +58,7 @@ namespace BfsdlTests
     using BfsdlParser::Objects::Property;
     using BfsdlParser::Objects::PropertyPtr;
 
-    class ObjectDatabaseTest
+    class ObjectsDatabaseTest
         : public ::testing::Test
     {
     public:
@@ -98,7 +98,7 @@ namespace BfsdlTests
     }
     using namespace BfsdlTestsInternal;
 
-    TEST_F( ObjectDatabaseTest, Iterate )
+    TEST_F( ObjectsDatabaseTest, Iterate )
     {
         char const* ExpectedData[] =
         {
