@@ -179,8 +179,8 @@ namespace BfsdlTests
         static TestDataType const sTestData[] =
         {
             { "s0",   "0",    NULL },
-            { "s0",   "1",    "s0.1" },
-            { "s0",   "64",   "s0.64" },
+            { "s0",   "1",    NULL }, // Unlike unsigned counterparts, the types require
+            { "s0",   "64",   NULL }, // at least one bit in the integral portion to hold the sign.
             { "s1",   "0",    "s1" },
             { "s1",   "1",    "s1.1" },
             { "s1",   "63",   "s1.63" },
@@ -259,8 +259,8 @@ namespace BfsdlTests
         static TestDataType const sTestData[] =
         {
             { "s0",   "0",    NULL },
-            { "s0",   "1",    "s0.8" },
-            { "s0",   "8",    "s0.64" },
+            { "s0",   "1",    NULL }, // Unlike unsigned counterparts, the types require
+            { "s0",   "8",    NULL }, // at least one bit in the integral portion to hold the sign.
             { "s1",   "0",    "s8" },
             { "s1",   "1",    "s8.8" },
             { "s1",   "7",    "s8.56" },

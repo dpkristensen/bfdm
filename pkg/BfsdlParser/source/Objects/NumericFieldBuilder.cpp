@@ -107,6 +107,12 @@ namespace BfsdlParser
                 return false;
             }
 
+            if( mProps.mSigned && ( mProps.mIntegralBits == 0 ) )
+            {
+                // Signed types require at least one integral bit.
+                return false;
+            }
+
             mIdentParsed = true;
             return true;
         }
