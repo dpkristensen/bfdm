@@ -36,6 +36,7 @@
 #include "App/Commands.hpp"
 
 // External Includes
+#include <algorithm>
 #include <cstdio>
 #include <fstream>
 #include <iomanip>
@@ -50,6 +51,7 @@
 #include "BfsdlParser/Objects/Database.hpp"
 #include "BfsdlParser/Objects/IObject.hpp"
 #include "BfsdlParser/Objects/NumericField.hpp"
+#include "BfsdlParser/Objects/NumericValueBuilder.hpp"
 #include "BfsdlParser/Objects/Property.hpp"
 #include "BfsdlParser/Objects/Tree.hpp"
 #include "BfsdlParser/StreamParser.hpp"
@@ -74,6 +76,7 @@ namespace App
     using BfsdlParser::Objects::NumericField;
     using BfsdlParser::Objects::NumericFieldProperties;
     using BfsdlParser::Objects::NumericFieldPtr;
+    using BfsdlParser::Objects::NumericValueBuilder;
     using BfsdlParser::Objects::ObjectType;
     using Bfdp::Console::Param;
     using BfsdlParser::Objects::Property;
@@ -211,6 +214,7 @@ namespace App
 
                 // Reset per-field parsing state
                 mFieldIsComplete = false;
+                mNumericValueBuilder.Reset();
 
                 if( curFrame.mCurFieldIter == curFrame.mFields.end() ) {
                     // Reached the end of the frame; continue to the next.
@@ -226,44 +230,52 @@ namespace App
             GenericBitStream& aInBitStream
             )
         {
-            NumericFieldProperties const& props = aField.GetNumericFieldProperties();
-            // TODO: Needs a numeric value builder ...
-            // Right now this assumes all bits must be available and doesn't support fractional values...
-            if( props.mFractionalBits != 0 )
+            if( !mNumericValueBuilder.HasProperties() )
             {
-                mContext.Log( stderr, Msg( "Fixed-point number " ) << aField.GetName() << " not supported yet.", Context::LogLevel::Problem );
-                return Control::Error;
+                if( !mNumericValueBuilder.SetFieldProperties( aField.GetNumericFieldProperties() ) )
+                {
+                    mContext.Log( stderr, Msg( "Unsupported field " ) << aField.GetTypeStr() << " " << aField.GetName(), Context::LogLevel::Problem );
+                    return Control::Error;
+                }
             }
-            if( props.mSigned )
+            size_t bitsToRead = std::min( aInBitStream.GetBitsTillEnd(), mNumericValueBuilder.GetBitsTillComplete() );
+            if( bitsToRead == 0 )
             {
-                // Have to handle sign bit extension for this
-                mContext.Log( stderr, Msg( "Signed integer " ) << aField.GetName() << " not supported yet.", Context::LogLevel::Problem );
-                return Control::Error;
-            }
-            if( props.mIntegralBits > 64 ) // Cannot process > 64-bit integers
-            {
-                mContext.Log( stderr, Msg( aField.GetName() ) << " too big to parse", Context::LogLevel::Problem );
-                return Control::Error;
-            }
-            if( aInBitStream.GetBitsTillEnd() < props.mIntegralBits )
-            {
-                // Value is too big.
                 return Control::Continue;
             }
             uint64_t uintValue = 0;
-            if( !aInBitStream.ReadBits(reinterpret_cast< Bfdp::Byte* >( &uintValue ), props.mIntegralBits ) )
+            if( !aInBitStream.ReadBits(reinterpret_cast< Bfdp::Byte* >( &uintValue ), bitsToRead ) )
             {
                 mContext.Log( stderr, Msg( "Failed to read " ) << aField.GetName(), Context::LogLevel::Problem );
                 return Control::Error;
             }
-            std::cout << aField.GetName() << "=" << uintValue << std::endl;
-            mFieldIsComplete = true;
+            if( !mNumericValueBuilder.ParseBits( uintValue, bitsToRead ) )
+            {
+                mContext.Log( stderr, Msg( "Failed to parse " ) << aField.GetName(), Context::LogLevel::Problem );
+                return Control::Error;
+            }
+            if( mNumericValueBuilder.IsComplete() )
+            {
+                // If complete, dump value and mark complete
+                // TODO: Should have a FixedPointNumber class that encapsulates the value, makes it pretty, etc...
+                if( mNumericValueBuilder.IsSigned() )
+                {
+                    std::cout << aField.GetName() << "=" << mNumericValueBuilder.GetRawS64() << std::endl;
+                }
+                else
+                {
+                    std::cout << aField.GetName() << "=" << mNumericValueBuilder.GetRawU64() << std::endl;
+                }
+                mFieldIsComplete = true;
+            }
+            // Either way, continue
             return Control::Continue;
         }
 
         Context& mContext;
         bool mFieldIsComplete;
         FrameStack mFrameStack;
+        NumericValueBuilder mNumericValueBuilder;
     };
 
     int CmdParse

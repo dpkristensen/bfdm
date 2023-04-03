@@ -1,6 +1,6 @@
 data_u8=1
-data_u11=10
-data_u7=4
-data_u6=44
+data_u4_7=10
+data_s7=4
+data_s2_4=-20
 data_u8=60
 Total: 5.0 Bb
